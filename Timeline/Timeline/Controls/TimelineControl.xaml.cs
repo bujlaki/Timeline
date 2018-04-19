@@ -13,14 +13,14 @@ namespace Timeline.Controls
             nameof(StartYear), 
             typeof(long), 
             typeof(TimelineControl), 
-            1, BindingMode.OneWay,
+            (long)1, BindingMode.OneWay,
             propertyChanged: OnStartYearChanged);
 
         public static readonly BindableProperty EndYearProperty = BindableProperty.Create(
             nameof(EndYear),
             typeof(long),
             typeof(TimelineControl),
-            DateTime.Now.Year, BindingMode.OneWay,
+            (long)DateTime.Now.Year, BindingMode.OneWay,
             propertyChanged: OnEndYearChanged);
         
         private static void OnStartYearChanged(BindableObject bindable, object oldValue, object newValue)

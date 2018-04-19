@@ -11,28 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controls\TimelineEventControl.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="App.xaml.cs">
       <DependentUpon>*.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Controls\TimelineEventControl.xaml.cs">
-      <DependentUpon>TimelineEventControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Styles\SMain.xaml.cs">
-      <DependentUpon>SMain.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\VMainPage.xaml.cs">
-      <DependentUpon>VMainPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\" />
-    <Folder Include="Converters\" />
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
-    <Folder Include="Styles\" />
-    <Folder Include="ViewModels\" />
-    <Folder Include="Views\" />
-    <Folder Include="ViewModels\Base\" />
-    <Folder Include="Services\Base\" />
   </ItemGroup>
 </Project>
