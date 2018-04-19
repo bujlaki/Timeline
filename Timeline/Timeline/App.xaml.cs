@@ -13,7 +13,7 @@ namespace Timeline
 		{
 			InitializeComponent();
 
-			MainPage = new Timeline.MainPage();
+            MainPage = new Views.VMainPage();
 		}
 
 		protected override void OnStart ()

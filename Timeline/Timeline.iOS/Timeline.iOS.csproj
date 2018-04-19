@@ -24,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>x86_64</MtouchArch>
-    <MtouchLink>None</MtouchLink>
+    <MtouchLink>SdkOnly</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
@@ -124,7 +124,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Timeline\Timeline.csproj">
-      <Project>{8E78F3B7-2B20-4E22-9BDC-4C1057566B45}</Project>
+      <Project>{D9704390-7375-4DF5-ACE7-EE1BD5F7AB28}</Project>
       <Name>Timeline</Name>
     </ProjectReference>
   </ItemGroup>
