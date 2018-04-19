@@ -6,9 +6,9 @@
             Title="Timeline"
             BindingContext="{Binding MainPageViewModel, Source={StaticResource vmLocator}}">
     <ContentPage.Content>
-        <Grid>
+        <Grid Margin="0,20,0,0">
             <Label Text="TEST" />
-            <controls:TimelineEventControl />
+            <controls:TimelineControl />
         </Grid>
     </ContentPage.Content>
 </ContentPage>
