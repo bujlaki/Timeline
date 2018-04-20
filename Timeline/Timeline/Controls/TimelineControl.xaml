@@ -5,7 +5,10 @@
              x:Class="Timeline.Controls.TimelineControl">
     <ContentView.Content>
         <Grid>
-            <skia:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface" />
+            <skia:SKCanvasView x:Name="canvasView" 
+                               PaintSurface="OnCanvasViewPaintSurface" 
+                               EnableTouchEvents="true"
+                               Touch="Handle_Touch"/>
         </Grid>
     </ContentView.Content>
 </ContentView>

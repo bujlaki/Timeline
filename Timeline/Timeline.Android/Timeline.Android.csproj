@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Timeline.Droid</RootNamespace>
     <AssemblyName>Timeline.Android</AssemblyName>
-    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
@@ -53,6 +53,12 @@
     <PackageReference Include="Xamarin.Android.Support.v4" Version="25.4.0.2" />
     <PackageReference Include="Xamarin.Android.Support.v7.CardView" Version="25.4.0.2" />
     <PackageReference Include="Xamarin.Android.Support.v7.MediaRouter" Version="25.4.0.2" />
+    <PackageReference Include="SkiaSharp">
+      <Version>1.60.0</Version>
+    </PackageReference>
+    <PackageReference Include="SkiaSharp.Views.Forms">
+      <Version>1.60.0</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -82,7 +88,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Timeline\Timeline.csproj">
-      <Project>{8E78F3B7-2B20-4E22-9BDC-4C1057566B45}</Project>
+      <Project>{D9704390-7375-4DF5-ACE7-EE1BD5F7AB28}</Project>
       <Name>Timeline</Name>
     </ProjectReference>
   </ItemGroup>
