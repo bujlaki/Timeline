@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Xamarin.Forms;
 
+using TouchTracking;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
 
@@ -107,9 +108,19 @@ namespace Timeline.Controls
             set { SetValue(EndYearProperty, value); }
         }
 
+        private TouchGestureRecognizer gestureRecognizer;
+
         public TimelineControl()
         {
             InitializeComponent();
+            gestureRecognizer = new TouchGestureRecognizer();
+            gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
+        }
+
+        void GestureRecognizer_OnGestureRecognized(object sender, TouchGestureEventArgs args)
+        {
+            Offset += (long)args.Data.Y*2;
+            canvasView.InvalidateSurface();
         }
 
         void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
@@ -170,38 +181,24 @@ namespace Timeline.Controls
 
         }
 
-        void Handle_Touch(object sender, SkiaSharp.Views.Forms.SKTouchEventArgs e)
+        protected void OnTouchEffectAction(object sender, TouchActionEventArgs args)
         {
-            Console.WriteLine("Type:" + e.ActionType.ToString() + "  - ID:" + e.Id.ToString());
-            e.Handled = true;
-            //switch(e.ActionType)
-            //{
-            //    case SKTouchAction.Pressed:
-            //        Console.WriteLine("Pressed: " + e.Id.ToString());
-            //        break;
-            //    case SKTouchAction.Cancelled:
-            //        Console.WriteLine("Cancelled: " + e.Id.ToString());
-            //        break;
-            //    case SKTouchAction.Entered:
-            //        Console.WriteLine("Entered: " + e.Id.ToString());
-            //        break;
-            //    case SKTouchAction.Exited:
-            //        Console.WriteLine("Exited: " + e.Id.ToString());
-            //        break;
-            //    case SKTouchAction.Moved:
-            //        Console.WriteLine("Moved: " + e.Id.ToString());
-            //        break;
-            //    case SKTouchAction.Released:
-            //        Console.WriteLine("Released: " + e.Id.ToString());
-            //        break;
+            //bool touchPointMoved = false;
+            Console.WriteLine("Type:" + args.Type.ToString() + "  - ID:" + args.Id.ToString() + "  - Location: " + args.Location.ToString());
+            gestureRecognizer.ProcessTouchEvent(args.Id, args.Type, args.Location.ToSKPoint());
 
-            //}
-            //if (e.ActionType == SKTouchAction.Pressed)
+            //foreach (TouchPoint touchPoint in touchPoints)
             //{
-            //    this.Offset += 10;
-            //    canvasView.InvalidateSurface();
+            //    float scale = baseCanvasView.CanvasSize.Width / (float)baseCanvasView.Width;
+            //    SKPoint point = new SKPoint(scale * (float)args.Location.X,
+            //                                scale * (float)args.Location.Y);
+            //    touchPointMoved |= touchPoint.ProcessTouchEvent(args.Id, args.Type, point);
             //}
-            //throw new NotImplementedException();
+
+            //if (touchPointMoved)
+            //{
+            //    baseCanvasView.InvalidateSurface();
+            //}
         }
     }
 }
