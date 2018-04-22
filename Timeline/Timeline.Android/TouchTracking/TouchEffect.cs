@@ -16,7 +16,7 @@ namespace TouchTracking.Droid
     {
         Android.Views.View view;
         Element formsElement;
-        TouchTracking.Droid.TouchEffect pclTouchEffect;
+        TouchTracking.TouchEffect pclTouchEffect;
         bool capture;
         Func<double, double> fromPixels;
         int[] twoIntArray = new int[2];

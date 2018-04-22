@@ -5,7 +5,9 @@ namespace TouchTracking
 {
     class TouchInfo
     {
-        public SKPoint PreviousPoint { set; get; }
-        public SKPoint NewPoint { set; get; }
+        public DateTime InitialTime { get; set; }
+        public SKPoint InitialPoint { get; set; }
+        public SKPoint PreviousPoint { get; set; }
+        public SKPoint NewPoint { get; set; }
     }
 }

@@ -119,8 +119,36 @@ namespace Timeline.Controls
 
         void GestureRecognizer_OnGestureRecognized(object sender, TouchGestureEventArgs args)
         {
-            Offset += (long)args.Data.Y*2;
-            canvasView.InvalidateSurface();
+            switch(args.Type)
+            {
+                case TouchGestureType.Tap:
+                    Console.WriteLine("TAP");
+                    break;
+
+                case TouchGestureType.LongTap:
+                    Console.WriteLine("LONGTAP");
+                    break;
+
+                case TouchGestureType.Pan:
+                    Console.WriteLine("PAN");
+                    Offset += (long)args.Data.Y * 2;
+                    canvasView.InvalidateSurface();
+                    break;
+
+                case TouchGestureType.Pinch:
+                    Console.WriteLine("PINCH - " + args.Data.ToString());
+                    long oldZoom = Zoom;
+                    Zoom += (long)args.Data.Y;
+                    Offset = Offset * Zoom / oldZoom;
+                    Console.WriteLine("zoom: " + Zoom.ToString() + " --- offset: " + Offset.ToString());
+                    canvasView.InvalidateSurface();
+                    break;
+
+                case TouchGestureType.Swipe:
+                    Console.WriteLine("SWIPE");
+                    break;
+            }
+
         }
 
         void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
