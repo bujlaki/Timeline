@@ -28,16 +28,13 @@ namespace Timeline.Controls
 
     public partial class TimelineControl : ContentView
     {
-        private string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-        private string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-        private TimelineOrientation orientation;
-
+        
+#region "Bindable properties"
         public static readonly BindableProperty OffsetProperty = BindableProperty.Create(
             nameof(Offset),
             typeof(long),
             typeof(TimelineControl),
-            (long)-DateTime.Now.Year * 100, BindingMode.OneWay,
+            (long)-10 * 100, BindingMode.OneWay,
             propertyChanged: OnOffsetChanged);
 
         public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
@@ -122,14 +119,41 @@ namespace Timeline.Controls
             get { return (long)GetValue(EndYearProperty); }
             set { SetValue(EndYearProperty, value); }
         }
+#endregion
+
+        private string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+        private string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
         private TouchGestureRecognizer gestureRecognizer;
+        private TimelineOrientation orientation;
+
+        private SKColor unitColor1;
+        private SKColor unitColor2;
+        private SKColor subUnitColor1;
+        private SKColor subUnitColor2;
+
+        private SKPaint unitPaint;
+        private SKPaint subUnitPaint;
 
         public TimelineControl()
         {
             InitializeComponent();
             gestureRecognizer = new TouchGestureRecognizer();
             gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
+
+            //init gui
+            unitColor1 = Color.AliceBlue.ToSKColor();
+            unitColor2 = Color.AntiqueWhite.ToSKColor();
+            subUnitColor1 = Color.Azure.ToSKColor();
+            subUnitColor2 = Color.Blue.ToSKColor();
+
+            unitPaint = new SKPaint();
+            unitPaint.Color = unitColor1;
+            unitPaint.StrokeWidth = 25;
+
+            subUnitPaint = new SKPaint();
+            subUnitPaint.Color = subUnitColor1;
+            subUnitPaint.StrokeWidth = 25;
 
             CheckOrientation();
         }
@@ -253,7 +277,7 @@ namespace Timeline.Controls
 
         private void DrawYears(SKImageInfo info, SKCanvas canvas)
         {
-            int firstVisibleYear = (int)(-this.Offset / this.Zoom + 1);
+            int firstVisibleYear = (int)(-this.Offset / this.Zoom);
             int lastVisibleYear = (int)((-this.Offset + info.Height) / this.Zoom + 1);
 
             SKPath path = new SKPath();
@@ -266,8 +290,12 @@ namespace Timeline.Controls
 
             long yearPos = firstVisibleYear * this.Zoom + this.Offset;
             int xpos = info.Width - 100;
+            int unitXpos = info.Width - 75;
             for (int i = firstVisibleYear; i < lastVisibleYear; i++)
             {
+                if (i % 2 == 0) unitPaint.Color = unitColor1;
+                    else unitPaint.Color = unitColor2;
+                canvas.DrawLine(unitXpos, yearPos, unitXpos, yearPos + this.Zoom, unitPaint);
                 canvas.DrawText(i.ToString(), new SKPoint(xpos, yearPos), paintText);
                 //canvas.DrawTextOnPath(i.ToString(), path, yearPos, 0, paintText);
                 yearPos += this.Zoom;
