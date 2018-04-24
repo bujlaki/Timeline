@@ -127,13 +127,23 @@ namespace Timeline.Controls
         private TouchGestureRecognizer gestureRecognizer;
         private TimelineOrientation orientation;
 
+        private SKColor summaryTextColor;
+        private SKColor unitMarkColor;
         private SKColor unitColor1;
         private SKColor unitColor2;
         private SKColor subUnitColor1;
         private SKColor subUnitColor2;
 
+        private SKPaint summaryTextPaint;
+        private SKPaint unitMarkPaint;
         private SKPaint unitPaint;
         private SKPaint subUnitPaint;
+        private SKPaint unitTextPaint;
+        private SKPaint subUnitTextPaint;
+
+        private SKPath summaryPath;
+        private SKPath unitPath;
+        private SKPath subUnitPath;
 
         public TimelineControl()
         {
@@ -142,10 +152,20 @@ namespace Timeline.Controls
             gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
             //init gui
+            summaryTextColor = Color.Blue.ToSKColor();
+            unitMarkColor = Color.Black.ToSKColor();
             unitColor1 = Color.AliceBlue.ToSKColor();
             unitColor2 = Color.AntiqueWhite.ToSKColor();
             subUnitColor1 = Color.Azure.ToSKColor();
             subUnitColor2 = Color.Blue.ToSKColor();
+
+            summaryTextPaint = new SKPaint();
+            summaryTextPaint.Color = summaryTextColor;
+            summaryTextPaint.TextSize = 24;
+
+            unitMarkPaint = new SKPaint();
+            unitMarkPaint.Color = unitMarkColor;
+            unitMarkPaint.StrokeWidth = 2;
 
             unitPaint = new SKPaint();
             unitPaint.Color = unitColor1;
@@ -154,6 +174,18 @@ namespace Timeline.Controls
             subUnitPaint = new SKPaint();
             subUnitPaint.Color = subUnitColor1;
             subUnitPaint.StrokeWidth = 25;
+
+            unitTextPaint = new SKPaint();
+            unitTextPaint.Color = Color.Black.ToSKColor();
+            unitTextPaint.TextSize = 24;
+
+            subUnitTextPaint = new SKPaint();
+            subUnitTextPaint.Color = Color.Black.ToSKColor();
+            subUnitTextPaint.TextSize = 24;
+
+            summaryPath = new SKPath();
+            unitPath = new SKPath();
+            subUnitPath = new SKPath();
 
             CheckOrientation();
         }
@@ -203,6 +235,19 @@ namespace Timeline.Controls
 
             canvas.Clear();
 
+            summaryPath.Reset();
+            summaryPath.MoveTo(info.Width - 20, 0);
+            summaryPath.LineTo(info.Width - 20, info.Height);
+
+            unitPath.Reset();
+            unitPath.MoveTo(info.Width - 60, 0);
+            unitPath.LineTo(info.Width - 60, info.Height);
+
+            subUnitPath.Reset();
+            subUnitPath.MoveTo(info.Width - 100, 0);
+            subUnitPath.LineTo(info.Width - 100, info.Height);
+
+
             //draw the blue line
             SKPaint paintLine = new SKPaint();
             paintLine.Color = Color.SkyBlue.ToSKColor();
@@ -214,7 +259,6 @@ namespace Timeline.Controls
                 paintLine.StrokeWidth = 50;
                 canvas.DrawLine(0, 25, info.Width, 25, paintLine);
             }
-
 
 
             switch(this.ZoomUnit)
@@ -251,26 +295,37 @@ namespace Timeline.Controls
 
         private void DrawMonths(SKImageInfo info, SKCanvas canvas)
         {
-            int firstVisibleMonth = (int)(-this.Offset / this.Zoom + 1);
-            int lastVisibleMonth = (int)((-this.Offset + info.Height) / this.Zoom + 1);
+            long firstVisibleMonth = -this.Offset / this.Zoom;
+            long lastVisibleMonth = (-this.Offset + info.Height) / this.Zoom + 1;
 
-            SKPath path = new SKPath();
-            path.MoveTo(info.Width - 45, 0);
-            path.LineTo(info.Width - 45, info.Height);
+            //summary text - century
+            string summaryText = "1st century";
+            int summaryTextWidth = (int)summaryTextPaint.MeasureText(summaryText);
+            canvas.DrawTextOnPath(summaryText, summaryPath, (info.Height - summaryTextWidth) / 2, 0, summaryTextPaint);
 
-            SKPaint paintText = new SKPaint();
-            paintText.Color = Color.Black.ToSKColor();
-            paintText.TextSize = 32;
-
+            //main unit data - MONTH
+            //optional subunit data - DAY
             long monthPos = firstVisibleMonth * this.Zoom + this.Offset;
-            for (int i = firstVisibleMonth; i < lastVisibleMonth; i++)
+            for (long i = firstVisibleMonth; i < lastVisibleMonth; i++)
             {
-                int year = i / 12;
-                int month = i % 12;
-                if(month==0)
-                    canvas.DrawTextOnPath(year.ToString(), path, monthPos, 0, paintText);
-                else
-                    canvas.DrawTextOnPath(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month), path, monthPos, 0, paintText);
+                int year = (int)(i / 12);
+                int month = (int)(i % 12 + 1);
+                canvas.DrawLine(info.Width - 100, monthPos, info.Width - 40, monthPos, unitMarkPaint);
+                canvas.DrawTextOnPath(shortMonthNames[month-1], unitPath, monthPos, 0, unitTextPaint);
+                //canvas.DrawTextOnPath(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month), unitPath, monthPos, 0, unitTextPaint);
+
+                //subunit data
+                if(Zoom>500)
+                {
+                    int days = DateTime.DaysInMonth(year, month);
+                    float dayStep = (float)Zoom / days;
+                    for (int day = 0; day < days; day++)
+                    {
+                        float dayPos = monthPos + day * dayStep;
+                        canvas.DrawLine(info.Width - 100, dayPos, info.Width - 60, dayPos, unitMarkPaint);
+                    }
+                }
+
                 monthPos += this.Zoom;
             }
         }
@@ -280,26 +335,35 @@ namespace Timeline.Controls
             int firstVisibleYear = (int)(-this.Offset / this.Zoom);
             int lastVisibleYear = (int)((-this.Offset + info.Height) / this.Zoom + 1);
 
-            SKPath path = new SKPath();
-            path.MoveTo(info.Width - 45, 0);
-            path.LineTo(info.Width - 45, info.Height);
+            //summary text - century
+            string summaryText = "1st century";
+            int summaryTextWidth = (int)summaryTextPaint.MeasureText(summaryText);
+            canvas.DrawTextOnPath(summaryText, summaryPath, (info.Height - summaryTextWidth) / 2, 0, summaryTextPaint);
 
-            SKPaint paintText = new SKPaint();
-            paintText.Color = Color.Black.ToSKColor();
-            paintText.TextSize = 32;
-
+            //main unit data - YEAR
+            //optional subunit data - MONTH
             long yearPos = firstVisibleYear * this.Zoom + this.Offset;
             int xpos = info.Width - 100;
             int unitXpos = info.Width - 75;
             for (int i = firstVisibleYear; i < lastVisibleYear; i++)
             {
-                if (i % 2 == 0) unitPaint.Color = unitColor1;
-                    else unitPaint.Color = unitColor2;
-                canvas.DrawLine(unitXpos, yearPos, unitXpos, yearPos + this.Zoom, unitPaint);
-                canvas.DrawText(i.ToString(), new SKPoint(xpos, yearPos), paintText);
-                //canvas.DrawTextOnPath(i.ToString(), path, yearPos, 0, paintText);
+                canvas.DrawLine(info.Width - 100, yearPos, info.Width - 40, yearPos, unitMarkPaint);
+                canvas.DrawTextOnPath(i.ToString(), unitPath, yearPos, 0, unitTextPaint);
+
+                //subunit data
+                if (Zoom > 200)
+                {
+                    long monthStep = Zoom / 12;
+                    for (int month = 0; month < 12; month++)
+                    {
+                        long monthPos = yearPos + month * monthStep;
+                        canvas.DrawLine(info.Width - 100, monthPos, info.Width - 60, monthPos, unitMarkPaint);
+                    }
+                }
+
                 yearPos += this.Zoom;
             }
+
         }
 
         private void DrawDecades(SKImageInfo info, SKCanvas canvas)
