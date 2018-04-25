@@ -34,7 +34,7 @@ namespace Timeline.Controls
             nameof(Offset),
             typeof(long),
             typeof(TimelineControl),
-            (long)-10 * 100, BindingMode.OneWay,
+            (long)-2018 * 100, BindingMode.OneWay,
             propertyChanged: OnOffsetChanged);
 
         public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
@@ -300,33 +300,38 @@ namespace Timeline.Controls
 
             //summary text - century
             string summaryText = "1st century";
-            int summaryTextWidth = (int)summaryTextPaint.MeasureText(summaryText);
-            canvas.DrawTextOnPath(summaryText, summaryPath, (info.Height - summaryTextWidth) / 2, 0, summaryTextPaint);
 
             //main unit data - MONTH
-            //optional subunit data - DAY
-            long monthPos = firstVisibleMonth * this.Zoom + this.Offset;
+            long unitPos = firstVisibleMonth * this.Zoom + this.Offset;
+            int unitMarkX1 = info.Width - 100;
+            int unitMarkX2 = info.Width - 40;
+            int subUnitMarkX1 = info.Width - 100;
+            int subUnitMarkX2 = info.Width - 60;
+            int unitTextXpos = info.Width - 50;
             for (long i = firstVisibleMonth; i < lastVisibleMonth; i++)
             {
                 int year = (int)(i / 12);
                 int month = (int)(i % 12 + 1);
-                canvas.DrawLine(info.Width - 100, monthPos, info.Width - 40, monthPos, unitMarkPaint);
-                canvas.DrawTextOnPath(shortMonthNames[month-1], unitPath, monthPos, 0, unitTextPaint);
-                //canvas.DrawTextOnPath(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month), unitPath, monthPos, 0, unitTextPaint);
+                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, unitMarkPaint);
 
-                //subunit data
+                string unitText1 = (month == 1) ? year.ToString() : shortMonthNames[month - 1];
+                string unitText2 = (month == 1) ? "Jan" : "";
+                canvas.DrawText(unitText1, unitTextXpos, unitPos + unitTextPaint.TextSize, unitTextPaint);
+                canvas.DrawText(unitText2, unitTextXpos, unitPos + unitTextPaint.TextSize * 2, unitTextPaint);
+
+                //optional subunit data - DAY
                 if(Zoom>500)
                 {
                     int days = DateTime.DaysInMonth(year, month);
-                    float dayStep = (float)Zoom / days;
+                    float subunitStep = (float)Zoom / days;
                     for (int day = 0; day < days; day++)
                     {
-                        float dayPos = monthPos + day * dayStep;
-                        canvas.DrawLine(info.Width - 100, dayPos, info.Width - 60, dayPos, unitMarkPaint);
+                        float subunitPos = unitPos + day * subunitStep;
+                        canvas.DrawLine(info.Width - 100, subunitPos, info.Width - 60, subunitPos, unitMarkPaint);
                     }
                 }
 
-                monthPos += this.Zoom;
+                unitPos += this.Zoom;
             }
         }
 
@@ -337,31 +342,31 @@ namespace Timeline.Controls
 
             //summary text - century
             string summaryText = "1st century";
-            int summaryTextWidth = (int)summaryTextPaint.MeasureText(summaryText);
-            canvas.DrawTextOnPath(summaryText, summaryPath, (info.Height - summaryTextWidth) / 2, 0, summaryTextPaint);
 
             //main unit data - YEAR
-            //optional subunit data - MONTH
-            long yearPos = firstVisibleYear * this.Zoom + this.Offset;
-            int xpos = info.Width - 100;
-            int unitXpos = info.Width - 75;
+            long unitPos = firstVisibleYear * this.Zoom + this.Offset;
+            int unitMarkX1 = info.Width - 100;
+            int unitMarkX2 = info.Width - 40;
+            int subUnitMarkX1 = info.Width - 100;
+            int subUnitMarkX2 = info.Width - 60;
+            int unitTextXpos = info.Width - 90;
             for (int i = firstVisibleYear; i < lastVisibleYear; i++)
             {
-                canvas.DrawLine(info.Width - 100, yearPos, info.Width - 40, yearPos, unitMarkPaint);
-                canvas.DrawTextOnPath(i.ToString(), unitPath, yearPos, 0, unitTextPaint);
+                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, unitMarkPaint);
+                canvas.DrawText(i.ToString(), unitTextXpos, unitPos + unitTextPaint.TextSize, unitTextPaint);
 
-                //subunit data
-                if (Zoom > 200)
+                //optional subunit data - MONTH
+                if (Zoom > 350)
                 {
-                    long monthStep = Zoom / 12;
+                    float subunitStep = (float)Zoom / 12;
                     for (int month = 0; month < 12; month++)
                     {
-                        long monthPos = yearPos + month * monthStep;
-                        canvas.DrawLine(info.Width - 100, monthPos, info.Width - 60, monthPos, unitMarkPaint);
+                        float subunitPos = unitPos + month * subunitStep;
+                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, unitMarkPaint);
                     }
                 }
 
-                yearPos += this.Zoom;
+                unitPos += this.Zoom;
             }
 
         }
@@ -401,6 +406,12 @@ namespace Timeline.Controls
                     break;
 
                 case TimelineUnits.Month:
+                    if(Zoom<50)
+                    {
+                        ZoomUnit = TimelineUnits.Year;
+                        Zoom = 600;
+                        Offset = Offset / 12;
+                    }
                     break;
 
                 case TimelineUnits.Year:
