@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using Xamarin.Forms;
 
 using TouchTracking;
@@ -18,6 +16,8 @@ namespace Timeline.Controls
         Decade,
         Century,
         KYear,
+        KKYear,
+        KKKYear,
         MYear
     }
 
@@ -126,24 +126,14 @@ namespace Timeline.Controls
 
         private TouchGestureRecognizer gestureRecognizer;
         private TimelineOrientation orientation;
+        private TimelineControlTheme theme;
+        private int timelineLeftPos;
 
-        private SKColor summaryTextColor;
-        private SKColor unitMarkColor;
-        private SKColor unitColor1;
-        private SKColor unitColor2;
-        private SKColor subUnitColor1;
-        private SKColor subUnitColor2;
-
-        private SKPaint summaryTextPaint;
-        private SKPaint unitMarkPaint;
-        private SKPaint unitPaint;
-        private SKPaint subUnitPaint;
-        private SKPaint unitTextPaint;
-        private SKPaint subUnitTextPaint;
-
-        private SKPath summaryPath;
-        private SKPath unitPath;
-        private SKPath subUnitPath;
+        int unitMarkX1;
+        int unitMarkX2;
+        int subUnitMarkX1;
+        int subUnitMarkX2;
+        int unitTextX;
 
         public TimelineControl()
         {
@@ -151,41 +141,7 @@ namespace Timeline.Controls
             gestureRecognizer = new TouchGestureRecognizer();
             gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-            //init gui
-            summaryTextColor = Color.Blue.ToSKColor();
-            unitMarkColor = Color.Black.ToSKColor();
-            unitColor1 = Color.AliceBlue.ToSKColor();
-            unitColor2 = Color.AntiqueWhite.ToSKColor();
-            subUnitColor1 = Color.Azure.ToSKColor();
-            subUnitColor2 = Color.Blue.ToSKColor();
-
-            summaryTextPaint = new SKPaint();
-            summaryTextPaint.Color = summaryTextColor;
-            summaryTextPaint.TextSize = 24;
-
-            unitMarkPaint = new SKPaint();
-            unitMarkPaint.Color = unitMarkColor;
-            unitMarkPaint.StrokeWidth = 2;
-
-            unitPaint = new SKPaint();
-            unitPaint.Color = unitColor1;
-            unitPaint.StrokeWidth = 25;
-
-            subUnitPaint = new SKPaint();
-            subUnitPaint.Color = subUnitColor1;
-            subUnitPaint.StrokeWidth = 25;
-
-            unitTextPaint = new SKPaint();
-            unitTextPaint.Color = Color.Black.ToSKColor();
-            unitTextPaint.TextSize = 24;
-
-            subUnitTextPaint = new SKPaint();
-            subUnitTextPaint.Color = Color.Black.ToSKColor();
-            subUnitTextPaint.TextSize = 24;
-
-            summaryPath = new SKPath();
-            unitPath = new SKPath();
-            subUnitPath = new SKPath();
+            theme = new TimelineControlTheme();
 
             CheckOrientation();
         }
@@ -235,31 +191,22 @@ namespace Timeline.Controls
 
             canvas.Clear();
 
-            summaryPath.Reset();
-            summaryPath.MoveTo(info.Width - 20, 0);
-            summaryPath.LineTo(info.Width - 20, info.Height);
-
-            unitPath.Reset();
-            unitPath.MoveTo(info.Width - 60, 0);
-            unitPath.LineTo(info.Width - 60, info.Height);
-
-            subUnitPath.Reset();
-            subUnitPath.MoveTo(info.Width - 100, 0);
-            subUnitPath.LineTo(info.Width - 100, info.Height);
-
-
-            //draw the blue line
-            SKPaint paintLine = new SKPaint();
-            paintLine.Color = Color.SkyBlue.ToSKColor();
+            //DRAW TIMELINE BACKGROUND
+            timelineLeftPos = info.Width - theme.TimelineWidth;
+            int lineMiddleX = timelineLeftPos + theme.TimelineWidth / 2;
             if (orientation == TimelineOrientation.Portrait)
             {
-                paintLine.StrokeWidth = 100;
-                canvas.DrawLine(info.Width - 50, 0, info.Width - 50, info.Height, paintLine);
+                canvas.DrawLine(lineMiddleX, 0, lineMiddleX, info.Height, theme.TimelinePaint);
             } else {
-                paintLine.StrokeWidth = 50;
-                canvas.DrawLine(0, 25, info.Width, 25, paintLine);
+                canvas.DrawLine(0, 25, info.Width, 25, theme.TimelinePaint);
             }
 
+            //DRAW UNITS
+            unitMarkX1 = timelineLeftPos + theme.UnitMarkOffset;
+            unitMarkX2 = unitMarkX1 + theme.UnitMarkLength;
+            subUnitMarkX1 = timelineLeftPos + theme.SubUnitMarkOffset;
+            subUnitMarkX2 = subUnitMarkX1 + theme.SubUnitMarkLength;
+            unitTextX = timelineLeftPos + theme.UnitTextOffset;
 
             switch(this.ZoomUnit)
             {
@@ -290,34 +237,54 @@ namespace Timeline.Controls
                 case TimelineUnits.MYear:
                     break;
             }
+        }
 
+        private void DrawDays(SKImageInfo info, SKCanvas canvas)
+        {
+            long firstVisibleUnit = -this.Offset / this.Zoom;
+            long lastVisibleUnit = (-this.Offset + info.Height) / this.Zoom + 1;
+
+            //main unit data - MONTH
+            long unitPos = firstVisibleUnit * this.Zoom + this.Offset;
+            for (long i = firstVisibleUnit; i < lastVisibleUnit; i++)
+            {
+                int year = (int)(i / 12);
+                int month = (int)(i % 12 + 1);
+                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, theme.UnitMarkPaint);
+
+                string unitText1 = (month == 1) ? year.ToString() + " Jan" : shortMonthNames[month - 1];
+                canvas.DrawText(unitText1, unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
+
+                //optional subunit data - DAY
+                if (Zoom > 500)
+                {
+                    int days = DateTime.DaysInMonth(year, month);
+                    float subunitStep = (float)Zoom / days;
+                    for (int day = 0; day < days; day++)
+                    {
+                        float subunitPos = unitPos + day * subunitStep;
+                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, theme.UnitMarkPaint);
+                    }
+                }
+                unitPos += this.Zoom;
+            }
         }
 
         private void DrawMonths(SKImageInfo info, SKCanvas canvas)
         {
-            long firstVisibleMonth = -this.Offset / this.Zoom;
-            long lastVisibleMonth = (-this.Offset + info.Height) / this.Zoom + 1;
-
-            //summary text - century
-            string summaryText = "1st century";
+            long firstVisibleUnit = -this.Offset / this.Zoom;
+            long lastVisibleUnit = (-this.Offset + info.Height) / this.Zoom + 1;
 
             //main unit data - MONTH
-            long unitPos = firstVisibleMonth * this.Zoom + this.Offset;
-            int unitMarkX1 = info.Width - 100;
-            int unitMarkX2 = info.Width - 40;
-            int subUnitMarkX1 = info.Width - 100;
-            int subUnitMarkX2 = info.Width - 60;
-            int unitTextXpos = info.Width - 50;
-            for (long i = firstVisibleMonth; i < lastVisibleMonth; i++)
+            long unitPos = firstVisibleUnit * this.Zoom + this.Offset;
+            for (long i = firstVisibleUnit; i < lastVisibleUnit; i++)
             {
                 int year = (int)(i / 12);
                 int month = (int)(i % 12 + 1);
-                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, unitMarkPaint);
+                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, theme.UnitMarkPaint);
 
-                string unitText1 = (month == 1) ? year.ToString() : shortMonthNames[month - 1];
-                string unitText2 = (month == 1) ? "Jan" : "";
-                canvas.DrawText(unitText1, unitTextXpos, unitPos + unitTextPaint.TextSize, unitTextPaint);
-                canvas.DrawText(unitText2, unitTextXpos, unitPos + unitTextPaint.TextSize * 2, unitTextPaint);
+                string unitText1 = (month == 1) ? year.ToString() + " Jan" : shortMonthNames[month - 1];
+                canvas.DrawText(unitText1, unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
 
                 //optional subunit data - DAY
                 if(Zoom>500)
@@ -327,33 +294,24 @@ namespace Timeline.Controls
                     for (int day = 0; day < days; day++)
                     {
                         float subunitPos = unitPos + day * subunitStep;
-                        canvas.DrawLine(info.Width - 100, subunitPos, info.Width - 60, subunitPos, unitMarkPaint);
+                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, theme.UnitMarkPaint);
                     }
                 }
-
                 unitPos += this.Zoom;
             }
         }
 
         private void DrawYears(SKImageInfo info, SKCanvas canvas)
         {
-            int firstVisibleYear = (int)(-this.Offset / this.Zoom);
-            int lastVisibleYear = (int)((-this.Offset + info.Height) / this.Zoom + 1);
-
-            //summary text - century
-            string summaryText = "1st century";
+            int firstVisibleUnit = (int)(-this.Offset / this.Zoom);
+            int lastVisibleUnit = (int)((-this.Offset + info.Height) / this.Zoom + 1);
 
             //main unit data - YEAR
-            long unitPos = firstVisibleYear * this.Zoom + this.Offset;
-            int unitMarkX1 = info.Width - 100;
-            int unitMarkX2 = info.Width - 40;
-            int subUnitMarkX1 = info.Width - 100;
-            int subUnitMarkX2 = info.Width - 60;
-            int unitTextXpos = info.Width - 90;
-            for (int i = firstVisibleYear; i < lastVisibleYear; i++)
+            long unitPos = firstVisibleUnit * this.Zoom + this.Offset;
+            for (int i = firstVisibleUnit; i < lastVisibleUnit; i++)
             {
-                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, unitMarkPaint);
-                canvas.DrawText(i.ToString(), unitTextXpos, unitPos + unitTextPaint.TextSize, unitTextPaint);
+                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, theme.UnitMarkPaint);
+                canvas.DrawText(i.ToString(), unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
 
                 //optional subunit data - MONTH
                 if (Zoom > 350)
@@ -362,7 +320,7 @@ namespace Timeline.Controls
                     for (int month = 0; month < 12; month++)
                     {
                         float subunitPos = unitPos + month * subunitStep;
-                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, unitMarkPaint);
+                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, theme.UnitMarkPaint);
                     }
                 }
 
