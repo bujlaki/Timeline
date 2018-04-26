@@ -13,6 +13,7 @@ namespace Timeline.Controls
         public int UnitTextOffset { get; set; }
         public int SubUnitMarkOffset { get; set; }
         public int SubUnitMarkLength { get; set; }
+        public int SubUnitTextOffset { get; set; }
 
         public SKColor TimelineColor { get; set; }
         public SKColor SummaryTextColor { get; set; }
@@ -28,10 +29,11 @@ namespace Timeline.Controls
         {
             TimelineWidth = 130;
             UnitMarkOffset = 5;
-            UnitMarkLength = 60;
-            UnitTextOffset = 30;
+            UnitMarkLength = 40;
+            UnitTextOffset = 55;
             SubUnitMarkOffset = 5;
             SubUnitMarkLength = 15;
+            SubUnitTextOffset = 10;
 
             TimelineColor = Color.SkyBlue.ToSKColor();
             SummaryTextColor = Color.Blue.ToSKColor();

@@ -31,15 +31,23 @@ namespace Timeline.Controls
         {
             Minute = 0;
             Hour = 0;
-            Day = 1;
-            Month = 1;
-            Year = 1;
-            Decade = 1;
-            Century = 1;
-            KYear = 1;
-            KKYear = 1;
-            KKKYear = 1;
-            MYear = 1;
+            Day = 0;
+            Month = 0;
+            Year = 0;
+            Decade = 0;
+            Century = 0;
+            KYear = 0;
+            KKYear = 0;
+            KKKYear = 0;
+            MYear = 0;
+        }
+
+        public void Add(TimelineUnits unit, int value)
+        {
+            switch(unit)
+            {
+                
+            }
         }
     }
 }

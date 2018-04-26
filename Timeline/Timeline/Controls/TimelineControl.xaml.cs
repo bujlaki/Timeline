@@ -34,7 +34,7 @@ namespace Timeline.Controls
             nameof(Offset),
             typeof(long),
             typeof(TimelineControl),
-            (long)-2018 * 100, BindingMode.OneWay,
+            (long)0, BindingMode.OneWay,
             propertyChanged: OnOffsetChanged);
 
         public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
@@ -129,11 +129,14 @@ namespace Timeline.Controls
         private TimelineControlTheme theme;
         private int timelineLeftPos;
 
+        private DateTime date;
+
         int unitMarkX1;
         int unitMarkX2;
         int subUnitMarkX1;
         int subUnitMarkX2;
         int unitTextX;
+        int subUnitTextX;
 
         public TimelineControl()
         {
@@ -142,6 +145,8 @@ namespace Timeline.Controls
             gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
             theme = new TimelineControlTheme();
+
+            date = new DateTime(2018, 1, 1);
 
             CheckOrientation();
         }
@@ -160,7 +165,15 @@ namespace Timeline.Controls
 
                 case TouchGestureType.Pan:
                     Console.WriteLine("PAN");
-                    Offset += (long)args.Data.Y * 2;
+                    Offset -= (long)args.Data.Y * 2;
+                    if(Offset>Zoom){
+                        Offset -= Zoom;
+                        date = date.AddYears(1);
+                    }
+                    if(Offset<0){
+                        Offset += Zoom;
+                        date = date.AddYears(-1);
+                    }
                     canvasView.InvalidateSurface();
                     break;
 
@@ -207,6 +220,7 @@ namespace Timeline.Controls
             subUnitMarkX1 = timelineLeftPos + theme.SubUnitMarkOffset;
             subUnitMarkX2 = subUnitMarkX1 + theme.SubUnitMarkLength;
             unitTextX = timelineLeftPos + theme.UnitTextOffset;
+            subUnitTextX = timelineLeftPos + theme.SubUnitTextOffset;
 
             switch(this.ZoomUnit)
             {
@@ -228,7 +242,7 @@ namespace Timeline.Controls
                     break;
 
                 case TimelineUnits.Decade:
-                    DrawDecades(info, canvas);
+                    //DrawDecades(info, canvas);
                     break;
 
                 case TimelineUnits.KYear:
@@ -239,114 +253,69 @@ namespace Timeline.Controls
             }
         }
 
-        private void DrawDays(SKImageInfo info, SKCanvas canvas)
-        {
-            long firstVisibleUnit = -this.Offset / this.Zoom;
-            long lastVisibleUnit = (-this.Offset + info.Height) / this.Zoom + 1;
-
-            //main unit data - MONTH
-            long unitPos = firstVisibleUnit * this.Zoom + this.Offset;
-            for (long i = firstVisibleUnit; i < lastVisibleUnit; i++)
-            {
-                int year = (int)(i / 12);
-                int month = (int)(i % 12 + 1);
-                canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, theme.UnitMarkPaint);
-
-                string unitText1 = (month == 1) ? year.ToString() + " Jan" : shortMonthNames[month - 1];
-                canvas.DrawText(unitText1, unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
-
-                //optional subunit data - DAY
-                if (Zoom > 500)
-                {
-                    int days = DateTime.DaysInMonth(year, month);
-                    float subunitStep = (float)Zoom / days;
-                    for (int day = 0; day < days; day++)
-                    {
-                        float subunitPos = unitPos + day * subunitStep;
-                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, theme.UnitMarkPaint);
-                    }
-                }
-                unitPos += this.Zoom;
-            }
-        }
-
         private void DrawMonths(SKImageInfo info, SKCanvas canvas)
         {
-            long firstVisibleUnit = -this.Offset / this.Zoom;
-            long lastVisibleUnit = (-this.Offset + info.Height) / this.Zoom + 1;
+            DateTime unitdate = date;
+            bool showSubUnit = Zoom > 1000;
 
-            //main unit data - MONTH
-            long unitPos = firstVisibleUnit * this.Zoom + this.Offset;
-            for (long i = firstVisibleUnit; i < lastVisibleUnit; i++)
+            //main unit data - YEAR
+            long unitPos = -Offset;
+            while (unitPos < info.Height)
             {
-                int year = (int)(i / 12);
-                int month = (int)(i % 12 + 1);
                 canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, theme.UnitMarkPaint);
+                canvas.DrawText(shortMonthNames[unitdate.Month - 1], unitTextX, unitPos + theme.UnitTextPaint.TextSize / 2, theme.UnitTextPaint);
 
-                string unitText1 = (month == 1) ? year.ToString() + " Jan" : shortMonthNames[month - 1];
-                canvas.DrawText(unitText1, unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
-
-                //optional subunit data - DAY
-                if(Zoom>500)
+                if (showSubUnit)
                 {
-                    int days = DateTime.DaysInMonth(year, month);
-                    float subunitStep = (float)Zoom / days;
-                    for (int day = 0; day < days; day++)
+                    float subUnitPos = unitPos;
+                    float subUnitStep = (float)Zoom / DateTime.DaysInMonth(unitdate.Year, unitdate.Month);
+                    DateTime subdate = date;
+                    while(subdate.Month==unitdate.Month)
                     {
-                        float subunitPos = unitPos + day * subunitStep;
-                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, theme.UnitMarkPaint);
+                        canvas.DrawLine(subUnitMarkX1, subUnitPos, subUnitMarkX2, subUnitPos, theme.UnitMarkPaint);
+                        canvas.DrawText(subdate.Day.ToString(), subUnitTextX, subUnitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
+                        subUnitPos += subUnitStep;
+                        subdate = subdate.AddDays(1);
                     }
                 }
-                unitPos += this.Zoom;
+
+                unitdate = unitdate.AddMonths(1);
+                unitPos += Zoom;
             }
         }
 
         private void DrawYears(SKImageInfo info, SKCanvas canvas)
         {
-            int firstVisibleUnit = (int)(-this.Offset / this.Zoom);
-            int lastVisibleUnit = (int)((-this.Offset + info.Height) / this.Zoom + 1);
+            int year = date.Year;
+            bool showSubUnit = Zoom > 500;
 
             //main unit data - YEAR
-            long unitPos = firstVisibleUnit * this.Zoom + this.Offset;
-            for (int i = firstVisibleUnit; i < lastVisibleUnit; i++)
+            long unitPos = -Offset;
+            while (unitPos < info.Height)
             {
                 canvas.DrawLine(unitMarkX1, unitPos, unitMarkX2, unitPos, theme.UnitMarkPaint);
-                canvas.DrawText(i.ToString(), unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
-
-                //optional subunit data - MONTH
-                if (Zoom > 350)
-                {
-                    float subunitStep = (float)Zoom / 12;
-                    for (int month = 0; month < 12; month++)
-                    {
-                        float subunitPos = unitPos + month * subunitStep;
-                        canvas.DrawLine(subUnitMarkX1, subunitPos, subUnitMarkX2, subunitPos, theme.UnitMarkPaint);
-                    }
-                }
-
-                unitPos += this.Zoom;
+                if(showSubUnit)
+                    canvas.DrawText(year.ToString() + " Jan", subUnitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
+                else
+                    canvas.DrawText(year.ToString(), unitTextX, unitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
+                year++;
+                unitPos += Zoom;
             }
 
-        }
-
-        private void DrawDecades(SKImageInfo info, SKCanvas canvas)
-        {
-            int firstVisibleDecade = (int)(-this.Offset / this.Zoom + 1);
-            int lastVisibleDecade = (int)((-this.Offset + info.Height) / this.Zoom + 1);
-
-            SKPath path = new SKPath();
-            path.MoveTo(info.Width - 45, 0);
-            path.LineTo(info.Width - 45, info.Height);
-
-            SKPaint paintText = new SKPaint();
-            paintText.Color = Color.Black.ToSKColor();
-            paintText.TextSize = 32;
-
-            long decadePos = firstVisibleDecade * this.Zoom + this.Offset;
-            for (int i = firstVisibleDecade; i < lastVisibleDecade; i++)
+            if(showSubUnit)
             {
-                canvas.DrawTextOnPath((i*10).ToString(), path, decadePos, 0, paintText);
-                decadePos += this.Zoom;
+                DateTime subdate = date;
+                float subUnitPos = -Offset;
+                float subUnitStep = (float)Zoom / 12;
+                while(subUnitPos < info.Height)
+                {
+                    canvas.DrawLine(subUnitMarkX1, subUnitPos, subUnitMarkX2, subUnitPos, theme.UnitMarkPaint);
+                    if(subdate.Month!=1)
+                        canvas.DrawText(shortMonthNames[subdate.Month - 1], subUnitTextX, subUnitPos + theme.UnitTextPaint.TextSize, theme.UnitTextPaint);
+
+                    subUnitPos += subUnitStep;
+                    subdate = subdate.AddMonths(1);
+                }
             }
         }
 
