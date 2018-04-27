@@ -57,6 +57,6 @@ namespace Timeline.Controls
 
             SubUnitTextPaint = new SKPaint();
             SubUnitTextPaint.Color = Color.Black.ToSKColor();
-            SubUnitTextPaint.TextSize = 24;}
+            SubUnitTextPaint.TextSize = 18;}
     }
 }
