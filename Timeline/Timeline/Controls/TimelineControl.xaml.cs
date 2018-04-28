@@ -270,7 +270,7 @@ namespace Timeline.Controls
                 case TimelineUnits.Minute:
                     return "";
                 case TimelineUnits.Hour:
-                    return tlcdate.baseDate.Minute.ToString();
+                    return tlcdate.baseDate.Hour.ToString() + ":" + tlcdate.baseDate.Minute.ToString();
                 case TimelineUnits.Day:
                     return tlcdate.baseDate.Hour.ToString() + ":00";
                 case TimelineUnits.Month:
@@ -332,11 +332,12 @@ namespace Timeline.Controls
                     break;
 
                 case TimelineUnits.Day:
-                    if (Zoom < 175)
+                    if (Zoom < 200)
                     {
                         ZoomUnit = TimelineUnits.Month;
                         Offset = Offset + Zoom * (date.baseDate.Day - 1);
-                        Zoom = 175 * DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
+                        //Zoom = 175 * DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
+                        Zoom = 6000;
                         //Offset = Offset / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
                     }
                     else if (Zoom > 4800)
@@ -357,7 +358,8 @@ namespace Timeline.Controls
                     else if (Zoom>6000)
                     {
                         ZoomUnit = TimelineUnits.Day;
-                        Zoom = 6000 / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
+                        //Zoom = 6000 / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
+                        Zoom = 200;
                         Offset = Offset - Zoom * (date.baseDate.Day - 1);
                     }
                     break;
