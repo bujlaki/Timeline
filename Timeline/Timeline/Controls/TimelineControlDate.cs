@@ -18,6 +18,11 @@ namespace Timeline.Controls
             KKKYear = 0;
         }
 
+        public string DateStr()
+        {
+            return baseDate.ToShortDateString() + "  " + baseDate.ToShortTimeString();    
+        }
+
         public void Copy(ref TimelineControlDate dstDate)
         {
             dstDate.baseDate = baseDate;

@@ -51,6 +51,13 @@ namespace Timeline.Controls
             TimelineUnits.Year, BindingMode.OneWay,
             propertyChanged: OnZoomUnitChanged);
       
+        public static readonly BindableProperty DateProperty = BindableProperty.Create(
+            nameof(Date),
+            typeof(TimelineControlDate),
+            typeof(TimelineControl),
+            new TimelineControlDate(), BindingMode.TwoWay,
+            propertyChanged: OnZoomUnitChanged);
+        
         private static void OnOffsetChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((TimelineControl)bindable).InvalidateLayout();
@@ -62,6 +69,11 @@ namespace Timeline.Controls
         }
 
         private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
+
+        private static void OnDateChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((TimelineControl)bindable).InvalidateLayout();
         }
@@ -84,6 +96,12 @@ namespace Timeline.Controls
             set { SetValue(ZoomUnitProperty, value); }
         }
 
+        public TimelineControlDate Date
+        {
+            get { return (TimelineControlDate)GetValue(DateProperty); }
+            set { SetValue(DateProperty, value); }
+        }
+
 #endregion
 
         private string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
@@ -94,7 +112,7 @@ namespace Timeline.Controls
         private TimelineControlTheme theme;
         private int timelineLeftPos;
 
-        private TimelineControlDate date;
+        //private TimelineControlDate date;
         private TimelineControlDate unitDate;
         private TimelineControlDate subUnitDate;
 
@@ -114,7 +132,7 @@ namespace Timeline.Controls
 
             theme = new TimelineControlTheme();
 
-            date = new TimelineControlDate();
+            //date = new TimelineControlDate();
             unitDate = new TimelineControlDate();
             subUnitDate = new TimelineControlDate();
 
@@ -138,11 +156,11 @@ namespace Timeline.Controls
                     Offset -= (long)args.Data.Y * 2;
                     if(Offset>Zoom){
                         Offset -= Zoom;
-                        date.Add(ZoomUnit);
+                        Date.Add(ZoomUnit);
                     }
                     if(Offset<0){
                         Offset += Zoom;
-                        date.Add(ZoomUnit, -1);
+                        Date.Add(ZoomUnit, -1);
                     }
                     canvasView.InvalidateSurface();
                     break;
@@ -202,7 +220,7 @@ namespace Timeline.Controls
         private void DrawUnitsAndSubUnits(SKImageInfo info, SKCanvas canvas)
         {
             
-            date.CopyByUnit(ref unitDate, ZoomUnit);
+            Date.CopyByUnit(ref unitDate, ZoomUnit);
             float unitPos = halfHeight - Offset;
 
             while (unitPos > 0)
@@ -326,7 +344,7 @@ namespace Timeline.Controls
                     if (Zoom < 200)
                     {
                         ZoomUnit = TimelineUnits.Day;
-                        Offset = Offset + Zoom * date.baseDate.Hour;
+                        Offset = Offset + Zoom * Date.baseDate.Hour;
                         Zoom = 4800;
                     }
                     break;
@@ -335,7 +353,7 @@ namespace Timeline.Controls
                     if (Zoom < 200)
                     {
                         ZoomUnit = TimelineUnits.Month;
-                        Offset = Offset + Zoom * (date.baseDate.Day - 1);
+                        Offset = Offset + Zoom * (Date.baseDate.Day - 1);
                         //Zoom = 175 * DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
                         Zoom = 6000;
                         //Offset = Offset / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
@@ -344,7 +362,7 @@ namespace Timeline.Controls
                     {
                         ZoomUnit = TimelineUnits.Hour;
                         Zoom = 200;
-                        Offset = Offset - Zoom * date.baseDate.Hour;
+                        Offset = Offset - Zoom * Date.baseDate.Hour;
                     }
                     break;
 
@@ -352,7 +370,7 @@ namespace Timeline.Controls
                     if(Zoom<250)
                     {
                         ZoomUnit = TimelineUnits.Year;
-                        Offset = Offset + Zoom * (date.baseDate.Month - 1);
+                        Offset = Offset + Zoom * (Date.baseDate.Month - 1);
                         Zoom = 3000;
                     }
                     else if (Zoom>6000)
@@ -360,7 +378,7 @@ namespace Timeline.Controls
                         ZoomUnit = TimelineUnits.Day;
                         //Zoom = 6000 / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
                         Zoom = 200;
-                        Offset = Offset - Zoom * (date.baseDate.Day - 1);
+                        Offset = Offset - Zoom * (Date.baseDate.Day - 1);
                     }
                     break;
 
@@ -368,14 +386,14 @@ namespace Timeline.Controls
                     if (Zoom < 100)
                     {
                         ZoomUnit = TimelineUnits.Decade;
-                        Offset = Offset + Zoom * date.YearsInDecade();
+                        Offset = Offset + Zoom * Date.YearsInDecade();
                         Zoom = 1000;
                     }
                     else if (Zoom > 3000)
                     {
                         ZoomUnit = TimelineUnits.Month;
                         Zoom = 250;
-                        Offset = Offset - Zoom * (date.baseDate.Month -1);
+                        Offset = Offset - Zoom * (Date.baseDate.Month -1);
                     }
                     break;
 
@@ -384,7 +402,7 @@ namespace Timeline.Controls
                     {
                         ZoomUnit = TimelineUnits.Year;
                         Zoom = 100;
-                        Offset = Offset - Zoom * date.YearsInDecade();
+                        Offset = Offset - Zoom * Date.YearsInDecade();
                     }
                     break;
 

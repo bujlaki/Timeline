@@ -7,8 +7,12 @@
             BindingContext="{Binding MainPageViewModel, Source={StaticResource vmLocator}}">
     <ContentPage.Content>
         <Grid Margin="0,20,0,0">
-            <Label Text="TEST" />
-            <controls:TimelineControl />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <controls:TimelineControl x:Name="tlc" Grid.Row="1"/>
+            <Label Grid.Row="0" Text="{Binding Date.DateStr, ElementName=tlc}" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>
