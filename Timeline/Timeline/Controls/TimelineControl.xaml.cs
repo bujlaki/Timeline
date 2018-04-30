@@ -51,12 +51,11 @@ namespace Timeline.Controls
             TimelineUnits.Year, BindingMode.OneWay,
             propertyChanged: OnZoomUnitChanged);
       
-        public static readonly BindableProperty DateProperty = BindableProperty.Create(
-            nameof(Date),
-            typeof(TimelineControlDate),
+        public static readonly BindableProperty DateStrProperty = BindableProperty.Create(
+            nameof(DateStr),
+            typeof(string),
             typeof(TimelineControl),
-            new TimelineControlDate(), BindingMode.TwoWay,
-            propertyChanged: OnZoomUnitChanged);
+            "", BindingMode.OneWay);
         
         private static void OnOffsetChanged(BindableObject bindable, object oldValue, object newValue)
         {
@@ -69,11 +68,6 @@ namespace Timeline.Controls
         }
 
         private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-        private static void OnDateChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((TimelineControl)bindable).InvalidateLayout();
         }
@@ -96,25 +90,26 @@ namespace Timeline.Controls
             set { SetValue(ZoomUnitProperty, value); }
         }
 
-        public TimelineControlDate Date
+        public string DateStr
         {
-            get { return (TimelineControlDate)GetValue(DateProperty); }
-            set { SetValue(DateProperty, value); }
+            get { return (string)GetValue(DateStrProperty); }
+            set { SetValue(DateStrProperty, value); }
         }
 
 #endregion
 
-        private string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-        private string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-        private TouchGestureRecognizer gestureRecognizer;
-        private TimelineOrientation orientation;
-        private TimelineControlTheme theme;
-        private int timelineLeftPos;
+        TouchGestureRecognizer gestureRecognizer;
+        TimelineOrientation orientation;
+        TimelineControlTheme theme;
+        int timelineLeftPos;
 
-        //private TimelineControlDate date;
-        private TimelineControlDate unitDate;
-        private TimelineControlDate subUnitDate;
+        TimelineControlDate date;
+        TimelineControlDate unitDate;
+        TimelineControlDate subUnitDate;
+
+        float subUnitStep;
 
         int unitMarkX1;
         int unitMarkX2;
@@ -130,9 +125,10 @@ namespace Timeline.Controls
             gestureRecognizer = new TouchGestureRecognizer();
             gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-            theme = new TimelineControlTheme();
+            theme = new TimelineControlTheme(TimelineOrientation.Portrait);
 
-            //date = new TimelineControlDate();
+            date = new TimelineControlDate();
+            DateStr = date.DateStr();
             unitDate = new TimelineControlDate();
             subUnitDate = new TimelineControlDate();
 
@@ -156,11 +152,13 @@ namespace Timeline.Controls
                     Offset -= (long)args.Data.Y * 2;
                     if(Offset>Zoom){
                         Offset -= Zoom;
-                        Date.Add(ZoomUnit);
+                        date.Add(ZoomUnit);
+                        DateStr = date.DateStr();
                     }
                     if(Offset<0){
                         Offset += Zoom;
-                        Date.Add(ZoomUnit, -1);
+                        date.Add(ZoomUnit, -1);
+                        DateStr = date.DateStr();
                     }
                     canvasView.InvalidateSurface();
                     break;
@@ -220,7 +218,7 @@ namespace Timeline.Controls
         private void DrawUnitsAndSubUnits(SKImageInfo info, SKCanvas canvas)
         {
             
-            Date.CopyByUnit(ref unitDate, ZoomUnit);
+            date.CopyByUnit(ref unitDate, ZoomUnit);
             float unitPos = halfHeight - Offset;
 
             while (unitPos > 0)
@@ -236,7 +234,7 @@ namespace Timeline.Controls
 
                 unitDate.CopyByUnit(ref subUnitDate, ZoomUnit-1);
                 float subUnitPos = unitPos;
-                float subUnitStep = GetSubUnitStep(unitDate);
+                subUnitStep = GetSubUnitStep(unitDate);
                 bool showSubUnitText = subUnitStep > 30;
                 while (subUnitDate.Value(ZoomUnit) == unitDate.Value(ZoomUnit) && subUnitPos < info.Height)
                 {
@@ -344,7 +342,7 @@ namespace Timeline.Controls
                     if (Zoom < 200)
                     {
                         ZoomUnit = TimelineUnits.Day;
-                        Offset = Offset + Zoom * Date.baseDate.Hour;
+                        Offset = Offset + Zoom * date.baseDate.Hour;
                         Zoom = 4800;
                     }
                     break;
@@ -353,7 +351,7 @@ namespace Timeline.Controls
                     if (Zoom < 200)
                     {
                         ZoomUnit = TimelineUnits.Month;
-                        Offset = Offset + Zoom * (Date.baseDate.Day - 1);
+                        Offset = Offset + Zoom * (date.baseDate.Day - 1);
                         //Zoom = 175 * DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
                         Zoom = 6000;
                         //Offset = Offset / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
@@ -362,7 +360,7 @@ namespace Timeline.Controls
                     {
                         ZoomUnit = TimelineUnits.Hour;
                         Zoom = 200;
-                        Offset = Offset - Zoom * Date.baseDate.Hour;
+                        Offset = Offset - Zoom * date.baseDate.Hour;
                     }
                     break;
 
@@ -370,7 +368,7 @@ namespace Timeline.Controls
                     if(Zoom<250)
                     {
                         ZoomUnit = TimelineUnits.Year;
-                        Offset = Offset + Zoom * (Date.baseDate.Month - 1);
+                        Offset = Offset + Zoom * (date.baseDate.Month - 1);
                         Zoom = 3000;
                     }
                     else if (Zoom>6000)
@@ -378,7 +376,7 @@ namespace Timeline.Controls
                         ZoomUnit = TimelineUnits.Day;
                         //Zoom = 6000 / DateTime.DaysInMonth(date.baseDate.Year, date.baseDate.Month);
                         Zoom = 200;
-                        Offset = Offset - Zoom * (Date.baseDate.Day - 1);
+                        Offset = Offset - Zoom * (date.baseDate.Day - 1);
                     }
                     break;
 
@@ -386,14 +384,14 @@ namespace Timeline.Controls
                     if (Zoom < 100)
                     {
                         ZoomUnit = TimelineUnits.Decade;
-                        Offset = Offset + Zoom * Date.YearsInDecade();
+                        Offset = Offset + Zoom * date.YearsInDecade();
                         Zoom = 1000;
                     }
                     else if (Zoom > 3000)
                     {
                         ZoomUnit = TimelineUnits.Month;
                         Zoom = 250;
-                        Offset = Offset - Zoom * (Date.baseDate.Month -1);
+                        Offset = Offset - Zoom * (date.baseDate.Month -1);
                     }
                     break;
 
@@ -402,7 +400,7 @@ namespace Timeline.Controls
                     {
                         ZoomUnit = TimelineUnits.Year;
                         Zoom = 100;
-                        Offset = Offset - Zoom * Date.YearsInDecade();
+                        Offset = Offset - Zoom * date.YearsInDecade();
                     }
                     break;
 
