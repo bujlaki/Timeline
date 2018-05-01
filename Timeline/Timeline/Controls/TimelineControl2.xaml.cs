@@ -34,9 +34,9 @@ namespace Timeline.Controls
         #region "Bindable properties"
         public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
             nameof(Zoom),
-            typeof(long),
+            typeof(double),
             typeof(TimelineControl2),
-            (long)10, BindingMode.OneWay,
+            (double)10, BindingMode.OneWay,
             propertyChanged: OnZoomChanged);
 
         public static readonly BindableProperty ZoomUnitProperty = BindableProperty.Create(
@@ -62,9 +62,9 @@ namespace Timeline.Controls
             ((TimelineControl2)bindable).InvalidateLayout();
         }
 
-        public long Zoom
+        public double Zoom
         {
-            get { return (long)GetValue(ZoomProperty); }
+            get { return (double)GetValue(ZoomProperty); }
             set { SetValue(ZoomProperty, value); }
         }
 
@@ -83,6 +83,14 @@ namespace Timeline.Controls
         #endregion
 
         string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        const int DEFAULT_PORTRAIT_HOUR_TO_DAY = 36;
+        const int DEFAULT_PORTRAIT_DAY_TO_MONTH = 432;
+        const int DEFAULT_PORTRAIT_MONTH_TO_YEAR = 12960;
+        const int DEFAULT_PORTRAIT_YEAR_TO_DECADE = 155520;
+        const int DEFAULT_LANDSCAPE_HOUR_TO_DAY = 36;
+        const int DEFAULT_LANDSCAPE_DAY_TO_MONTH = 432;
+        const int DEFAULT_LANDSCAPE_MONTH_TO_YEAR = 12960;
+        const int DEFAULT_LANDSCAPE_YEAR_TO_DECADE = 155520;
 
         TouchGestureRecognizer gestureRecognizer;
         TimelineOrientation orientation;
@@ -97,6 +105,12 @@ namespace Timeline.Controls
         bool showSubUnitText;
         bool showSubUnitTextPartial;
 
+        int hourToDayZoomLimit;
+        int dayToMonthZoomLimit;
+        int monthToYearZoomLimit;
+        int yearToDecadeZoomLimit;
+
+        //for portrait mode
         int timelineLeftPos;
         int timelineMiddleX;
         int unitMarkX1;
@@ -107,6 +121,7 @@ namespace Timeline.Controls
         int subUnitTextX;
         int halfHeight;
 
+        //for landscape mode
         int timelineBottomPos;
         int timelineMiddleY;
         int unitMarkY1;
@@ -131,7 +146,7 @@ namespace Timeline.Controls
             subUnitDate = new TimelineControlDate();
             DateStr = date.DateStr();
 
-            pixeltime = Zoom * TimeSpan.TicksPerSecond;
+            pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
             showSubUnitText = false;
 
             CheckOrientation();
@@ -162,9 +177,9 @@ namespace Timeline.Controls
                 case TouchGestureType.Pinch:
                     Console.WriteLine("PINCH - " + args.Data.ToString());
                     move = (orientation == TimelineOrientation.Portrait) ? args.Data.Y : args.Data.X;
-                    Zoom -= (long)move * (long)(1 + Zoom * 0.005);
+                    Zoom -= Zoom * 0.005 * move;
                     if (Zoom < 2) Zoom = 2;
-                    pixeltime = Zoom * TimeSpan.TicksPerSecond;
+                    pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
                     Console.WriteLine("Zoom: " + Zoom.ToString() + "  pixeltime: " + pixeltime.ToString());
                     AdjustZoomUnit();
                     canvasView.InvalidateSurface();
@@ -387,6 +402,21 @@ namespace Timeline.Controls
         {
             orientation = TimelineOrientation.Portrait;
             if (this.Bounds.Width > this.Bounds.Height) orientation = TimelineOrientation.Landscape;
+
+            if(orientation==TimelineOrientation.Portrait)
+            {
+                hourToDayZoomLimit = DEFAULT_PORTRAIT_HOUR_TO_DAY;
+                dayToMonthZoomLimit = DEFAULT_PORTRAIT_DAY_TO_MONTH;
+                monthToYearZoomLimit = DEFAULT_PORTRAIT_MONTH_TO_YEAR;
+                yearToDecadeZoomLimit = DEFAULT_PORTRAIT_YEAR_TO_DECADE;
+            }
+            else
+            {
+                hourToDayZoomLimit = DEFAULT_LANDSCAPE_HOUR_TO_DAY;
+                dayToMonthZoomLimit = DEFAULT_LANDSCAPE_DAY_TO_MONTH;
+                monthToYearZoomLimit = DEFAULT_LANDSCAPE_MONTH_TO_YEAR;
+                yearToDecadeZoomLimit = DEFAULT_LANDSCAPE_YEAR_TO_DECADE;
+            }
         }
 
         //Any touch action we simply forward to the gesture recognizer
