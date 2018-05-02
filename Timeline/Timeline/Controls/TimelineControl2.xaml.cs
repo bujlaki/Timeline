@@ -92,6 +92,28 @@ namespace Timeline.Controls
         const int DEFAULT_LANDSCAPE_MONTH_TO_YEAR = 12960;
         const int DEFAULT_LANDSCAPE_YEAR_TO_DECADE = 155520;
 
+        const int DEFAULT_PORTRAIT_HOUR_SUBUNIT_LIMIT = 5;
+        const int DEFAULT_PORTRAIT_HOUR_HALFSUBUNIT_LIMIT = 24;
+        const int DEFAULT_PORTRAIT_DAY_SUBUNIT_LIMIT = 120;
+        const int DEFAULT_PORTRAIT_DAY_HALFSUBUNIT_LIMIT = 300;
+        const int DEFAULT_PORTRAIT_MONTH_SUBUNIT_LIMIT = 2880;
+        const int DEFAULT_PORTRAIT_MONTH_HALFSUBUNIT_LIMIT = 9600;
+        const int DEFAULT_PORTRAIT_YEAR_SUBUNIT_LIMIT = 64800;
+        const int DEFAULT_PORTRAIT_YEAR_HALFSUBUNIT_LIMIT = 124000;
+        const int DEFAULT_PORTRAIT_DECADE_SUBUNIT_LIMIT = 1036800;
+        const int DEFAULT_PORTRAIT_DECADE_HALFSUBUNIT_LIMIT = 2000000;
+
+        const int DEFAULT_LANDSCAPE_HOUR_SUBUNIT_LIMIT = 5;
+        const int DEFAULT_LANDSCAPE_HOUR_HALFSUBUNIT_LIMIT = 24;
+        const int DEFAULT_LANDSCAPE_DAY_SUBUNIT_LIMIT = 120;
+        const int DEFAULT_LANDSCAPE_DAY_HALFSUBUNIT_LIMIT = 300;
+        const int DEFAULT_LANDSCAPE_MONTH_SUBUNIT_LIMIT = 2880;
+        const int DEFAULT_LANDSCAPE_MONTH_HALFSUBUNIT_LIMIT = 9600;
+        const int DEFAULT_LANDSCAPE_YEAR_SUBUNIT_LIMIT = 64800;
+        const int DEFAULT_LANDSCAPE_YEAR_HALFSUBUNIT_LIMIT = 124000;
+        const int DEFAULT_LANDSCAPE_DECADE_SUBUNIT_LIMIT = 1036800;
+        const int DEFAULT_LANDSCAPE_DECADE_HALFSUBUNIT_LIMIT = 2000000;
+
         TouchGestureRecognizer gestureRecognizer;
         TimelineOrientation orientation;
         TimelineControlTheme theme_portrait;
@@ -103,12 +125,23 @@ namespace Timeline.Controls
 
         Int64 pixeltime;
         bool showSubUnitText;
-        bool showSubUnitTextPartial;
+        bool showMiddleSubUnitText;
 
         int hourToDayZoomLimit;
         int dayToMonthZoomLimit;
         int monthToYearZoomLimit;
         int yearToDecadeZoomLimit;
+
+        int hourSubunitLimit;
+        int hourHalfSubUnitLimit;
+        int daySubunitLimit;
+        int dayHalfSubUnitLimit;
+        int monthSubunitLimit;
+        int monthHalfSubUnitLimit;
+        int yearSubunitLimit;
+        int yearHalfSubUnitLimit;
+        int decadeSubunitLimit;
+        int decadeHalfSubUnitLimit;
 
         //for portrait mode
         int timelineLeftPos;
@@ -270,7 +303,14 @@ namespace Timeline.Controls
                     subUnitPos = (subUnitDate.baseDate.Ticks - minDate.Ticks) / pixeltime;
                     canvas.DrawLine(subUnitMarkX1, subUnitPos, subUnitMarkX2, subUnitPos, theme_portrait.SubUnitMarkPaint);
 
-                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitTextX, subUnitPos + theme_portrait.SubUnitTextPaint.TextSize, theme_portrait.SubUnitTextPaint);
+                    if (showSubUnitText)
+                    {
+                        canvas.DrawText(GetSubUnitText(subUnitDate), subUnitTextX, subUnitPos + theme_portrait.SubUnitTextPaint.TextSize, theme_portrait.SubUnitTextPaint);
+                    }
+                    else if (showMiddleSubUnitText && IsMiddleSubUnit(subUnitDate))
+                    {
+                        canvas.DrawText(GetSubUnitText(subUnitDate), subUnitTextX, subUnitPos + theme_portrait.SubUnitTextPaint.TextSize, theme_portrait.SubUnitTextPaint);
+                    }
 
                     subUnitDate.Add(ZoomUnit - 1);
                 }
@@ -305,8 +345,14 @@ namespace Timeline.Controls
                     subUnitPos = (subUnitDate.baseDate.Ticks - minDate.Ticks) / pixeltime;
                     canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, theme_landscape.UnitMarkPaint);
 
-                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + theme_landscape.UnitTextPaint.TextSize, subUnitTextY, theme_landscape.UnitTextPaint);
-
+                    if (showSubUnitText)
+                    {
+                        canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + theme_landscape.UnitTextPaint.TextSize, subUnitTextY, theme_landscape.UnitTextPaint);
+                    }
+                    else if (showMiddleSubUnitText && IsMiddleSubUnit(subUnitDate))
+                    {
+                        canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + theme_landscape.UnitTextPaint.TextSize, subUnitTextY, theme_landscape.UnitTextPaint);
+                    }
                     subUnitDate.Add(ZoomUnit - 1);
                 }
 
@@ -352,11 +398,35 @@ namespace Timeline.Controls
                 case TimelineUnits.Year:
                     return shortMonthNames[tlcdate.baseDate.Month - 1];
                 case TimelineUnits.Decade:
+                    if (tlcdate.baseDate.Year % 10 == 0) return "";
                     return tlcdate.baseDate.Year.ToString();
                 case TimelineUnits.Century:
                     return tlcdate.Decade.ToString() + "0";
                 default:
                     return "";
+            }
+        }
+
+        private bool IsMiddleSubUnit(TimelineControlDate tlcdate)
+        {
+            switch (this.ZoomUnit-1)
+            {
+                case TimelineUnits.Minute:
+                    return tlcdate.baseDate.Minute % 10 == 0;
+                case TimelineUnits.Hour:
+                    return tlcdate.baseDate.Hour == 12;
+                case TimelineUnits.Day:
+                    return false;
+                case TimelineUnits.Month:
+                    return false;
+                case TimelineUnits.Year:
+                    return tlcdate.baseDate.Year % 5 == 0;
+                case TimelineUnits.Decade:
+                    return false;
+                case TimelineUnits.Century:
+                    return false;
+                default:
+                    return false;
             }
         }
 
@@ -368,31 +438,36 @@ namespace Timeline.Controls
                     break;
 
                 case TimelineUnits.Hour:
-                    if (Zoom > 36) ZoomUnit = TimelineUnits.Day;
-                    showSubUnitText = (Zoom < 5) ? true : false;
+                    if (Zoom > hourToDayZoomLimit) ZoomUnit = TimelineUnits.Day;
+                    showSubUnitText = (Zoom < hourSubunitLimit) ? true : false;
+                    showMiddleSubUnitText = (Zoom < hourHalfSubUnitLimit) ? true : false;
                     break;
 
                 case TimelineUnits.Day:
-                    if (Zoom > 432) ZoomUnit = TimelineUnits.Month;
-                    if (Zoom < 36) ZoomUnit = TimelineUnits.Hour;
-                    showSubUnitText = (Zoom < 120) ? true : false;
+                    if (Zoom > dayToMonthZoomLimit) ZoomUnit = TimelineUnits.Month;
+                    if (Zoom < hourToDayZoomLimit) ZoomUnit = TimelineUnits.Hour;
+                    showSubUnitText = (Zoom < daySubunitLimit) ? true : false;
+                    showMiddleSubUnitText = (Zoom < dayHalfSubUnitLimit) ? true : false;
                     break;
 
                 case TimelineUnits.Month:
-                    if (Zoom > 12960) ZoomUnit = TimelineUnits.Year;
-                    if (Zoom < 432) ZoomUnit = TimelineUnits.Day;
-                    showSubUnitText = (Zoom < 2880) ? true : false;
+                    if (Zoom > monthToYearZoomLimit) ZoomUnit = TimelineUnits.Year;
+                    if (Zoom < dayToMonthZoomLimit) ZoomUnit = TimelineUnits.Day;
+                    showSubUnitText = (Zoom < monthSubunitLimit) ? true : false;
+                    showMiddleSubUnitText = (Zoom < monthHalfSubUnitLimit) ? true : false;
                     break;
 
                 case TimelineUnits.Year:
-                    if (Zoom > 155520) ZoomUnit = TimelineUnits.Decade;
-                    if (Zoom < 12960) ZoomUnit = TimelineUnits.Month;
-                    showSubUnitText = (Zoom < 64800) ? true : false;
+                    if (Zoom > yearToDecadeZoomLimit) ZoomUnit = TimelineUnits.Decade;
+                    if (Zoom < monthToYearZoomLimit) ZoomUnit = TimelineUnits.Month;
+                    showSubUnitText = (Zoom < yearSubunitLimit) ? true : false;
+                    showMiddleSubUnitText = (Zoom < yearHalfSubUnitLimit) ? true : false;
                     break;
 
                 case TimelineUnits.Decade:
-                    if (Zoom < 155520) ZoomUnit = TimelineUnits.Year;
-                    showSubUnitText = (Zoom < 1036800) ? true : false;
+                    if (Zoom < yearToDecadeZoomLimit) ZoomUnit = TimelineUnits.Year;
+                    showSubUnitText = (Zoom < decadeSubunitLimit) ? true : false;
+                    showMiddleSubUnitText = (Zoom < decadeHalfSubUnitLimit) ? true : false;
                     break;
             }
         }
@@ -409,6 +484,17 @@ namespace Timeline.Controls
                 dayToMonthZoomLimit = DEFAULT_PORTRAIT_DAY_TO_MONTH;
                 monthToYearZoomLimit = DEFAULT_PORTRAIT_MONTH_TO_YEAR;
                 yearToDecadeZoomLimit = DEFAULT_PORTRAIT_YEAR_TO_DECADE;
+
+                hourSubunitLimit = DEFAULT_PORTRAIT_HOUR_SUBUNIT_LIMIT;
+                hourHalfSubUnitLimit = DEFAULT_PORTRAIT_HOUR_HALFSUBUNIT_LIMIT;
+                daySubunitLimit = DEFAULT_PORTRAIT_DAY_SUBUNIT_LIMIT;
+                dayHalfSubUnitLimit = DEFAULT_PORTRAIT_DAY_HALFSUBUNIT_LIMIT;
+                monthSubunitLimit = DEFAULT_PORTRAIT_MONTH_SUBUNIT_LIMIT;
+                monthHalfSubUnitLimit = DEFAULT_PORTRAIT_MONTH_HALFSUBUNIT_LIMIT;
+                yearSubunitLimit = DEFAULT_PORTRAIT_YEAR_SUBUNIT_LIMIT;
+                yearHalfSubUnitLimit = DEFAULT_PORTRAIT_YEAR_HALFSUBUNIT_LIMIT;
+                decadeSubunitLimit = DEFAULT_PORTRAIT_DECADE_SUBUNIT_LIMIT;
+                decadeHalfSubUnitLimit = DEFAULT_PORTRAIT_DECADE_HALFSUBUNIT_LIMIT;
             }
             else
             {
@@ -416,6 +502,17 @@ namespace Timeline.Controls
                 dayToMonthZoomLimit = DEFAULT_LANDSCAPE_DAY_TO_MONTH;
                 monthToYearZoomLimit = DEFAULT_LANDSCAPE_MONTH_TO_YEAR;
                 yearToDecadeZoomLimit = DEFAULT_LANDSCAPE_YEAR_TO_DECADE;
+
+                hourSubunitLimit = DEFAULT_LANDSCAPE_HOUR_SUBUNIT_LIMIT;
+                hourHalfSubUnitLimit = DEFAULT_LANDSCAPE_HOUR_HALFSUBUNIT_LIMIT;
+                daySubunitLimit = DEFAULT_LANDSCAPE_DAY_SUBUNIT_LIMIT;
+                dayHalfSubUnitLimit = DEFAULT_LANDSCAPE_DAY_HALFSUBUNIT_LIMIT;
+                monthSubunitLimit = DEFAULT_LANDSCAPE_MONTH_SUBUNIT_LIMIT;
+                monthHalfSubUnitLimit = DEFAULT_LANDSCAPE_MONTH_HALFSUBUNIT_LIMIT;
+                yearSubunitLimit = DEFAULT_LANDSCAPE_YEAR_SUBUNIT_LIMIT;
+                yearHalfSubUnitLimit = DEFAULT_LANDSCAPE_YEAR_HALFSUBUNIT_LIMIT;
+                decadeSubunitLimit = DEFAULT_LANDSCAPE_DECADE_SUBUNIT_LIMIT;
+                decadeHalfSubUnitLimit = DEFAULT_LANDSCAPE_DECADE_HALFSUBUNIT_LIMIT;
             }
         }
 
