@@ -7,99 +7,103 @@ namespace Timeline.Controls
 {
     public class TimelineControlTheme
     {
-        public int TimelineWidth { get; set; }
+        int unitMarkOffset;
+        int unitMarkLength;
+        Point unitTextOffset;
+        public int UnitMarkOffset { get { return unitMarkOffset; } }
+        public int UnitMarkLength { get { return unitMarkLength; } }
+        public Point UnitTextOffset { get { return unitTextOffset; } }
 
-        public int UnitMarkOffset { get; set; }
-        public int UnitMarkLength { get; set; }
-        public int UnitTextOffset { get; set; }
+        int subUnitMarkOffset;
+        int subUnitMarkLength;
+        Point subUnitTextOffset;
+        public int SubUnitMarkOffset { get { return subUnitMarkOffset; } }
+        public int SubUnitMarkLength { get { return subUnitMarkLength; } }
+        public Point SubUnitTextOffset { get { return subUnitTextOffset; } }
 
-        public int SubUnitMarkOffset { get; set; }
-        public int SubUnitMarkLength { get; set; }
-        public int SubUnitTextOffset { get; set; }
+        SKPaint timelinePaint;
+        SKPaint unitMarkPaint;
+        SKPaint unitTextPaint;
+        SKPaint subUnitMarkPaint;
+        SKPaint subUnitTextPaint;
+        float unitTextHalfHeight;
+        float subUnitTextHalfHeight;
 
-        public SKColor TimelineColor { get; set; }
+        public SKPaint TimelinePaint { 
+            get { return timelinePaint; }
+            set { timelinePaint = value; }
+        }
+        public SKPaint UnitMarkPaint { 
+            get { return unitMarkPaint; }
+            set { unitMarkPaint = value; }
+        }
+        public SKPaint UnitTextPaint { 
+            get { return unitTextPaint; }
+            set { unitTextPaint = value; unitTextHalfHeight = unitTextPaint.FontMetrics.CapHeight / 2; }
+        }
+        public SKPaint SubUnitMarkPaint { 
+            get { return subUnitMarkPaint; }
+            set { subUnitMarkPaint = value; }
+        }
+        public SKPaint SubUnitTextPaint { 
+            get { return subUnitTextPaint; }
+            set { subUnitTextPaint = value; subUnitTextHalfHeight = subUnitTextPaint.FontMetrics.CapHeight / 2; }
+        }
 
-        public SKColor UnitMarkColor { get; set; }
-        public SKColor UnitTextColor { get; set; }
-
-        public SKColor SubUnitMarkColor { get; set; }
-        public SKColor SubUnitTextColor { get; set; }
-
-        public SKPaint TimelinePaint { get; set; }
-        public SKPaint SummaryTextPaint { get; set; }
-        public SKPaint UnitMarkPaint { get; set; }
-        public SKPaint UnitTextPaint { get; set; }
-        public SKPaint SubUnitMarkPaint { get; set; }
-        public SKPaint SubUnitTextPaint { get; set; }
+        public float UnitTextHalfHeight {
+            get { return unitTextHalfHeight; }
+        }
+        public float SubUnitTextHalfHeight {
+            get { return subUnitTextHalfHeight; }
+        }
 
         public TimelineControlTheme(TimelineOrientation orientation)
         {
+            UnitMarkPaint = new SKPaint();
+            UnitMarkPaint.Color = Color.Black.ToSKColor();
+            UnitMarkPaint.StrokeWidth = 2;
+
+            UnitTextPaint = new SKPaint();
+            UnitTextPaint.Color = Color.Black.ToSKColor();
+            UnitTextPaint.TextSize = 24;
+
+            SubUnitMarkPaint = new SKPaint();
+            SubUnitMarkPaint.Color = Color.Black.ToSKColor();
+            SubUnitMarkPaint.StrokeWidth = 2;
+
+            SubUnitTextPaint = new SKPaint();
+            SubUnitTextPaint.Color = Color.Black.ToSKColor();
+            SubUnitTextPaint.TextSize = 18;
+
             if (orientation == TimelineOrientation.Portrait)
             {
-                TimelineWidth = 130;
+                TimelinePaint = new SKPaint();
+                TimelinePaint.Color = Color.SkyBlue.ToSKColor();
+                TimelinePaint.StrokeWidth = 130;
 
-                UnitMarkOffset = 5;
-                UnitMarkLength = 40;
-                UnitTextOffset = 55;
+                unitMarkOffset = 5;
+                unitMarkLength = 40;
+                unitTextOffset = new Point(55, unitTextHalfHeight);
 
-                SubUnitMarkOffset = 5;
-                SubUnitMarkLength = 15;
-                SubUnitTextOffset = 10;
-
-                TimelineColor = Color.SkyBlue.ToSKColor();
-
-                UnitMarkColor = Color.Black.ToSKColor();
-                UnitTextColor = Color.Black.ToSKColor();
-
-                SubUnitMarkColor = Color.Black.ToSKColor();
-                SubUnitTextColor = Color.Black.ToSKColor();
+                subUnitMarkOffset = 5;
+                subUnitMarkLength = 15;
+                subUnitTextOffset = new Point(25, subUnitTextHalfHeight);
             }
 
             if(orientation==TimelineOrientation.Landscape)
             {
-                TimelineWidth = 80;
+                TimelinePaint = new SKPaint();
+                TimelinePaint.Color = Color.SkyBlue.ToSKColor();
+                TimelinePaint.StrokeWidth = 80;
 
-                UnitMarkOffset = 0;
-                UnitMarkLength = 40;
-                UnitTextOffset = 45;
+                unitMarkOffset = 0;
+                unitMarkLength = 40;
+                unitTextOffset = new Point(0, -45);
 
-                SubUnitMarkOffset = 0;
-                SubUnitMarkLength = 10;
-                SubUnitTextOffset = 15;
-
-                TimelineColor = Color.SkyBlue.ToSKColor();
-
-                UnitMarkColor = Color.Black.ToSKColor();
-                UnitTextColor = Color.Black.ToSKColor();
-
-                SubUnitMarkColor = Color.Black.ToSKColor();
-                SubUnitTextColor = Color.Black.ToSKColor();
+                subUnitMarkOffset = 0;
+                subUnitMarkLength = 10;
+                subUnitTextOffset = new Point(0, -15);
             }
-
-            ApplyChanges();
-        }
-
-        public void ApplyChanges()
-        {
-            TimelinePaint = new SKPaint();
-            TimelinePaint.Color = TimelineColor;
-            TimelinePaint.StrokeWidth = TimelineWidth;
-
-            UnitMarkPaint = new SKPaint();
-            UnitMarkPaint.Color = UnitMarkColor;
-            UnitMarkPaint.StrokeWidth = 2;
-
-            UnitTextPaint = new SKPaint();
-            UnitTextPaint.Color = UnitTextColor;
-            UnitTextPaint.TextSize = 24;
-
-            SubUnitMarkPaint = new SKPaint();
-            SubUnitMarkPaint.Color = SubUnitMarkColor;
-            SubUnitMarkPaint.StrokeWidth = 2;
-
-            SubUnitTextPaint = new SKPaint();
-            SubUnitTextPaint.Color = SubUnitTextColor;
-            SubUnitTextPaint.TextSize = 18;
         }
     }
 }
