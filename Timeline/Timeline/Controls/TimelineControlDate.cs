@@ -18,9 +18,25 @@ namespace Timeline.Controls
             KKKYear = 0;
         }
 
-        public string DateStr()
+        public string DateStr(TimelineUnits unit)
         {
-            return baseDate.ToShortDateString() + "  " + baseDate.ToShortTimeString();    
+            switch (unit)
+            {
+                case TimelineUnits.Minute:
+                    return baseDate.ToShortDateString() + "  " + baseDate.ToShortTimeString();
+                case TimelineUnits.Hour:
+                    return baseDate.ToShortDateString() + "  " + baseDate.ToString("hh:00");
+                case TimelineUnits.Day:
+                    return baseDate.ToShortDateString();
+                case TimelineUnits.Month:
+                    return baseDate.ToString("yyyy.MM");
+                case TimelineUnits.Year:
+                    return baseDate.Year.ToString();
+                case TimelineUnits.Decade:
+                    return Decade.ToString();
+                default:
+                    return "";
+            }
         }
 
         public void Copy(ref TimelineControlDate dstDate)

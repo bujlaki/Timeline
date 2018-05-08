@@ -26,6 +26,7 @@ namespace Timeline.Controls
         SKPaint unitTextPaint;
         SKPaint subUnitMarkPaint;
         SKPaint subUnitTextPaint;
+        SKPaint highlightPaint;
         float unitTextHalfHeight;
         float subUnitTextHalfHeight;
 
@@ -48,6 +49,10 @@ namespace Timeline.Controls
         public SKPaint SubUnitTextPaint { 
             get { return subUnitTextPaint; }
             set { subUnitTextPaint = value; subUnitTextHalfHeight = subUnitTextPaint.FontMetrics.CapHeight / 2; }
+        }
+        public SKPaint HighlightPaint {
+            get { return highlightPaint; }
+            set { highlightPaint = value; }
         }
 
         public float UnitTextHalfHeight {
@@ -75,6 +80,10 @@ namespace Timeline.Controls
             SubUnitTextPaint.Color = Color.Black.ToSKColor();
             SubUnitTextPaint.TextSize = 18;
 
+            HighlightPaint = new SKPaint();
+            HighlightPaint.Color = Color.FromRgba(255, 255, 0, 128).ToSKColor();
+            HighlightPaint.StrokeWidth = 10;
+
             if (orientation == TimelineOrientation.Portrait)
             {
                 TimelinePaint = new SKPaint();
@@ -98,11 +107,11 @@ namespace Timeline.Controls
 
                 unitMarkOffset = 0;
                 unitMarkLength = 40;
-                unitTextOffset = new Point(0, -45);
+                unitTextOffset = new Point(0, 45);
 
                 subUnitMarkOffset = 0;
                 subUnitMarkLength = 10;
-                subUnitTextOffset = new Point(0, -15);
+                subUnitTextOffset = new Point(0, 15);
             }
         }
     }
