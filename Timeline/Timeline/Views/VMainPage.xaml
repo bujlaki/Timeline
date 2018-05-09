@@ -12,6 +12,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
+
             <controls:TimelineControl2 x:Name="tlc" Grid.Row="0"/>
             <Label Grid.Row="1" BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
         </Grid>
