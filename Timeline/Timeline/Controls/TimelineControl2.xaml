@@ -7,10 +7,14 @@
     <ContentView.Content>
         <Grid>
             <skia:SKCanvasView x:Name="canvasView" 
-                               PaintSurface="OnCanvasViewPaintSurface"/>
+                               PaintSurface="OnCanvasViewPaintSurface">
+<!--                <skia:SKCanvasView.GestureRecognizers>
+                    <PinchGestureRecognizer PinchUpdated="Handle_PinchUpdated" />
+                    <PanGestureRecognizer PanUpdated="Handle_PanUpdated" />
+                </skia:SKCanvasView.GestureRecognizers>-->
+            </skia:SKCanvasView>
             <Grid.Effects>
-                <tt:TouchEffect Capture="True"
-                                TouchAction="OnTouchEffectAction" />
+                <tt:TouchEffect Capture="True" TouchAction="OnTouchEffectAction" />
             </Grid.Effects>
         </Grid>
     </ContentView.Content>

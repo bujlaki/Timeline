@@ -163,8 +163,7 @@ namespace TouchTracking.iOS
             Action<Element, TouchActionEventArgs> onTouchAction = recognizer.touchEffect.OnTouchAction;
 
             // Call that method
-            onTouchAction(recognizer.element,
-                new TouchActionEventArgs(id, actionType, xfPoint, isInContact));
+            onTouchAction(recognizer.element, new TouchActionEventArgs(id, actionType, xfPoint, isInContact));
         }
     }
 }

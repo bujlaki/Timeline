@@ -105,7 +105,6 @@ namespace Timeline.Controls
         float unitXWidth;
         float subunitXWidth;
         bool showSubUnitText;
-        bool showMiddleSubUnitText;
 
         int hourToDayZoomLimit;
         int dayToMonthZoomLimit;
@@ -125,17 +124,6 @@ namespace Timeline.Controls
 		const int SEC_PER_YEAR = 31104000;
 
         //FOR PORTRAIT MODE
-        const int DEFAULT_PORTRAIT_HOUR_TO_DAY = 36;
-		const int DEFAULT_PORTRAIT_DAY_TO_MONTH = 576;
-        const int DEFAULT_PORTRAIT_MONTH_TO_YEAR = 25920;
-        const int DEFAULT_PORTRAIT_YEAR_TO_DECADE = 622080;
-
-        const int DEFAULT_PORTRAIT_HOUR_SUBUNIT_LIMIT = 4;
-        const int DEFAULT_PORTRAIT_DAY_SUBUNIT_LIMIT = 120;
-        const int DEFAULT_PORTRAIT_MONTH_SUBUNIT_LIMIT = 4320;
-        const int DEFAULT_PORTRAIT_YEAR_SUBUNIT_LIMIT = 64800;
-        const int DEFAULT_PORTRAIT_DECADE_SUBUNIT_LIMIT = 1036800;
-
         float timelineWidth;
         float timelineLeftX;
         float timelineMiddleX;
@@ -148,22 +136,6 @@ namespace Timeline.Controls
         int halfHeight;
 
         //FOR LANDSCAPE MODE
-        const int DEFAULT_LANDSCAPE_HOUR_TO_DAY = 36;
-        const int DEFAULT_LANDSCAPE_DAY_TO_MONTH = 432;
-        const int DEFAULT_LANDSCAPE_MONTH_TO_YEAR = 12960;
-        const int DEFAULT_LANDSCAPE_YEAR_TO_DECADE = 155520;
-
-        const int DEFAULT_LANDSCAPE_HOUR_SUBUNIT_LIMIT = 2;
-        const int DEFAULT_LANDSCAPE_HOUR_HALFSUBUNIT_LIMIT = 24;
-        const int DEFAULT_LANDSCAPE_DAY_SUBUNIT_LIMIT = 120;
-        const int DEFAULT_LANDSCAPE_DAY_HALFSUBUNIT_LIMIT = 300;
-        const int DEFAULT_LANDSCAPE_MONTH_SUBUNIT_LIMIT = 2880;
-        const int DEFAULT_LANDSCAPE_MONTH_HALFSUBUNIT_LIMIT = 9600;
-        const int DEFAULT_LANDSCAPE_YEAR_SUBUNIT_LIMIT = 64800;
-        const int DEFAULT_LANDSCAPE_YEAR_HALFSUBUNIT_LIMIT = 124000;
-        const int DEFAULT_LANDSCAPE_DECADE_SUBUNIT_LIMIT = 1036800;
-        const int DEFAULT_LANDSCAPE_DECADE_HALFSUBUNIT_LIMIT = 2000000;
-
         float timelineHeight;
         float timelineBottomY;
         float timelineMiddleY;
@@ -177,31 +149,31 @@ namespace Timeline.Controls
 
         bool initialOrientationCheck;
 
-        public TimelineControl2()
-        {
-            InitializeComponent();
-            gestureRecognizer = new TouchGestureRecognizer();
-            gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
+		public TimelineControl2()
+		{
+			InitializeComponent();
+			gestureRecognizer = new TouchGestureRecognizer();
+			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-            theme_portrait = new TimelineControlTheme(TimelineOrientation.Portrait);
-            theme_landscape = new TimelineControlTheme(TimelineOrientation.Landscape);
+			theme_portrait = new TimelineControlTheme(TimelineOrientation.Portrait);
+			theme_landscape = new TimelineControlTheme(TimelineOrientation.Landscape);
 
-            date = new TimelineControlDate();
-            unitDate = new TimelineControlDate();
-            subUnitDate = new TimelineControlDate();
-            DateStr = date.DateStr(ZoomUnit);
+			date = new TimelineControlDate();
+			unitDate = new TimelineControlDate();
+			subUnitDate = new TimelineControlDate();
+			DateStr = date.DateStr(ZoomUnit);
 
-            pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
-            showSubUnitText = false;
+			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
+			showSubUnitText = false;
 
-            initialOrientationCheck = true;
+			initialOrientationCheck = true;
 
-            timelinePaint = new SKPaint();
-            unitMarkPaint = new SKPaint();
-            unitTextPaint = new SKPaint();
-            subUnitMarkPaint = new SKPaint();
-            subUnitTextPaint = new SKPaint();
-        }
+			timelinePaint = new SKPaint();
+			unitMarkPaint = new SKPaint();
+			unitTextPaint = new SKPaint();
+			subUnitMarkPaint = new SKPaint();
+			subUnitTextPaint = new SKPaint();
+		}
 
         void GestureRecognizer_OnGestureRecognized(object sender, TouchGestureEventArgs args)
         {
@@ -305,11 +277,8 @@ namespace Timeline.Controls
                     //SUBUNIT MARK
                     canvas.DrawLine(subUnitMarkX1, subUnitPos, subUnitMarkX2, subUnitPos, subUnitMarkPaint);
 
-                    if (showSubUnitText)
-                    {
-                        //SUBUNIT TEXT
-                        canvas.DrawText(GetSubUnitText(subUnitDate), subUnitTextX, subUnitPos + subUnitTextHalfHeight, subUnitTextPaint);
-                    }
+					//SUBUNIT TEXT
+                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitTextX, subUnitPos + subUnitTextHalfHeight, subUnitTextPaint);
 
                     subUnitDate.Add(ZoomUnit - 1);
                 }
@@ -339,12 +308,13 @@ namespace Timeline.Controls
             {
                 unitPos = (unitDate.baseDate.Ticks - minDate.Ticks) / pixeltime;
                 unitText = GetUnitText(unitDate);
-                unitTextWidthHalf = unitText.Length * unitXWidth / 2;
+                //unitTextWidthHalf = unitText.Length * unitXWidth / 2;
 
                 //UNIT MARK
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);
                 //UNIT TEXT
-                canvas.DrawText(unitText, unitPos - unitTextWidthHalf, unitTextY, unitTextPaint);
+                //canvas.DrawText(unitText, unitPos - unitTextWidthHalf, unitTextY, unitTextPaint);
+				canvas.DrawText(unitText, unitPos, unitTextY, unitTextPaint);
 
                 unitDate.CopyByUnit(ref subUnitDate, ZoomUnit - 1);
 
@@ -352,16 +322,14 @@ namespace Timeline.Controls
                 {
                     subUnitPos = (subUnitDate.baseDate.Ticks - minDate.Ticks) / pixeltime;
                     subUnitText = GetSubUnitText(subUnitDate);
-                    subUnitTextWidthHalf = subUnitText.Length * subunitXWidth / 2;
+                    //subUnitTextWidthHalf = subUnitText.Length * subunitXWidth / 2;
                     
                     //SUBUNIT MARK
                     canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);
 
-                    if (showSubUnitText)
-                    {
-                        //SUBUNIT TEXT
-                        canvas.DrawText(subUnitText, subUnitPos - subUnitTextWidthHalf, subUnitTextY, subUnitTextPaint);
-                    }
+					//SUBUNIT TEXT
+                    //if (showSubUnitText) canvas.DrawText(subUnitText, subUnitPos - subUnitTextWidthHalf, subUnitTextY, subUnitTextPaint);
+					if (showSubUnitText) canvas.DrawText(subUnitText, subUnitPos + 5, subUnitTextY, subUnitTextPaint);
 
                     subUnitDate.Add(ZoomUnit - 1);
                 }
@@ -436,13 +404,13 @@ namespace Timeline.Controls
                         if (tlcdate.baseDate.Hour == 0) return "";
                         return tlcdate.baseDate.Hour.ToString();
                     case TimelineUnits.Month:
-                        if (tlcdate.baseDate.Day == 1) return "";
+                        //if (tlcdate.baseDate.Day == 1) return "";
                         return tlcdate.baseDate.Day.ToString();
                     case TimelineUnits.Year:
-                        if (tlcdate.baseDate.Month == 1) return "";
+                        //if (tlcdate.baseDate.Month == 1) return "";
                         return shortMonthNames[tlcdate.baseDate.Month - 1];
                     case TimelineUnits.Decade:
-                        if (tlcdate.baseDate.Year % 10 == 0) return "";
+                        //if (tlcdate.baseDate.Year % 10 == 0) return "";
                         return tlcdate.baseDate.Year.ToString();
                     case TimelineUnits.Century:
                         return tlcdate.Decade.ToString() + "0";
@@ -503,11 +471,11 @@ namespace Timeline.Controls
                     timelineLeftX = info.Width - timelineWidth;
                     timelineMiddleX = timelineLeftX + timelineWidth / 2;
                     unitMarkX1 = timelineLeftX;
-					unitMarkX2 = unitMarkX1 + (timelineWidth * 0.2f); //30;
+					unitMarkX2 = unitMarkX1 + (timelineWidth * 0.2f);
                     subUnitMarkX1 = timelineLeftX;
-					subUnitMarkX2 = subUnitMarkX1 + (timelineWidth * 0.1f); //15;
-					unitTextX = timelineLeftX + (timelineWidth * 0.25f); //35;
-					subUnitTextX = timelineLeftX + (timelineWidth * 0.15f); //20;
+					subUnitMarkX2 = subUnitMarkX1 + (timelineWidth * 0.1f);
+					unitTextX = timelineLeftX + (timelineWidth * 0.25f);
+					subUnitTextX = timelineLeftX + (timelineWidth * 0.15f);
                     halfHeight = info.Height / 2;
 
                     timelinePaint.Color = Color.SkyBlue.ToSKColor();
@@ -520,16 +488,16 @@ namespace Timeline.Controls
 					subUnitMarkPaint.Color = Color.DimGray.ToSKColor();
                     subUnitMarkPaint.StrokeWidth = 2;
 					subUnitTextPaint.Color = Color.DimGray.ToSKColor();
-                    subUnitTextPaint.TextSize = unitTextPaint.TextSize - 4;
+                    subUnitTextPaint.TextSize = unitTextPaint.TextSize - 6;
                     subUnitTextHalfHeight = subUnitTextPaint.FontMetrics.CapHeight / 2;
 
 					unitXWidth = theme_portrait.UnitTextPaint.MeasureText("X");
                     subunitXWidth = theme_portrait.SubUnitTextPaint.MeasureText("X");
 
-					hourToDayZoomLimit = (int)(SEC_PER_HOUR / 100); //DEFAULT_PORTRAIT_HOUR_TO_DAY;
-					dayToMonthZoomLimit = (int)(SEC_PER_DAY / 150); //DEFAULT_PORTRAIT_DAY_TO_MONTH;
-					monthToYearZoomLimit = (int)(SEC_PER_MONTH / 100); //DEFAULT_PORTRAIT_MONTH_TO_YEAR;
-					yearToDecadeZoomLimit = (int)(SEC_PER_YEAR / 50); //DEFAULT_PORTRAIT_YEAR_TO_DECADE;
+					hourToDayZoomLimit = (int)(SEC_PER_HOUR / 100);
+					dayToMonthZoomLimit = (int)(SEC_PER_DAY / 150);
+					monthToYearZoomLimit = (int)(SEC_PER_MONTH / 100);
+					yearToDecadeZoomLimit = (int)(SEC_PER_YEAR / 50);
                     
 					hourSubunitLimit = (int)(SEC_PER_MINUTE / subUnitTextPaint.TextSize / 0.2);
 					daySubunitLimit = (int)(SEC_PER_HOUR / subUnitTextPaint.TextSize);
@@ -543,39 +511,39 @@ namespace Timeline.Controls
                     timelineBottomY = timelineHeight;
                     timelineMiddleY = timelineHeight / 2;
                     unitMarkY1 = timelineBottomY;
-					unitMarkY2 = unitMarkY1 - (timelineHeight * 0.2f);
+					unitMarkY2 = unitMarkY1 - (timelineHeight * 0.45f);
                     subUnitMarkY1 = timelineBottomY;
 					subUnitMarkY2 = subUnitMarkY1 - (timelineHeight * 0.1f);
-					unitTextY = timelineBottomY - (timelineHeight * 0.25f);
+					unitTextY = timelineBottomY - (timelineHeight * 0.5f);
 					subUnitTextY = timelineBottomY - (timelineHeight * 0.15f);
                     halfWidth = info.Width / 2;
 
 					timelinePaint.Color = Color.SkyBlue.ToSKColor();
-                    timelinePaint.StrokeWidth = timelineWidth;
+                    timelinePaint.StrokeWidth = timelineHeight;
                     unitMarkPaint.Color = Color.Black.ToSKColor();
                     unitMarkPaint.StrokeWidth = 4;
                     unitTextPaint.Color = Color.Black.ToSKColor();
-					unitTextPaint.TextSize = 36; //GetTextSizeForWidth(timelineWidth - 40);
+					unitTextPaint.TextSize = unitTextY - 10;
                     unitTextHalfHeight = unitTextPaint.FontMetrics.CapHeight / 2;
                     subUnitMarkPaint.Color = Color.DimGray.ToSKColor();
                     subUnitMarkPaint.StrokeWidth = 2;
 					subUnitTextPaint.Color = Color.DimGray.ToSKColor();
-                    subUnitTextPaint.TextSize = unitTextPaint.TextSize - 4;
+                    subUnitTextPaint.TextSize = unitTextPaint.TextSize - 6;
                     subUnitTextHalfHeight = subUnitTextPaint.FontMetrics.CapHeight / 2;
 
                     unitXWidth = theme_landscape.UnitTextPaint.MeasureText("X");
                     subunitXWidth = theme_landscape.SubUnitTextPaint.MeasureText("X");
 
-                    hourToDayZoomLimit = DEFAULT_LANDSCAPE_HOUR_TO_DAY;
-                    dayToMonthZoomLimit = DEFAULT_LANDSCAPE_DAY_TO_MONTH;
-                    monthToYearZoomLimit = DEFAULT_LANDSCAPE_MONTH_TO_YEAR;
-                    yearToDecadeZoomLimit = DEFAULT_LANDSCAPE_YEAR_TO_DECADE;
+					hourToDayZoomLimit = (int)(SEC_PER_HOUR / 100);
+                    dayToMonthZoomLimit = (int)(SEC_PER_DAY / 150);
+                    monthToYearZoomLimit = (int)(SEC_PER_MONTH / 100);
+                    yearToDecadeZoomLimit = (int)(SEC_PER_YEAR / 150);
 
-                    hourSubunitLimit = DEFAULT_LANDSCAPE_HOUR_SUBUNIT_LIMIT;
-                    daySubunitLimit = DEFAULT_LANDSCAPE_DAY_SUBUNIT_LIMIT;
-                    monthSubunitLimit = DEFAULT_LANDSCAPE_MONTH_SUBUNIT_LIMIT;
-                    yearSubunitLimit = DEFAULT_LANDSCAPE_YEAR_SUBUNIT_LIMIT;
-                    decadeSubunitLimit = DEFAULT_LANDSCAPE_DECADE_SUBUNIT_LIMIT;
+					hourSubunitLimit = (int)(SEC_PER_MINUTE / subunitXWidth * 2);
+					daySubunitLimit = (int)(SEC_PER_HOUR / subunitXWidth / 3);
+					monthSubunitLimit = (int)(SEC_PER_DAY / subunitXWidth / 3);
+					yearSubunitLimit = (int)(SEC_PER_MONTH / subunitXWidth / 4);
+					decadeSubunitLimit = (int)(SEC_PER_YEAR / subunitXWidth / 5);
                 }
 
                 initialOrientationCheck = false;

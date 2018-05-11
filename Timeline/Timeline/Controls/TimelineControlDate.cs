@@ -25,7 +25,7 @@ namespace Timeline.Controls
                 case TimelineUnits.Minute:
                     return baseDate.ToShortDateString() + "  " + baseDate.ToShortTimeString();
                 case TimelineUnits.Hour:
-                    return baseDate.ToShortDateString() + "  " + baseDate.ToString("hh:00");
+                    return baseDate.ToShortDateString() + "  " + baseDate.ToString("HH:00");
                 case TimelineUnits.Day:
                     return baseDate.ToShortDateString();
                 case TimelineUnits.Month:

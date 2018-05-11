@@ -203,8 +203,7 @@ namespace TouchTracking.Droid
             Point point = new Point(fromPixels(x), fromPixels(y));
 
             // Call the method
-            onTouchAction(touchEffect.formsElement,
-                new TouchActionEventArgs(id, actionType, point, isInContact));
+            onTouchAction(touchEffect.formsElement, new TouchActionEventArgs(id, actionType, point, isInContact));
         }
     }
 
