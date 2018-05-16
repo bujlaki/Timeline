@@ -12,8 +12,7 @@ namespace Timeline.Services
     {
         private readonly object _sync = new object();
         private readonly Dictionary<string, Type> _pagesByKey = new Dictionary<string, Type>();
-        private readonly Stack<NavigationPage> _navigationPageStack =
-            new Stack<NavigationPage>();
+        private readonly Stack<NavigationPage> _navigationPageStack = new Stack<NavigationPage>();
         private NavigationPage CurrentNavigationPage => _navigationPageStack.Peek();
 
         public void Configure(string pageKey, Type pageType)

@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:controls="clr-namespace:Timeline.Controls"
              xmlns:converters="clr-namespace:Timeline.Converters"
-             x:Class="Timeline.Views.VMainPage"
+             x:Class="Timeline.Views.VTimeline"
              Title="Timeline"
-             BindingContext="{Binding MainPageViewModel, Source={StaticResource vmLocator}}">
+             BindingContext="{Binding TimelineViewModel, Source={StaticResource vmLocator}}">
     <ContentPage.Content>
         <Grid Margin="0,20,0,0">
             <Grid.RowDefinitions>
@@ -13,7 +13,8 @@
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
 
-            <Button Text="Open timeline" Command="{Binding CMDOpenTimeline}"/>
+            <controls:TimelineControl Grid.Row="0" x:Name="tlc" />
+            <Label Grid.Row="1" BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

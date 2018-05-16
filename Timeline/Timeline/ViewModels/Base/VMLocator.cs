@@ -9,6 +9,7 @@ namespace Timeline.ViewModels.Base
     public class VMLocator
     {
         private Lazy<VMMainPage> _mainPageViewModel;
+		private Lazy<VMTimeline> _timelineViewModel;
 
         private ServiceContainer _services;
 
@@ -18,6 +19,7 @@ namespace Timeline.ViewModels.Base
             _services.Navigation = new NavigationService();
 
             _mainPageViewModel = new Lazy<VMMainPage>(() => new VMMainPage(_services));
+			_timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));
         }
 
         public VMMainPage MainPageViewModel
@@ -25,5 +27,9 @@ namespace Timeline.ViewModels.Base
             get { return _mainPageViewModel.Value; }
         }
 
+		public VMTimeline TimelineViewModel
+        {
+			get { return _timelineViewModel.Value; }
+        }
     }
 }
