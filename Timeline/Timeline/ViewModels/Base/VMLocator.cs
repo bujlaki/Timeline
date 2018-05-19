@@ -13,10 +13,12 @@ namespace Timeline.ViewModels.Base
 
         private ServiceContainer _services;
 
+		public ServiceContainer Services { get { return _services; } }
+
         public VMLocator()
         {
             _services = new ServiceContainer();
-            _services.Navigation = new NavigationService();
+            _services.Navigation = new NavigationService(this);
 
             _mainPageViewModel = new Lazy<VMMainPage>(() => new VMMainPage(_services));
 			_timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));

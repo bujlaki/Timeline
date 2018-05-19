@@ -5,7 +5,7 @@ namespace Timeline.ViewModels
 {
     public class VMMainPage : Base.VMBase
     {
-		Command CMDOpenTimeline;
+		public Command CMDOpenTimeline { get; set; }
 
         public VMMainPage(Services.Base.ServiceContainer services) : base(services)
         {
@@ -14,7 +14,7 @@ namespace Timeline.ViewModels
 
 		void CMDOpenTimelineExecute(object obj)
 		{
-			_services.Navigation.
+			_services.Navigation.GoToTimelineView(null);
 		}
 
 		bool CMDOpenTimelineCanExecute(object arg)

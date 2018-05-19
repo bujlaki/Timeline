@@ -5,6 +5,8 @@ using System.Text;
 
 using Xamarin.Forms;
 
+using Timeline.ViewModels.Base;
+
 namespace Timeline
 {
 	public partial class App : Application
@@ -12,8 +14,7 @@ namespace Timeline
 		public App ()
 		{
 			InitializeComponent();
-
-            MainPage = new Views.VMainPage();
+			MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
 		}
 
 		protected override void OnStart ()
