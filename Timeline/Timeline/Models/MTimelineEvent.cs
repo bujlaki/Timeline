@@ -13,12 +13,15 @@ namespace Timeline.Models
 
         public Image Image { get; set; }
 
-		public TimelineDate Date { get; set; }
+		public TimelineDate StartDate { get; set; }
+
+		public TimelineDate EndDate { get; set; }
 
 		public MTimelineEvent(string _title, DateTime _date)
         {
 			Title = _title;
-			Date = new TimelineDate(_date);
+			StartDate = new TimelineDate(_date);
+			EndDate = new TimelineDate(_date);
         }
 
     }

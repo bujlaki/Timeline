@@ -363,7 +363,7 @@ namespace Timeline.Controls
             canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, highlightPaint);
 
 			//EVENTS
-			if (this.Timeline1 != null) DrawTimelineEvents();
+			if (this.Timeline1 != null) DrawTimelineEvents(canvas);
         }
 
 		#region "UNITS AND SUBUNITS DRAWING"
@@ -456,15 +456,25 @@ namespace Timeline.Controls
 		}
 		#endregion
 
-		private void DrawTimelineEvents()
+		private void DrawTimelineEvents(SKCanvas canvas)
 		{
 			DateTime minDate = new DateTime(date.BaseDate.Ticks - halfWidth * pixeltime);
 			DateTime maxDate = new DateTime(date.BaseDate.Ticks + halfWidth * pixeltime);
             
 			foreach(MTimelineEvent e in this.Timeline1.Events)
 			{
-				
+				if((e.StartDate.BaseDate.Ticks>minDate.Ticks)&&(e.StartDate.BaseDate.Ticks<maxDate.Ticks))
+				{
+					DrawTimelineEvent(e, canvas, minDate);
+				}
 			}
+		}
+
+		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, DateTime minDate)
+		{
+			float eventX;
+			eventX = (e.StartDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
+			canvas.DrawRect(eventX, timelineBottomY, 50, 20, timelinePaint);
 		}
 
 		private void AdjustZoomUnit()

@@ -6,12 +6,12 @@ namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
-		MTimeline _timeline;
+		public MTimeline Timeline { get; set; }
 
 		public VMTimeline(Services.Base.ServiceContainer services) : base(services)
         {
-			_timeline = new MTimeline();
-			_timeline.Events.Add(new MTimelineEvent("event1", DateTime.UtcNow));
+			Timeline = new MTimeline();
+			Timeline.Events.Add(new MTimelineEvent("event1", DateTime.UtcNow));
 
         }
     }
