@@ -236,9 +236,9 @@ namespace Timeline.Controls
         TouchGestureRecognizer gestureRecognizer;
         TimelineOrientation orientation;
 
-        TimelineDate date;
-        TimelineDate unitDate;
-        TimelineDate subUnitDate;
+        MTimelineDate date;
+        MTimelineDate unitDate;
+        MTimelineDate subUnitDate;
 
         SKPaint timelinePaint;
         SKPaint unitMarkPaint;
@@ -246,6 +246,9 @@ namespace Timeline.Controls
         SKPaint subUnitMarkPaint;
         SKPaint subUnitTextPaint;
 		SKPaint highlightPaint;
+		SKPaint eventPaint;
+		SKPaint eventBorderPaint;
+		SKPaint eventTextPaint;
 
         Int64 pixeltime;
         float unitXWidth;
@@ -289,9 +292,9 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new TimelineDate(DateTime.UtcNow);
-			unitDate = new TimelineDate(DateTime.UtcNow);
-			subUnitDate = new TimelineDate(DateTime.UtcNow);
+			date = new MTimelineDate(DateTime.UtcNow);
+			unitDate = new MTimelineDate(DateTime.UtcNow);
+			subUnitDate = new MTimelineDate(DateTime.UtcNow);
 			DateStr = date.DateStr(ZoomUnit);
 
 			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
@@ -305,6 +308,20 @@ namespace Timeline.Controls
 			subUnitMarkPaint = new SKPaint();
 			subUnitTextPaint = new SKPaint();
 			highlightPaint = new SKPaint();
+
+			eventPaint = new SKPaint();
+			eventPaint.StrokeWidth = 2;
+			eventPaint.Color = Color.DarkGray.ToSKColor();
+			eventPaint.Style = SKPaintStyle.Fill;
+
+			eventBorderPaint = new SKPaint();
+			eventBorderPaint.Color = Color.Black.ToSKColor();
+			eventBorderPaint.StrokeWidth = 4;
+			eventBorderPaint.Style = SKPaintStyle.Stroke;
+
+			eventTextPaint = new SKPaint();
+			eventTextPaint.Color = Color.Black.ToSKColor();
+			eventTextPaint.TextSize = 16;
 		}
 
         void GestureRecognizer_OnGestureRecognized(object sender, TouchGestureEventArgs args)
@@ -406,7 +423,7 @@ namespace Timeline.Controls
             }
         }
 
-        private string GetUnitText(TimelineDate tlcdate)
+        private string GetUnitText(MTimelineDate tlcdate)
         {
             switch (this.ZoomUnit)
             {
@@ -429,7 +446,7 @@ namespace Timeline.Controls
             }
         }
         
-		private string GetSubUnitText(TimelineDate tlcdate)
+		private string GetSubUnitText(MTimelineDate tlcdate)
 		{
 			switch (this.ZoomUnit)
             {
@@ -463,7 +480,7 @@ namespace Timeline.Controls
             
 			foreach(MTimelineEvent e in this.Timeline1.Events)
 			{
-				if((e.StartDate.BaseDate.Ticks>minDate.Ticks)&&(e.StartDate.BaseDate.Ticks<maxDate.Ticks))
+				if((e.EndDate.BaseDate.Ticks>minDate.Ticks)&&(e.StartDate.BaseDate.Ticks<maxDate.Ticks))
 				{
 					DrawTimelineEvent(e, canvas, minDate);
 				}
@@ -472,9 +489,12 @@ namespace Timeline.Controls
 
 		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, DateTime minDate)
 		{
-			float eventX;
-			eventX = (e.StartDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
-			canvas.DrawRect(eventX, timelineBottomY, 50, 20, timelinePaint);
+			float startX;
+			float endX;
+			startX = (e.StartDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
+			endX = (e.EndDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
+			canvas.DrawRect(startX, timelineBottomY, endX-startX, 100, eventPaint);
+			canvas.DrawRect(startX, timelineBottomY, endX - startX, 100, eventBorderPaint);
 		}
 
 		private void AdjustZoomUnit()

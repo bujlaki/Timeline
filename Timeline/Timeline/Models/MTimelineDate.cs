@@ -1,14 +1,17 @@
 ﻿using System;
-namespace Timeline.Controls
+
+using Timeline.Controls;
+
+namespace Timeline.Models
 {
-    public class TimelineDate
+    public class MTimelineDate
     {
         public DateTime BaseDate { get; set; }
         public int Decade { get; set; }
         public int Century { get; set; }
 		public TimelineUnits Precision { get; set; }
 
-		public TimelineDate(DateTime _date)
+		public MTimelineDate(DateTime _date)
 		{
 			BaseDate = _date;
 			Precision = TimelineUnits.Minute;
@@ -16,7 +19,7 @@ namespace Timeline.Controls
             Century = BaseDate.Year / 100;
 		}
 
-        public TimelineDate(int year, int month=-1, int day=-1, int hour=-1, int minute=-1)
+        public MTimelineDate(int year, int month=-1, int day=-1, int hour=-1, int minute=-1)
         {
 			if(month==-1)
 			{
@@ -68,15 +71,16 @@ namespace Timeline.Controls
             }
         }
         
-        public void CopyTo(ref TimelineDate dstDate)
+        public void CopyTo(ref MTimelineDate dstDate)
         {
-			dstDate.BaseDate = BaseDate;
-            dstDate.Decade = Decade;
-            dstDate.Century = Century;
-			dstDate.Precision = Precision;
+			CopyTo(ref dstDate, this.Precision);
+			//dstDate.BaseDate = BaseDate;
+            //dstDate.Decade = Decade;
+            //dstDate.Century = Century;
+			//dstDate.Precision = Precision;
         }
 
-		public void CopyTo(ref TimelineDate dstDate, TimelineUnits precision)
+		public void CopyTo(ref MTimelineDate dstDate, TimelineUnits precision)
 		{
 			switch (precision)
 			{
@@ -115,7 +119,14 @@ namespace Timeline.Controls
 					dstDate.Decade = Century * 10;
 					dstDate.BaseDate = new DateTime(Century * 100, 1, 1, 0, 0, 0);
 					break;
-			}         
+			}
+
+			dstDate.Precision = precision;
+		}
+
+        public void Add(int value=1)
+		{
+			Add(this.Precision, value);
 		}
 
         public void Add(TimelineUnits unit, int value = 1)

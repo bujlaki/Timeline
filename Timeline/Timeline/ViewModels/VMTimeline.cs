@@ -11,7 +11,8 @@ namespace Timeline.ViewModels
 		public VMTimeline(Services.Base.ServiceContainer services) : base(services)
         {
 			Timeline = new MTimeline();
-			Timeline.Events.Add(new MTimelineEvent("event1", DateTime.UtcNow));
+			MTimelineDate tld = new MTimelineDate(2018, 1);
+			Timeline.Events.Add(new MTimelineEvent("event1", tld));
 
         }
     }
