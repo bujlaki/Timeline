@@ -284,6 +284,13 @@ namespace Timeline.Controls
         float subUnitTextY;
         int halfWidth;
 
+		int eventLanes;
+		float eventsHeight;
+		float eventsTopY;
+		float laneHeight;
+		bool[] laneBusy;
+		MTimelineDate[] laneBusyUntil;
+
         bool initialOrientationCheck;
 
 		public TimelineControl()
@@ -380,6 +387,7 @@ namespace Timeline.Controls
             canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, highlightPaint);
 
 			//EVENTS
+			for (int i = 0; i < 8; i++) laneBusyUntil[i] = null;
 			if (this.Timeline1 != null) DrawTimelineEvents(canvas);
         }
 
@@ -491,10 +499,33 @@ namespace Timeline.Controls
 		{
 			float startX;
 			float endX;
+			float eventWidth;
+			float eventTop;
+			float eventBottom;
+
+			int lane = GetFreeLane(e.StartDate);
+			SetLaneBusy(lane, e.EndDate);
 			startX = (e.StartDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
-			endX = (e.EndDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
-			canvas.DrawRect(startX, timelineBottomY, endX-startX, 100, eventPaint);
-			canvas.DrawRect(startX, timelineBottomY, endX - startX, 100, eventBorderPaint);
+			endX = (e.EndDate.BaseDate.Ticks - minDate.Ticks) / pixeltime - 1;
+			eventWidth = endX - startX;
+			eventTop = eventsTopY + lane * laneHeight;
+			eventBottom = eventTop + laneHeight - 1;
+			canvas.DrawRect(startX, eventTop, endX - startX, eventBottom - eventTop, eventPaint);
+			canvas.DrawRect(startX, eventTop, endX - startX, eventBottom - eventTop, eventBorderPaint);
+		}
+
+		private void SetLaneBusy(int lane, MTimelineDate tld)
+		{
+			if (laneBusyUntil[lane] == null) laneBusyUntil[lane] = new MTimelineDate(DateTime.UtcNow);
+			tld.CopyTo(ref laneBusyUntil[lane]);
+		}
+
+		private int GetFreeLane(MTimelineDate tld)
+		{
+			for (int i = 0; i < 8;i++)
+				if((laneBusyUntil[i]==null)||(laneBusyUntil[i]<tld)) return i;
+			
+			return -1;
 		}
 
 		private void AdjustZoomUnit()
@@ -590,6 +621,13 @@ namespace Timeline.Controls
 				subunitLimitMonth = (int)(SEC_PER_MONTH / subunitXWidth / 3);
 				subunitLimitYear = (int)(SEC_PER_YEAR / subunitXWidth / 4);
 
+				eventLanes = 8;
+                eventsTopY = timelineBottomY + 10;
+				eventsHeight = info.Height - eventsTopY;
+				laneHeight = eventsHeight / eventLanes;
+				laneBusy = new bool[eventLanes];
+				laneBusyUntil = new MTimelineDate[eventLanes];
+                
                 initialOrientationCheck = false;
             }
         }

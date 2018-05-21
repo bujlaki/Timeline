@@ -11,6 +11,16 @@ namespace Timeline.Models
         public int Century { get; set; }
 		public TimelineUnits Precision { get; set; }
 
+        public static bool operator < (MTimelineDate tld1, MTimelineDate tld2)
+		{
+			return tld1.BaseDate < tld2.BaseDate;            
+		}
+
+		public static bool operator > (MTimelineDate tld1, MTimelineDate tld2)
+        {
+			return tld1.BaseDate > tld2.BaseDate;
+        }
+
 		public MTimelineDate(DateTime _date)
 		{
 			BaseDate = _date;

@@ -12,8 +12,11 @@ namespace Timeline.ViewModels
         {
 			Timeline = new MTimeline();
 			MTimelineDate tld = new MTimelineDate(2018, 1);
-			Timeline.Events.Add(new MTimelineEvent("event1", tld));
-
+			for (int i = 0; i < 10; i++)
+			{
+				Timeline.Events.Add(new MTimelineEvent("event1", tld, 2));
+				tld.Add();
+			}
         }
     }
 }
