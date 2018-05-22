@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:controls="clr-namespace:Timeline.Controls"
+             xmlns:converters="clr-namespace:Timeline.Converters"
+             x:Class="Timeline.Views.TestPages.VTestPage"
+             Title="TestPage"
+             BindingContext="{Binding TestViewModel, Source={StaticResource vmLocator}}">
+    <ContentPage.Content>
+        <Button Text="RUN TESTS" Command="{Binding CMDRunTests}"/>
+    </ContentPage.Content>
+</ContentPage>

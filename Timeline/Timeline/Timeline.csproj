@@ -17,5 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TouchTracking\" />
+    <Folder Include="Views\TestPages\" />
+    <Folder Include="ViewModels\TestViewModels\" />
   </ItemGroup>
 </Project>
