@@ -141,12 +141,26 @@ namespace Timeline.Models
 			Add(this.Precision, value);
 		}
 
+        //BC -- add -value
+        //AD -- add value
         public void Add(TimelineUnits unit, int value = 1)
         {
             switch(unit)
             {
                 case TimelineUnits.Minute:
-					BaseDate = BaseDate.AddMinutes(value);
+					try
+					{
+						BaseDate = BaseDate.AddMinutes(value);
+					}
+					catch (ArgumentOutOfRangeException ex)
+					{
+						if(value<0){
+							//AD to BC
+
+						} else {
+							//BC to AD
+						}
+					}
                     break;
                 case TimelineUnits.Hour:
 					BaseDate = BaseDate.AddHours(value);
