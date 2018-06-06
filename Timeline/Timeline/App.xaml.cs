@@ -6,6 +6,7 @@ using System.Text;
 using Xamarin.Forms;
 
 using Timeline.ViewModels.Base;
+using Amazon;
 
 namespace Timeline
 {
@@ -14,6 +15,16 @@ namespace Timeline
 		public App ()
 		{
 			InitializeComponent();
+
+			var loggingConfig = AWSConfigs.LoggingConfig;
+            loggingConfig.LogMetrics = true;
+            loggingConfig.LogResponses = ResponseLoggingOption.Always;
+            loggingConfig.LogMetricsFormat = LogMetricsFormatOption.JSON;
+            loggingConfig.LogTo = LoggingOptions.SystemDiagnostics;
+            
+			AWSConfigs.AWSRegion = AwsRegion.EUCentral1.Name;
+			AWSConfigs.CorrectForClockSkew = true;
+
 			MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
 		}
 

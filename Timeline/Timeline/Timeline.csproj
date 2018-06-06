@@ -9,6 +9,7 @@
     <PackageReference Include="SkiaSharp" Version="1.60.0" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.60.0" />
     <PackageReference Include="Amazon.DynamoDb" Version="0.11.0" />
+    <PackageReference Include="AWSSDK.CognitoIdentity" Version="3.3.2.23" />
   </ItemGroup>
 
   <ItemGroup>
