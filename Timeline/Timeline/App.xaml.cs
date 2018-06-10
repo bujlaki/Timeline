@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 using Timeline.ViewModels.Base;
 using Amazon;

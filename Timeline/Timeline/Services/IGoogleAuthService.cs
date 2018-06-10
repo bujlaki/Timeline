@@ -7,5 +7,6 @@ namespace Timeline.Services
     public interface IGoogleAuthService
     {
         void Test();
+        void Test2();
     }
 }
