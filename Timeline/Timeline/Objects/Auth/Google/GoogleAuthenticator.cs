@@ -43,7 +43,8 @@ namespace Timeline.Objects.Auth.Google
                 var token = new GoogleOAuthToken
                 {
                     TokenType = e.Account.Properties["token_type"],
-                    AccessToken = e.Account.Properties["access_token"]
+                    AccessToken = e.Account.Properties["access_token"],
+                    IdToken = e.Account.Properties["id_token"]
                 };
                 _authenticationDelegate.OnAuthenticationCompleted(token);
             }

@@ -26,6 +26,7 @@ namespace Timeline.ViewModels.Base
         {
             _services = new ServiceContainer();
             _services.Navigation = new NavigationService(this);
+            _services.Cognito = new CognitoService();
             _services.Authentication = DependencyService.Get<IAuthenticationService>();
 
 			_testViewModel = new Lazy<TestViewModels.VMTestPage>(() => new TestViewModels.VMTestPage(_services));

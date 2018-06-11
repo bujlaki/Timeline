@@ -23,6 +23,13 @@ namespace Timeline.ViewModels
         {
             CmdGoogleLogin = new Command(CmdGoogleLoginExecute, CmdGoogleLoginCanExecute);
             LoginResult = "TRY GMAIL";
+
+            Console.WriteLine("Checking cached Cognito credentials");
+            _services.Cognito.GetCachedCognitoIdentity();
+            if(_services.Cognito.IsLoggedIn) {
+                LoginResult = "ALREADY LOGGED IN";
+                Console.WriteLine("LOGGED IN AS: " + _services.Cognito.CognitoId);
+            }
         }
 
         void CmdGoogleLoginExecute(object obj)
@@ -38,6 +45,13 @@ namespace Timeline.ViewModels
         public void OnAuthenticationCompleted(GoogleOAuthToken token)
         {
             LoginResult = "SUCCESS";
+            _services.Cognito.GetCognitoIdentityWithGoogleToken(token.IdToken);
+
+            if (_services.Cognito.IsLoggedIn)
+            {
+                LoginResult = "COGNITO SUCCESS";
+                Console.WriteLine("LOGGED IN AS: " + _services.Cognito.CognitoId);
+            }
         }
 
         public void OnAuthenticationFailed(string message, Exception exception)

@@ -8,5 +8,6 @@ namespace Timeline.Objects.Auth.Google
     {
         public string TokenType { get; set; }
         public string AccessToken { get; set; }
+        public string IdToken { get; set; }
     }
 }
