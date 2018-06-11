@@ -19,6 +19,7 @@ namespace Timeline.Services
 		private Lazy<VTestPage> testView;
 
         //REAL
+        private Lazy<VLogin> loginView;
 		private Lazy<VMainPage> mainpageView;
         private Lazy<VTimeline> timelineView;
 
@@ -30,13 +31,15 @@ namespace Timeline.Services
 			testView = new Lazy<VTestPage>(() => new VTestPage());
 
             //REAL
-			mainpageView = new Lazy<VMainPage>(() => new VMainPage());
-			timelineView = new Lazy<VTimeline>(() => new VTimeline());
+            loginView = new Lazy<VLogin>(() => new VLogin());
+            mainpageView = new Lazy<VMainPage>(() => new VMainPage());
+            timelineView = new Lazy<VTimeline>(() => new VTimeline());
         }
 
 		public Page RootPage()
 		{
-			return mainpageView.Value;
+            //return mainpageView.Value;
+            return loginView.Value;
 		}
 
         public void GoToTestPage()

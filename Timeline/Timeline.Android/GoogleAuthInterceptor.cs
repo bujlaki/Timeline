@@ -34,7 +34,8 @@ namespace Timeline.Droid
             base.OnCreate(savedInstanceState);
             Android.Net.Uri uri_android = Intent.Data;
             Uri uri_netfx = new Uri(uri_android.ToString());
-            MainActivity.auth?.OnPageLoading(uri_netfx);
+            
+            Timeline.Droid.Services.AuthenticationService_Android.Auth?.OnPageLoading(uri_netfx);
 
             var intent = new Intent(this, typeof(MainActivity));
             intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop);
