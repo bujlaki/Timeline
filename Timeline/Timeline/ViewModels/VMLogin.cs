@@ -14,6 +14,8 @@ namespace Timeline.ViewModels
 
         public Command CmdGoogleLogin { get; set; }
 
+        public Command CmdUserPassLogin { get; set; }
+
         public string LoginResult {
             get { return loginResult; }
             set { loginResult = value; RaisePropertyChanged("LoginResult"); }
@@ -22,6 +24,8 @@ namespace Timeline.ViewModels
         public VMLogin(Services.Base.ServiceContainer services) : base(services)
         {
             CmdGoogleLogin = new Command(CmdGoogleLoginExecute, CmdGoogleLoginCanExecute);
+            CmdUserPassLogin = new Command(CmdUserPassLoginExecute, CmdUserPassLoginCanExecute);
+
             LoginResult = "TRY GMAIL";
 
             Console.WriteLine("Checking cached Cognito credentials");
@@ -38,6 +42,16 @@ namespace Timeline.ViewModels
         }
 
         bool CmdGoogleLoginCanExecute(object arg)
+        {
+            return true;
+        }
+
+        void CmdUserPassLoginExecute(object obj)
+        {
+            _services.Cognito.GetCognitoIdentityWithUserPass("user", "pass");
+        }
+
+        bool CmdUserPassLoginCanExecute(object arg)
         {
             return true;
         }

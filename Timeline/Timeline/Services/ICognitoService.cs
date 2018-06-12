@@ -11,5 +11,6 @@ namespace Timeline.Services
 
         void GetCachedCognitoIdentity();
         void GetCognitoIdentityWithGoogleToken(string token);
+        void GetCognitoIdentityWithUserPass(string username, string password);
     }
 }

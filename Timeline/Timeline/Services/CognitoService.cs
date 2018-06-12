@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+
 using Amazon;
 using Amazon.CognitoIdentity;
 using Amazon.CognitoIdentity.Model;
+using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentityProvider.Model;
+using Amazon.Extensions.CognitoAuthentication;
 
 namespace Timeline.Services
 {
@@ -60,6 +64,173 @@ namespace Timeline.Services
             {
                 CognitoId = "";
                 throw task.Exception;
+            }
+        }
+
+        public void GetCognitoIdentityWithUserPass(string username, string password)
+        {
+            bool success;
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
+            //AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(credentials,RegionEndpoint.EUCentral1);
+
+            CognitoUserPool userPool = new CognitoUserPool("eu-central-1_92Db6PCAi", "365ckri3ic37q8crv6orpk7q7s", provider);
+            CognitoUser user = new CognitoUser("username", "365ckri3ic37q8crv6orpk7q7s", userPool, provider);
+
+            InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
+            {
+                Password = "userPassword123"
+            };
+
+            try
+            {
+                Task<AuthFlowResponse> task = user.StartWithSrpAuthAsync(authRequest);
+                task.Wait();
+
+                AuthFlowResponse authResponse = task.Result;
+                var accessToken = authResponse.AuthenticationResult.AccessToken;
+                success = true;
+            } catch
+            {
+                success = false;
+            }
+
+
+
+            if (!success)
+            {
+                //SIGNUP
+                SignUpRequest sr = new SignUpRequest();
+
+                sr.ClientId = "365ckri3ic37q8crv6orpk7q7s";
+                sr.Username = "username";
+                sr.Password = "userPassword123";
+                sr.UserAttributes = new List<AttributeType> {
+                new AttributeType
+                {
+                        Name = "email",
+                        Value = "balazs.ujlaki@gmail.com",
+                }
+            };
+
+                Task<SignUpResponse> task2 = provider.SignUpAsync(sr);
+                task2.Wait();
+                SignUpResponse resp = task2.Result;
+            }
+        }
+
+        private string POOL_ID = ConfigurationManager.AppSettings["POOL_id"];
+        private string CLIENTAPP_ID = ConfigurationManager.AppSettings["CLIENT_id"];
+        private string FED_POOL_ID = ConfigurationManager.AppSettings["FED_POOL_id"];
+        private string CUSTOM_DOMAIN = ConfigurationManager.AppSettings["CUSTOMDOMAIN"];
+        private string REGION = ConfigurationManager.AppSettings["AWSREGION"];
+
+        internal string GetCustomHostedURL()
+        {
+            return string.Format("https://{0}.auth.{1}.amazoncognito.com/login?response_type=code&client_id={2}&redirect_uri=https://sid343.reinvent-workshop.com/", CUSTOM_DOMAIN, REGION, CLIENTAPP_ID);
+        }
+
+        internal async Task<bool> SignUpUser(string username, string password, string email, string phonenumber)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
+
+            SignUpRequest signUpRequest = new SignUpRequest();
+
+            signUpRequest.ClientId = CLIENTAPP_ID;
+            signUpRequest.Username = username;
+            signUpRequest.Password = password;
+
+
+            AttributeType attributeType = new AttributeType();
+            attributeType.Name = "phone_number";
+            attributeType.Value = phonenumber;
+            signUpRequest.UserAttributes.Add(attributeType);
+
+            AttributeType attributeType1 = new AttributeType();
+            attributeType1.Name = "email";
+            attributeType1.Value = email;
+            signUpRequest.UserAttributes.Add(attributeType1);
+
+
+            try
+            {
+
+                SignUpResponse result = await provider.SignUpAsync(signUpRequest);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            return true;
+
+        }
+
+        internal async Task<bool> VerifyAccessCode(string username, string code)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
+            ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
+            confirmSignUpRequest.Username = username;
+            confirmSignUpRequest.ConfirmationCode = code;
+            confirmSignUpRequest.ClientId = CLIENTAPP_ID;
+            try
+            {
+                ConfirmSignUpResponse confirmSignUpResult = provider.ConfirmSignUp(confirmSignUpRequest);
+                Console.WriteLine(confirmSignUpResult.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        internal async Task<CognitoUser> ResetPassword(string username)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
+
+            CognitoUserPool userPool = new CognitoUserPool(this.POOL_ID, this.CLIENTAPP_ID, provider);
+
+            CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
+            await user.ForgotPasswordAsync();
+            return user;
+        }
+
+        internal async Task<CognitoUser> UpdatePassword(string username, string code, string newpassword)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
+
+            CognitoUserPool userPool = new CognitoUserPool(this.POOL_ID, this.CLIENTAPP_ID, provider);
+
+            CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
+            await user.ConfirmForgotPasswordAsync(code, newpassword);
+            return user;
+        }
+
+        internal async Task<CognitoUser> ValidateUser(string username, string password)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
+
+            CognitoUserPool userPool = new CognitoUserPool(this.POOL_ID, this.CLIENTAPP_ID, provider);
+
+            CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
+            InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
+            {
+                Password = password
+            };
+
+
+            AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
+            if (authResponse.AuthenticationResult != null)
+            {
+                return user;
+            }
+            else
+            {
+                return null;
             }
         }
     }

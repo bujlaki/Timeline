@@ -24,7 +24,7 @@
                 <Entry x:Name="usernameEntry" Placeholder="username" />
                 <Label Text="Password" />
                 <Entry x:Name="passwordEntry" IsPassword="true" />
-                <Button Text="Login" />
+                <Button Text="Login" Command="{Binding CmdUserPassLogin}"/>
                 <Button Text="Login using GMail" Command="{Binding CmdGoogleLogin}"/>
                 <Label x:Name="messageLabel" Text="{Binding LoginResult}"/>
             </StackLayout>
