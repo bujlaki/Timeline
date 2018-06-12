@@ -10,24 +10,34 @@
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="100"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
 
-            <Label Text="Login to Timeline" 
+            <Label Text="TIMELINE" 
                    VerticalOptions="CenterAndExpand" 
                    HorizontalOptions="CenterAndExpand"
                    FontSize="28"/>
             
-            <StackLayout VerticalOptions="StartAndExpand" Grid.Row="1">
-                <Label Text="Username" />
-                <Entry x:Name="usernameEntry" Placeholder="username" />
-                <Label Text="Password" />
-                <Entry x:Name="passwordEntry" IsPassword="true" />
+            <StackLayout Grid.Row="1">
+                
+                <Entry Placeholder="username" />
+                
+                <Entry IsPassword="true" />
                 <Button Text="Login" Command="{Binding CmdUserPassLogin}"/>
-                <Button Text="Login using GMail" Command="{Binding CmdGoogleLogin}"/>
-                <Label x:Name="messageLabel" Text="{Binding LoginResult}"/>
+                <Button Text="Forgot password" />
+                <Label Text="{Binding LoginResult}"/>
             </StackLayout>
+            
+            <Button Grid.Row="2" Text="Create new account" />
+
+            <StackLayout VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Grid.Row="3">
+                <Label Text="- or -" HorizontalOptions="Center"/>
+                <Button Text="Login using GMail" Command="{Binding CmdGoogleLogin}"/>
+            </StackLayout>
+            
         </Grid>
     </ContentPage.Content>
 

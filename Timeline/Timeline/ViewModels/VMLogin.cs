@@ -46,9 +46,16 @@ namespace Timeline.ViewModels
             return true;
         }
 
-        void CmdUserPassLoginExecute(object obj)
+        async void CmdUserPassLoginExecute(object obj)
         {
-            _services.Cognito.GetCognitoIdentityWithUserPass("user", "pass");
+            try
+            {
+                await _services.Cognito.ValidateUser("username", "userPassword123");
+            }
+            catch (Exception ex)
+            {
+                LoginResult = ex.Message;
+            }
         }
 
         bool CmdUserPassLoginCanExecute(object arg)
