@@ -1,7 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
 
-namespace TouchTracking
+namespace Timeline.Objects.TouchTracking
 {
     public enum TouchActionType
     {

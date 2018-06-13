@@ -20,12 +20,10 @@
                    VerticalOptions="CenterAndExpand" 
                    HorizontalOptions="CenterAndExpand"
                    FontSize="28"/>
-            
+
             <StackLayout Grid.Row="1">
-                
-                <Entry Placeholder="username" />
-                
-                <Entry IsPassword="true" />
+                <Entry Placeholder="username" Text="{Binding Username, Mode=OneWayToSource}"/>
+                <Entry IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
                 <Button Text="Login" Command="{Binding CmdUserPassLogin}"/>
                 <Button Text="Forgot password" />
                 <Label Text="{Binding LoginResult}"/>

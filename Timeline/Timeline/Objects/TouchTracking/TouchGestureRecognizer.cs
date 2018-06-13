@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using SkiaSharp;
 
-namespace TouchTracking
+namespace Timeline.Objects.TouchTracking
 {
     public class Timings
     {

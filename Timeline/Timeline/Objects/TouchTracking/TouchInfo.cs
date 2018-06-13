@@ -1,7 +1,7 @@
 ﻿using System;
 using SkiaSharp;
 
-namespace TouchTracking
+namespace Timeline.Objects.TouchTracking
 {
     class TouchInfo
     {

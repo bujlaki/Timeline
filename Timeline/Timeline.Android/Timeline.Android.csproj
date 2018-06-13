@@ -87,8 +87,8 @@
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\AuthenticationService_Android.cs" />
-    <Compile Include="TouchTracking\TouchEffect.cs" />
+    <Compile Include="Objects\Auth\Google\AndroidSpecificGoogleAuth.cs" />
+    <Compile Include="Objects\TouchTracking\TouchEffectDroid.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

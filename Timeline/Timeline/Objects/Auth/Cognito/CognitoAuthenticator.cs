@@ -10,9 +10,9 @@ using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
 
-namespace Timeline.Services
+namespace Timeline.Objects.Auth.Cognito
 {
-    class CognitoService : ICognitoService
+    class CognitoAuthenticator
     {
         private string POOL_ID = "eu-central-1_92Db6PCAi";
         private string CLIENTAPP_ID = "365ckri3ic37q8crv6orpk7q7s";
@@ -25,7 +25,7 @@ namespace Timeline.Services
         public string CognitoId { get; private set; }
         public bool IsLoggedIn { get; private set; }
 
-        public CognitoService()
+        public CognitoAuthenticator()
         {
             credentials = new CognitoAWSCredentials(
                 "eu-central-1:fd027885-da62-40c8-a16e-44c8a7cb8300", // Identity pool ID
@@ -95,7 +95,8 @@ namespace Timeline.Services
                 AuthFlowResponse authResponse = task.Result;
                 var accessToken = authResponse.AuthenticationResult.AccessToken;
                 success = true;
-            } catch
+            }
+            catch
             {
                 success = false;
             }
@@ -222,7 +223,6 @@ namespace Timeline.Services
                 Password = password
             };
 
-
             AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
             if (authResponse.AuthenticationResult != null)
             {
@@ -233,5 +233,6 @@ namespace Timeline.Services
                 return null;
             }
         }
+
     }
 }

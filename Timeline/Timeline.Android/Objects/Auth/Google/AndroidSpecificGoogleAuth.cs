@@ -10,14 +10,13 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Timeline.Objects.Auth.Google;
-using Timeline.Services;
 using Plugin.CurrentActivity;
 using Xamarin.Forms;
 
-[assembly: Dependency(typeof(Timeline.Droid.Services.AuthenticationService_Android))]
-namespace Timeline.Droid.Services
+[assembly: Dependency(typeof(Timeline.Droid.Objects.Auth.Google.AndroidSpecificGoogleAuth))]
+namespace Timeline.Droid.Objects.Auth.Google
 {
-    class AuthenticationService_Android : IAuthenticationService
+    class AndroidSpecificGoogleAuth : IPlatformSpecificGoogleAuth
     {
         // Need to be static because we need to access it in GoogleAuthInterceptor for continuation
         public static GoogleAuthenticator Auth;

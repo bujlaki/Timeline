@@ -4,7 +4,7 @@ using Xamarin.Forms;
 
 using Timeline.Services;
 using Timeline.Services.Base;
-using Timeline.ViewModels;
+using Timeline.Objects.Auth.Google;
 
 namespace Timeline.ViewModels.Base
 {
@@ -26,8 +26,7 @@ namespace Timeline.ViewModels.Base
         {
             _services = new ServiceContainer();
             _services.Navigation = new NavigationService(this);
-            _services.Cognito = new CognitoService();
-            _services.Authentication = DependencyService.Get<IAuthenticationService>();
+            _services.Authentication = new AuthenticationService();
 
 			_testViewModel = new Lazy<TestViewModels.VMTestPage>(() => new TestViewModels.VMTestPage(_services));
 

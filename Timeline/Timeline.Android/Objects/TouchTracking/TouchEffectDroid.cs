@@ -7,25 +7,27 @@ using Xamarin.Forms.Platform.Android;
 
 using Android.Views;
 
-[assembly: ResolutionGroupName("XamarinDocs")]
-[assembly: ExportEffect(typeof(TouchTracking.Droid.TouchEffect), "TouchEffect")]
+using Timeline.Objects.TouchTracking;
 
-namespace TouchTracking.Droid
+[assembly: ResolutionGroupName("XamarinDocs")]
+[assembly: ExportEffect(typeof(Timeline.Droid.Objects.TouchTracking.TouchEffectDroid), "TouchEffect")]
+
+namespace Timeline.Droid.Objects.TouchTracking
 {
-    public class TouchEffect : PlatformEffect
+    public class TouchEffectDroid : PlatformEffect
     {
         Android.Views.View view;
         Element formsElement;
-        TouchTracking.TouchEffect pclTouchEffect;
+        TouchEffect sharedTouchEffect;
         bool capture;
         Func<double, double> fromPixels;
         int[] twoIntArray = new int[2];
 
-        static Dictionary<Android.Views.View, TouchEffect> viewDictionary =
-            new Dictionary<Android.Views.View, TouchEffect>();
+        static Dictionary<Android.Views.View, TouchEffectDroid> viewDictionary =
+            new Dictionary<Android.Views.View, TouchEffectDroid>();
 
-        static Dictionary<int, TouchEffect> idToEffectDictionary =
-            new Dictionary<int, TouchEffect>();
+        static Dictionary<int, TouchEffectDroid> idToEffectDictionary =
+            new Dictionary<int, TouchEffectDroid>();
 
         protected override void OnAttached()
         {
@@ -33,9 +35,9 @@ namespace TouchTracking.Droid
             view = Control == null ? Container : Control;
 
             // Get access to the TouchEffect class in the PCL
-            TouchTracking.TouchEffect touchEffect =
-                (TouchTracking.TouchEffect)Element.Effects.
-                    FirstOrDefault(e => e is TouchTracking.TouchEffect);
+            TouchEffect touchEffect =
+                (TouchEffect)Element.Effects.
+                    FirstOrDefault(e => e is TouchEffect);
 
             if (touchEffect != null && view != null)
             {
@@ -43,7 +45,7 @@ namespace TouchTracking.Droid
 
                 formsElement = Element;
 
-                pclTouchEffect = touchEffect;
+                sharedTouchEffect = touchEffect;
 
                 // Save fromPixels function
                 fromPixels = view.Context.FromPixels;
@@ -89,7 +91,7 @@ namespace TouchTracking.Droid
 
                     idToEffectDictionary.Add(id, this);
 
-                    capture = pclTouchEffect.Capture;
+                    capture = sharedTouchEffect.Capture;
                     break;
 
                 case MotionEventActions.Move:
@@ -156,7 +158,7 @@ namespace TouchTracking.Droid
 
         void CheckForBoundaryHop(int id, Point pointerLocation)
         {
-            TouchEffect touchEffectHit = null;
+            TouchEffectDroid touchEffectHit = null;
 
             foreach (Android.Views.View view in viewDictionary.Keys)
             {
@@ -191,10 +193,10 @@ namespace TouchTracking.Droid
             }
         }
 
-        void FireEvent(TouchEffect touchEffect, int id, TouchActionType actionType, Point pointerLocation, bool isInContact)
+        void FireEvent(TouchEffectDroid touchEffect, int id, TouchActionType actionType, Point pointerLocation, bool isInContact)
         {
             // Get the method to call for firing events
-            Action<Element, TouchActionEventArgs> onTouchAction = touchEffect.pclTouchEffect.OnTouchAction;
+            Action<Element, TouchActionEventArgs> onTouchAction = touchEffect.sharedTouchEffect.OnTouchAction;
 
             // Get the location of the pointer within the view
             touchEffect.view.GetLocationOnScreen(twoIntArray);

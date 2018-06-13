@@ -46,17 +46,17 @@ namespace Timeline.Objects.Auth.Google
                     AccessToken = e.Account.Properties["access_token"],
                     IdToken = e.Account.Properties["id_token"]
                 };
-                _authenticationDelegate.OnAuthenticationCompleted(token);
+                _authenticationDelegate.OnGoogleAuthCompleted(token);
             }
             else
             {
-                _authenticationDelegate.OnAuthenticationCanceled();
+                _authenticationDelegate.OnGoogleAuthCanceled();
             }
         }
 
         private void OnAuthenticationFailed(object sender, AuthenticatorErrorEventArgs e)
         {
-            _authenticationDelegate.OnAuthenticationFailed(e.Message, e.Exception);
+            _authenticationDelegate.OnGoogleAuthFailed(e.Message, e.Exception);
         }
     }
 }

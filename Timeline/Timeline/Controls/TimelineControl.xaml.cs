@@ -1,11 +1,11 @@
 ﻿using System;
 using Xamarin.Forms;
 
-using TouchTracking;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
 
 using Timeline.Models;
+using Timeline.Objects.TouchTracking;
 
 namespace Timeline.Controls
 {
