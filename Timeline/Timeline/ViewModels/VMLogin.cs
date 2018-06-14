@@ -19,6 +19,8 @@ namespace Timeline.ViewModels
 
         public Command CmdUserPassLogin { get; set; }
 
+        public Command CmdSignup { get; set; }
+
         public string LoginResult {
             get { return loginResult; }
             set { loginResult = value; RaisePropertyChanged("LoginResult"); }
@@ -38,8 +40,9 @@ namespace Timeline.ViewModels
 
         public VMLogin(Services.Base.ServiceContainer services) : base(services)
         {
-            CmdGoogleLogin = new Command(CmdGoogleLoginExecute, CmdGoogleLoginCanExecute);
-            CmdUserPassLogin = new Command(CmdUserPassLoginExecute, CmdUserPassLoginCanExecute);
+            CmdGoogleLogin = new Command(CmdGoogleLoginExecute);
+            CmdUserPassLogin = new Command(CmdUserPassLoginExecute);
+            CmdSignup = new Command(CmdSignupExecute);
 
             LoginResult = "TRY GMAIL";
 
@@ -57,19 +60,14 @@ namespace Timeline.ViewModels
             _services.Authentication.AuthenticateGoogle(this);
         }
 
-        bool CmdGoogleLoginCanExecute(object arg)
-        {
-            return true;
-        }
-
         async void CmdUserPassLoginExecute(object obj)
         {
             await _services.Authentication.LoginCognito(this, username, password);
         }
 
-        bool CmdUserPassLoginCanExecute(object arg)
+        void CmdSignupExecute(object obj)
         {
-            return true;
+            _services.Navigation.GoToSignupPage();
         }
 
         public void OnAuthCompleted(GoogleOAuthToken token)

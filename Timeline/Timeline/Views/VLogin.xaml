@@ -3,10 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Timeline.Views.VLogin"
              Title="LOGIN"
-             BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Sign Up" />
-    </ContentPage.ToolbarItems>
+             BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
+             BackgroundImage="background">
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
@@ -28,8 +26,8 @@
                 <Button Text="Forgot password" />
                 <Label Text="{Binding LoginResult}"/>
             </StackLayout>
-            
-            <Button Grid.Row="2" Text="Create new account" />
+
+            <Button Grid.Row="2" Text="Create new account" Command="{Binding CmdSignup}"/>
 
             <StackLayout VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Grid.Row="3">
                 <Label Text="- or -" HorizontalOptions="Center"/>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Timeline.Views.VSignup"
+             Title="SIGNUP"
+             BindingContext="{Binding SignupViewModel, Source={StaticResource vmLocator}}"
+             BackgroundImage="background">
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+
+            <Label Text="TIMELINE" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="28"/>
+
+            <Entry Grid.Row="1" Placeholder="username" Text="{Binding Username, Mode=OneWayToSource}"/>
+            <Entry Grid.Row="2" IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
+            <Entry Grid.Row="3" Placeholder="john@gmail.com" Text="{Binding Email, Mode=OneWayToSource}"/>
+            <Button Grid.Row="4" Text="Submit" Command="{Binding CmdSignup}"/>
+            <Label Grid.Row="5" Text="{Binding LoginResult}"/>
+            
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

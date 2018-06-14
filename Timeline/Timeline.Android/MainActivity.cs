@@ -9,6 +9,7 @@ using Android.OS;
 
 using Xamarin.Auth;
 using Plugin.CurrentActivity;
+using Acr.UserDialogs;
 
 namespace Timeline.Droid
 {
@@ -28,6 +29,9 @@ namespace Timeline.Droid
 
             //initialize CurrentActivity plugin
             CrossCurrentActivity.Current.Init(this, bundle);
+
+            //initialize UserDialogs
+            UserDialogs.Init(() => (Activity)CrossCurrentActivity.Current.Activity);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());

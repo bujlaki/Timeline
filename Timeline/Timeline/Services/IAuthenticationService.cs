@@ -10,7 +10,8 @@ namespace Timeline.Services
     {
         void AuthenticateGoogle(IAuthenticationDelegate _delegate);
         Task LoginCognito(IAuthenticationDelegate _delegate, string username, string password);
-        void SignupCognito(IAuthenticationDelegate _delegate, string username, string password, string email);
+        Task SignupCognito(IAuthenticationDelegate _delegate, string username, string password, string email);
+        Task VerifyUserCognito(IAuthenticationDelegate _delegate, string username, string code);
     }
 
     public interface IAuthenticationDelegate

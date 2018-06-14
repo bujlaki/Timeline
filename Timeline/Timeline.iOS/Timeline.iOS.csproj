@@ -140,5 +140,7 @@
       <Name>Timeline</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BundleResource Include="Resources\bkgPopup.png" />
+  </ItemGroup>
 </Project>

@@ -11,12 +11,13 @@ namespace Timeline.ViewModels.Base
     public class VMLocator
     {
 		//TEST
-		private Lazy<TestViewModels.VMTestPage> _testViewModel;
+		private Lazy<TestViewModels.VMTestPage> testViewModel;
 
         //REAL
-        private Lazy<VMLogin> _loginViewModel;
-        private Lazy<VMMainPage> _mainPageViewModel;
-		private Lazy<VMTimeline> _timelineViewModel;
+        private Lazy<VMLogin> loginViewModel;
+        private Lazy<VMSignup> signupViewModel;
+        private Lazy<VMMainPage> mainPageViewModel;
+		private Lazy<VMTimeline> timelineViewModel;
         
         private ServiceContainer _services;
 
@@ -28,27 +29,32 @@ namespace Timeline.ViewModels.Base
             _services.Navigation = new NavigationService(this);
             _services.Authentication = new AuthenticationService();
 
-			_testViewModel = new Lazy<TestViewModels.VMTestPage>(() => new TestViewModels.VMTestPage(_services));
+			testViewModel = new Lazy<TestViewModels.VMTestPage>(() => new TestViewModels.VMTestPage(_services));
 
-            _loginViewModel = new Lazy<VMLogin>(() => new VMLogin(_services));
-            _mainPageViewModel = new Lazy<VMMainPage>(() => new VMMainPage(_services));
-			_timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));
+            loginViewModel = new Lazy<VMLogin>(() => new VMLogin(_services));
+            signupViewModel = new Lazy<VMSignup>(() => new VMSignup(_services));
+            mainPageViewModel = new Lazy<VMMainPage>(() => new VMMainPage(_services));
+			timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));
         }
         
 		public TestViewModels.VMTestPage TestViewModel {
-			get { return _testViewModel.Value; }
+			get { return testViewModel.Value; }
 		}
 
         public VMLogin LoginViewModel {
-            get { return _loginViewModel.Value; }
+            get { return loginViewModel.Value; }
+        }
+
+        public VMSignup SignupViewModel {
+            get { return signupViewModel.Value; }
         }
 
         public VMMainPage MainPageViewModel {
-            get { return _mainPageViewModel.Value; }
+            get { return mainPageViewModel.Value; }
         }
 
 		public VMTimeline TimelineViewModel {
-			get { return _timelineViewModel.Value; }
+			get { return timelineViewModel.Value; }
         }
     }
 }

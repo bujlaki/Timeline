@@ -20,6 +20,7 @@ namespace Timeline.Services
 
         //REAL
         private Lazy<VLogin> loginView;
+        private Lazy<VSignup> signupView;
 		private Lazy<VMainPage> mainpageView;
         private Lazy<VTimeline> timelineView;
 
@@ -32,6 +33,7 @@ namespace Timeline.Services
 
             //REAL
             loginView = new Lazy<VLogin>(() => new VLogin());
+            signupView = new Lazy<VSignup>(() => new VSignup());
             mainpageView = new Lazy<VMainPage>(() => new VMainPage());
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
         }
@@ -46,6 +48,11 @@ namespace Timeline.Services
 		{
 			_navigation.PushModalAsync(testView.Value);	
 		}
+
+        public void GoToSignupPage()
+        {
+            _navigation.PushModalAsync(signupView.Value);
+        }
 
         public void GoToTimelineView(Models.MTimeline timeline)
         {

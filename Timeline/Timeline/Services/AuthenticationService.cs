@@ -41,9 +41,28 @@ namespace Timeline.Services
             }
         }
 
-        public void SignupCognito(IAuthenticationDelegate _delegate, string username, string password, string email)
+        public async Task SignupCognito(IAuthenticationDelegate _delegate, string username, string password, string email)
         {
-            throw new NotImplementedException();
+            try
+            {
+                CognitoUser user = await cognitoAuth.SignupUser(username, password, email);
+            }
+            catch(Exception ex)
+            {
+                _delegate.OnAuthFailed(ex.Message, ex);
+            }
+        }
+
+        public async Task VerifyUserCognito(IAuthenticationDelegate _delegate, string username, string code)
+        {
+            try
+            {
+                CognitoUser user = await cognitoAuth.VerifyAccessCode(username, code);
+            }
+            catch (Exception ex)
+            {
+                _delegate.OnAuthFailed(ex.Message, ex);
+            }
         }
 
         public void AuthenticateGoogle(IAuthenticationDelegate _delegate)
@@ -73,5 +92,7 @@ namespace Timeline.Services
         {
             authDelegate.OnAuthFailed(message, exception);
         }
+
+
     }
 }

@@ -130,64 +130,58 @@ namespace Timeline.Objects.Auth.Cognito
         //    return string.Format("https://{0}.auth.{1}.amazoncognito.com/login?response_type=code&client_id={2}&redirect_uri=https://sid343.reinvent-workshop.com/", CUSTOM_DOMAIN, REGION, CLIENTAPP_ID);
         //}
 
-        //internal async Task<bool> SignUpUser(string username, string password, string email, string phonenumber)
-        //{
-        //    AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
+        //public async Task<bool> SignUpUser(string username, string password, string email, string phonenumber)
+        public async Task<CognitoUser> SignupUser(string username, string password, string email)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
+            SignUpRequest signUpRequest = new SignUpRequest();
 
-        //    SignUpRequest signUpRequest = new SignUpRequest();
+            signUpRequest.ClientId = CLIENTAPP_ID;
+            signUpRequest.Username = username;
+            signUpRequest.Password = password;
 
-        //    signUpRequest.ClientId = CLIENTAPP_ID;
-        //    signUpRequest.Username = username;
-        //    signUpRequest.Password = password;
+            //AttributeType attributeType = new AttributeType();
+            //attributeType.Name = "phone_number";
+            //attributeType.Value = phonenumber;
+            //signUpRequest.UserAttributes.Add(attributeType);
 
+            AttributeType attributeType1 = new AttributeType();
+            attributeType1.Name = "email";
+            attributeType1.Value = email;
+            signUpRequest.UserAttributes.Add(attributeType1);
 
-        //    AttributeType attributeType = new AttributeType();
-        //    attributeType.Name = "phone_number";
-        //    attributeType.Value = phonenumber;
-        //    signUpRequest.UserAttributes.Add(attributeType);
+            try
+            {
+                SignUpResponse result = await provider.SignUpAsync(signUpRequest);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            return null;
+        }
 
-        //    AttributeType attributeType1 = new AttributeType();
-        //    attributeType1.Name = "email";
-        //    attributeType1.Value = email;
-        //    signUpRequest.UserAttributes.Add(attributeType1);
+        public async Task<CognitoUser> VerifyAccessCode(string username, string code)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
+            ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
+            confirmSignUpRequest.Username = username;
+            confirmSignUpRequest.ConfirmationCode = code;
+            confirmSignUpRequest.ClientId = CLIENTAPP_ID;
+            try
+            {
+                ConfirmSignUpResponse confirmSignUpResult = await provider.ConfirmSignUpAsync(confirmSignUpRequest);
+                Console.WriteLine(confirmSignUpResult.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
 
-
-        //    try
-        //    {
-
-        //        SignUpResponse result = await provider.SignUpAsync(signUpRequest);
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e);
-        //        return false;
-        //    }
-        //    return true;
-
-        //}
-
-        //internal async Task<bool> VerifyAccessCode(string username, string code)
-        //{
-        //    AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials());
-        //    ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
-        //    confirmSignUpRequest.Username = username;
-        //    confirmSignUpRequest.ConfirmationCode = code;
-        //    confirmSignUpRequest.ClientId = CLIENTAPP_ID;
-        //    try
-        //    {
-        //        ConfirmSignUpResponse confirmSignUpResult = provider.ConfirmSignUp(confirmSignUpRequest);
-        //        Console.WriteLine(confirmSignUpResult.ToString());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex);
-        //        return false;
-        //    }
-
-        //    return true;
-
-        //}
+            return null;
+        }
 
         //internal async Task<CognitoUser> ResetPassword(string username)
         //{
