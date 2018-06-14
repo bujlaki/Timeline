@@ -7,6 +7,7 @@ using Xamarin.Forms;
 using Timeline.Services;
 using Timeline.Objects.Auth.Google;
 using Acr.UserDialogs;
+using System.Threading.Tasks;
 
 namespace Timeline.ViewModels
 {
@@ -51,21 +52,33 @@ namespace Timeline.ViewModels
 
         async void CmdSignupExecute(object obj)
         {
-            await _services.Authentication.SignupCognito(this, "balazs2", "Password123", "balazs.ujlaki@gmail.com");
-            PromptConfig pc = new PromptConfig
+            UserDialogs.Instance.ShowLoading("Please wait");
+
+            try
+            {    
+                await _services.Authentication.SignupCognito(username, password, email);
+
+                PromptConfig pc = new PromptConfig
+                {
+                    OnTextChanged = args => {
+                        args.IsValid = true; // setting this to false will disable the OK/Positive button
+                    }
+                };
+                Task<PromptResult> task = UserDialogs.Instance.PromptAsync(pc);
+                task.Wait();            
+
+                await _services.Authentication.VerifyUserCognito(username, task.Result.Text);
+
+                UserDialogs.Instance.HideLoading();
+            }
+            catch(Exception ex)
             {
-                OnTextChanged = args => {
-                    args.IsValid = true; // setting this to false will disable the OK/Positive button
-                    //args.Text = ""; // you can read the current value as well as replace the textbox value here
-                }
-            };
-            PromptResult pr = await UserDialogs.Instance.PromptAsync(pc);
-
-            await _services.Authentication.VerifyUserCognito(this, "balazs2", pr.Text);
-
+                UserDialogs.Instance.HideLoading();
+                UserDialogs.Instance.Alert(ex.Message, "Timeline Signup error");
+            }
         }
 
-        public void OnAuthCompleted(GoogleOAuthToken token)
+        public void OnAuthCompleted()
         {
             throw new NotImplementedException();
         }

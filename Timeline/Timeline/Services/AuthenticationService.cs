@@ -9,6 +9,7 @@ using Amazon.Extensions.CognitoAuthentication;
 using Timeline.Models;
 using Timeline.Objects.Auth.Cognito;
 using Timeline.Objects.Auth.Google;
+using Amazon.CognitoIdentityProvider.Model;
 
 namespace Timeline.Services
 {
@@ -41,28 +42,14 @@ namespace Timeline.Services
             }
         }
 
-        public async Task SignupCognito(IAuthenticationDelegate _delegate, string username, string password, string email)
+        public async Task SignupCognito(string username, string password, string email)
         {
-            try
-            {
-                CognitoUser user = await cognitoAuth.SignupUser(username, password, email);
-            }
-            catch(Exception ex)
-            {
-                _delegate.OnAuthFailed(ex.Message, ex);
-            }
+            await cognitoAuth.SignupUser(username, password, email);
         }
 
-        public async Task VerifyUserCognito(IAuthenticationDelegate _delegate, string username, string code)
+        public async Task VerifyUserCognito(string username, string code)
         {
-            try
-            {
-                await cognitoAuth.VerifyAccessCode(username, code);
-            }
-            catch (Exception ex)
-            {
-                _delegate.OnAuthFailed(ex.Message, ex);
-            }
+            await cognitoAuth.VerifyAccessCode(username, code);
         }
 
         public void AuthenticateGoogle(IAuthenticationDelegate _delegate)

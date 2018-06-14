@@ -11,7 +11,6 @@ namespace Timeline.ViewModels
 {
     public class VMLogin : Base.VMBase, IAuthenticationDelegate
     {
-        string loginResult;
         string username;
         string password;
 
@@ -19,12 +18,9 @@ namespace Timeline.ViewModels
 
         public Command CmdUserPassLogin { get; set; }
 
-        public Command CmdSignup { get; set; }
+        public Command CmdForgotPassword { get; set; }
 
-        public string LoginResult {
-            get { return loginResult; }
-            set { loginResult = value; RaisePropertyChanged("LoginResult"); }
-        }
+        public Command CmdSignup { get; set; }
 
         public string Username
         {
@@ -42,9 +38,10 @@ namespace Timeline.ViewModels
         {
             CmdGoogleLogin = new Command(CmdGoogleLoginExecute);
             CmdUserPassLogin = new Command(CmdUserPassLoginExecute);
+            CmdForgotPassword = new Command(CmdForgotPasswordExecute);
             CmdSignup = new Command(CmdSignupExecute);
 
-            LoginResult = "TRY GMAIL";
+            //LoginResult = "TRY GMAIL";
 
             //CHECK CACHED COGNITO IDENTITY
             //Console.WriteLine("Checking cached Cognito credentials");
@@ -65,19 +62,24 @@ namespace Timeline.ViewModels
             await _services.Authentication.LoginCognito(this, username, password);
         }
 
+        async void CmdForgotPasswordExecute(object obj)
+        {
+            
+        }
+
         void CmdSignupExecute(object obj)
         {
             _services.Navigation.GoToSignupPage();
         }
 
-        public void OnAuthCompleted(GoogleOAuthToken token)
+        public void OnAuthCompleted()
         {
-            LoginResult = "success";
+
         }
 
         public void OnAuthFailed(string message, Exception exception)
         {
-            LoginResult = message;
+
         }
     }
 }

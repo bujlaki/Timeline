@@ -4,37 +4,87 @@
              x:Class="Timeline.Views.VLogin"
              Title="LOGIN"
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="background">
+             BackgroundImage="bkg">
     <ContentPage.Content>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="5*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="2*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5*"/>
+            </Grid.ColumnDefinitions>
 
-            <Label Text="TIMELINE" 
-                   VerticalOptions="CenterAndExpand" 
-                   HorizontalOptions="CenterAndExpand"
-                   FontSize="28"/>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <StackLayout Grid.Row="1">
-                <Entry Placeholder="username" Text="{Binding Username, Mode=OneWayToSource}"/>
-                <Entry IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
-                <Button Text="Login" Command="{Binding CmdUserPassLogin}"/>
-                <Button Text="Forgot password" />
-                <Label Text="{Binding LoginResult}"/>
-            </StackLayout>
+                <Label Text="LOGIN" VerticalOptions="CenterAndExpand" FontSize="28"/>
 
-            <Button Grid.Row="2" Text="Create new account" Command="{Binding CmdSignup}"/>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="Username"/>
+                    <Entry Grid.Column="1" Text="{Binding Username, Mode=OneWayToSource}"/>
+                </Grid>
 
-            <StackLayout VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Grid.Row="3">
-                <Label Text="- or -" HorizontalOptions="Center"/>
-                <Button Text="Login using GMail" Command="{Binding CmdGoogleLogin}"/>
-            </StackLayout>
-            
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="Password"/>
+                    <Entry Grid.Column="1" IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
+                </Grid>
+
+                <Button Grid.Row="3" 
+                        Text="Login" 
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Command="{Binding CmdUserPassLogin}"/>
+
+                <Label Grid.Row="4" 
+                       Text="Forgot password" 
+                       HorizontalOptions="Center"
+                       FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <Label Grid.Row="5" 
+                       Text="Create new account" 
+                       HorizontalOptions="Center"
+                       FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CmdSignup}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <BoxView Grid.Row="6" 
+                         HorizontalOptions="FillAndExpand"
+                         VerticalOptions="Center"
+                         Color="White"
+                         HeightRequest="2"/>
+
+                <Button Grid.Row="7" 
+                        Text="Login using GMail" 
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Image="google"
+                        Command="{Binding CmdGoogleLogin}"/>
+
+            </Grid>
         </Grid>
+
     </ContentPage.Content>
 
 </ContentPage>

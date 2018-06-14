@@ -4,26 +4,60 @@
              x:Class="Timeline.Views.VSignup"
              Title="SIGNUP"
              BindingContext="{Binding SignupViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="background">
+             BackgroundImage="bkg">
     <ContentPage.Content>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="2*"/>
-            </Grid.RowDefinitions>
-
-            <Label Text="TIMELINE" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" FontSize="28"/>
-
-            <Entry Grid.Row="1" Placeholder="username" Text="{Binding Username, Mode=OneWayToSource}"/>
-            <Entry Grid.Row="2" IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
-            <Entry Grid.Row="3" Placeholder="john@gmail.com" Text="{Binding Email, Mode=OneWayToSource}"/>
-            <Button Grid.Row="4" Text="Submit" Command="{Binding CmdSignup}"/>
-            <Label Grid.Row="5" Text="{Binding LoginResult}"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5*"/>
+            </Grid.ColumnDefinitions>
             
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+
+                <Label Text="SIGNUP" VerticalOptions="CenterAndExpand" FontSize="28"/>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="Username"/>
+                    <Entry Grid.Column="1" Text="{Binding Username, Mode=OneWayToSource}"/>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="Password"/>
+                    <Entry Grid.Column="1" IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Text="E-mail"/>
+                    <Entry Grid.Column="1" Text="{Binding Email, Mode=OneWayToSource}"/>
+                </Grid>
+
+                <Button Grid.Row="4" 
+                        Text="Submit" 
+                        Command="{Binding CmdSignup}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"/>
+
+            </Grid>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

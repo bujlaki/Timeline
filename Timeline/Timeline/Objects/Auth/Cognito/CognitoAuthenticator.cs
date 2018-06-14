@@ -122,6 +122,7 @@ namespace Timeline.Objects.Auth.Cognito
                 Task<SignUpResponse> task2 = provider.SignUpAsync(sr);
                 task2.Wait();
                 SignUpResponse resp = task2.Result;
+                
             }
         }
 
@@ -131,7 +132,7 @@ namespace Timeline.Objects.Auth.Cognito
         //}
 
         //public async Task<bool> SignUpUser(string username, string password, string email, string phonenumber)
-        public async Task<CognitoUser> SignupUser(string username, string password, string email)
+        public async Task<SignUpResponse> SignupUser(string username, string password, string email)
         {
             AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
             SignUpRequest signUpRequest = new SignUpRequest();
@@ -140,26 +141,14 @@ namespace Timeline.Objects.Auth.Cognito
             signUpRequest.Username = username;
             signUpRequest.Password = password;
 
-            //AttributeType attributeType = new AttributeType();
-            //attributeType.Name = "phone_number";
-            //attributeType.Value = phonenumber;
-            //signUpRequest.UserAttributes.Add(attributeType);
-
             AttributeType attributeType1 = new AttributeType();
             attributeType1.Name = "email";
             attributeType1.Value = email;
             signUpRequest.UserAttributes.Add(attributeType1);
 
-            try
-            {
-                SignUpResponse result = await provider.SignUpAsync(signUpRequest);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
-            return null;
+            SignUpResponse result = await provider.SignUpAsync(signUpRequest);
+
+            return result;
         }
 
         public async Task<CognitoUser> VerifyAccessCode(string username, string code)
@@ -176,6 +165,7 @@ namespace Timeline.Objects.Auth.Cognito
                 task.Wait();
                 ConfirmSignUpResponse confirmSignUpResult = task.Result; //provider.ConfirmSignUpAsync(confirmSignUpRequest);
                 Console.WriteLine(confirmSignUpResult.ToString());
+                
             }
             catch (Exception ex)
             {
@@ -221,6 +211,7 @@ namespace Timeline.Objects.Auth.Cognito
             };
 
             AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
+            
             if (authResponse.AuthenticationResult != null)
             {
                 return user;

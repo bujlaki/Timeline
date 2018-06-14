@@ -27,14 +27,16 @@ namespace Timeline.ViewModels.Base
         {
             _services = new ServiceContainer();
             _services.Navigation = new NavigationService(this);
-            _services.Authentication = new AuthenticationService();
 
-			testViewModel = new Lazy<TestViewModels.VMTestPage>(() => new TestViewModels.VMTestPage(_services));
+            //XAML Preview doesn't work if this is directly created
+            if (!DesignMode.IsDesignModeEnabled) _services.Authentication = new AuthenticationService();
+
+            testViewModel = new Lazy<TestViewModels.VMTestPage>(() => new TestViewModels.VMTestPage(_services));
 
             loginViewModel = new Lazy<VMLogin>(() => new VMLogin(_services));
             signupViewModel = new Lazy<VMSignup>(() => new VMSignup(_services));
             mainPageViewModel = new Lazy<VMMainPage>(() => new VMMainPage(_services));
-			timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));
+            timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));
         }
         
 		public TestViewModels.VMTestPage TestViewModel {
