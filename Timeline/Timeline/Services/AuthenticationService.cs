@@ -57,7 +57,7 @@ namespace Timeline.Services
         {
             try
             {
-                CognitoUser user = await cognitoAuth.VerifyAccessCode(username, code);
+                await cognitoAuth.VerifyAccessCode(username, code);
             }
             catch (Exception ex)
             {

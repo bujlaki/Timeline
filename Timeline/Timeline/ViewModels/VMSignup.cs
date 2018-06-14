@@ -62,6 +62,7 @@ namespace Timeline.ViewModels
             PromptResult pr = await UserDialogs.Instance.PromptAsync(pc);
 
             await _services.Authentication.VerifyUserCognito(this, "balazs2", pr.Text);
+
         }
 
         public void OnAuthCompleted(GoogleOAuthToken token)

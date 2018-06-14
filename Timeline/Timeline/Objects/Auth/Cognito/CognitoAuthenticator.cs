@@ -164,14 +164,17 @@ namespace Timeline.Objects.Auth.Cognito
 
         public async Task<CognitoUser> VerifyAccessCode(string username, string code)
         {
-            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
-            ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
-            confirmSignUpRequest.Username = username;
-            confirmSignUpRequest.ConfirmationCode = code;
-            confirmSignUpRequest.ClientId = CLIENTAPP_ID;
             try
             {
-                ConfirmSignUpResponse confirmSignUpResult = await provider.ConfirmSignUpAsync(confirmSignUpRequest);
+                AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
+                ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
+                confirmSignUpRequest.Username = username;
+                confirmSignUpRequest.ConfirmationCode = code;
+                confirmSignUpRequest.ClientId = CLIENTAPP_ID;
+
+                Task<ConfirmSignUpResponse> task = provider.ConfirmSignUpAsync(confirmSignUpRequest);
+                task.Wait();
+                ConfirmSignUpResponse confirmSignUpResult = task.Result; //provider.ConfirmSignUpAsync(confirmSignUpRequest);
                 Console.WriteLine(confirmSignUpResult.ToString());
             }
             catch (Exception ex)
