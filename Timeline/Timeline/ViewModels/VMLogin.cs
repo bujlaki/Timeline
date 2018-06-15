@@ -6,11 +6,13 @@ using Xamarin.Forms;
 
 using Timeline.Objects.Auth.Google;
 using Timeline.Services;
+using Acr.UserDialogs;
 
 namespace Timeline.ViewModels
 {
     public class VMLogin : Base.VMBase, IAuthenticationDelegate
     {
+        bool busy;
         string username;
         string password;
 
@@ -21,6 +23,12 @@ namespace Timeline.ViewModels
         public Command CmdForgotPassword { get; set; }
 
         public Command CmdSignup { get; set; }
+
+        public bool Busy
+        {
+            get { return busy; }
+            set { busy = value; RaisePropertyChanged("Busy"); }
+        }
 
         public string Username
         {
@@ -44,22 +52,47 @@ namespace Timeline.ViewModels
             //LoginResult = "TRY GMAIL";
 
             //CHECK CACHED COGNITO IDENTITY
-            //Console.WriteLine("Checking cached Cognito credentials");
-            //_services.Cognito.GetCachedCognitoIdentity();
-            //if(_services.Cognito.IsLoggedIn) {
-            //    LoginResult = "ALREADY LOGGED IN";
-            //    Console.WriteLine("LOGGED IN AS: " + _services.Cognito.CognitoId);
-            //}
+            Console.WriteLine("Checking cached Cognito credentials");
+            if(_services.Authentication.GetCachedCredentials())
+            {
+                UserDialogs.Instance.Alert("Login successful. Cached credentials");
+            }
         }
 
         void CmdGoogleLoginExecute(object obj)
         {
-            _services.Authentication.AuthenticateGoogle(this);
+            try
+            {
+                Busy = true;
+                _services.Authentication.AuthenticateGoogle(this);
+            }
+            finally
+            {
+                Busy = false;
+            }
         }
 
         async void CmdUserPassLoginExecute(object obj)
         {
-            await _services.Authentication.LoginCognito(this, username, password);
+            try
+            {
+                Busy = true;
+                using (UserDialogs.Instance.Loading("Logging in..."))
+                {
+                    await _services.Authentication.LoginCognito(username, password);
+                }
+
+                UserDialogs.Instance.Alert("Login successful. Username: " + _services.Authentication.CurrentUser.UserName);
+            }
+            catch (Exception ex)
+            {
+                UserDialogs.Instance.Alert(ex.Message, "Timeline Signup error");
+            }
+            finally
+            {
+                Busy = false;
+            }
+            
         }
 
         async void CmdForgotPasswordExecute(object obj)
@@ -74,7 +107,7 @@ namespace Timeline.ViewModels
 
         public void OnAuthCompleted()
         {
-
+            UserDialogs.Instance.Alert("Login successful. CognitoIdentityId: " + _services.Authentication.CurrentUser.CognitoIdentityId);
         }
 
         public void OnAuthFailed(string message, Exception exception)

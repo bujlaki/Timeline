@@ -6,7 +6,7 @@
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
              BackgroundImage="bkg">
     <ContentPage.Content>
-        <Grid>
+        <Grid IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5*"/>

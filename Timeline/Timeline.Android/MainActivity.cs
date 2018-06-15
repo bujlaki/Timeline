@@ -31,7 +31,8 @@ namespace Timeline.Droid
             CrossCurrentActivity.Current.Init(this, bundle);
 
             //initialize UserDialogs
-            UserDialogs.Init(() => (Activity)CrossCurrentActivity.Current.Activity);
+            UserDialogs.Init(this);
+            //UserDialogs.Init(() => (Activity)CrossCurrentActivity.Current.Activity);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());

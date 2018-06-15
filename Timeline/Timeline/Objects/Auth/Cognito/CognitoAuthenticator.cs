@@ -9,12 +9,14 @@ using Amazon.CognitoIdentity.Model;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Extensions.CognitoAuthentication;
+using Timeline.Models;
 
 namespace Timeline.Objects.Auth.Cognito
 {
     class CognitoAuthenticator
     {
-        private string POOL_ID = "eu-central-1_92Db6PCAi";
+        private string USERPOOL_ID = "eu-central-1_92Db6PCAi";
+        private string IDENTITYPOOL_ID = "eu-central-1:fd027885-da62-40c8-a16e-44c8a7cb8300";
         private string CLIENTAPP_ID = "365ckri3ic37q8crv6orpk7q7s";
         //private string FED_POOL_ID = ConfigurationManager.AppSettings["FED_POOL_id"];
         private string CUSTOM_DOMAIN = "timeline";
@@ -35,95 +37,35 @@ namespace Timeline.Objects.Auth.Cognito
             IsLoggedIn = false;
         }
 
-        public void GetCachedCognitoIdentity()
+        public CognitoAWSCredentials GetCachedCognitoIdentity()
         {
-            credentials.Clear();
-
             Console.WriteLine("GetCachedCognitoIdentity");
             if (!string.IsNullOrEmpty(credentials.GetCachedIdentityId()) || credentials.CurrentLoginProviders.Length > 0)
             {
-                if (!IsLoggedIn) CognitoId = credentials.GetIdentityId();
-                IsLoggedIn = true;
+                return credentials;
             }
+            return null;
         }
 
-        public void GetCognitoIdentityWithGoogleToken(string token)
+        public async Task<GetCredentialsForIdentityResponse> GetCognitoIdentityWithGoogleToken(string token)
         {
             Console.WriteLine("GetCognitoIdentityWithGoogleToken");
 
             credentials.AddLogin("accounts.google.com", token);
+            
             AmazonCognitoIdentityClient cli = new AmazonCognitoIdentityClient(credentials, RegionEndpoint.EUCentral1);
 
             var req = new Amazon.CognitoIdentity.Model.GetIdRequest();
             req.Logins.Add("accounts.google.com", token);
             req.IdentityPoolId = "eu-central-1:fd027885-da62-40c8-a16e-44c8a7cb8300";
+            
+            GetIdResponse getIdResponse = await cli.GetIdAsync(req);
 
-            Task<GetIdResponse> task = cli.GetIdAsync(req);
-            task.Wait();
+            var getCredentialReq = new Amazon.CognitoIdentity.Model.GetCredentialsForIdentityRequest();
+            getCredentialReq.IdentityId = getIdResponse.IdentityId;
+            getCredentialReq.Logins.Add("accounts.google.com", token);
 
-            if ((task.Status == TaskStatus.RanToCompletion) && (task.Result != null))
-            {
-                CognitoId = task.Result.IdentityId;
-                IsLoggedIn = true;
-            }
-            else
-            {
-                CognitoId = "";
-                throw task.Exception;
-            }
-        }
-
-        public void GetCognitoIdentityWithUserPass(string username, string password)
-        {
-            bool success;
-            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
-            //AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(credentials,RegionEndpoint.EUCentral1);
-
-            CognitoUserPool userPool = new CognitoUserPool("eu-central-1_92Db6PCAi", "365ckri3ic37q8crv6orpk7q7s", provider);
-            CognitoUser user = new CognitoUser("username", "365ckri3ic37q8crv6orpk7q7s", userPool, provider);
-
-            InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
-            {
-                Password = "userPassword123"
-            };
-
-            try
-            {
-                Task<AuthFlowResponse> task = user.StartWithSrpAuthAsync(authRequest);
-                task.Wait();
-
-                AuthFlowResponse authResponse = task.Result;
-                var accessToken = authResponse.AuthenticationResult.AccessToken;
-                success = true;
-            }
-            catch
-            {
-                success = false;
-            }
-
-
-
-            if (!success)
-            {
-                //SIGNUP
-                SignUpRequest sr = new SignUpRequest();
-
-                sr.ClientId = "365ckri3ic37q8crv6orpk7q7s";
-                sr.Username = "username";
-                sr.Password = "userPassword123";
-                sr.UserAttributes = new List<AttributeType> {
-                new AttributeType
-                {
-                        Name = "email",
-                        Value = "balazs.ujlaki@gmail.com",
-                }
-            };
-
-                Task<SignUpResponse> task2 = provider.SignUpAsync(sr);
-                task2.Wait();
-                SignUpResponse resp = task2.Result;
-                
-            }
+            return await cli.GetCredentialsForIdentityAsync(getCredentialReq);
         }
 
         //internal string GetCustomHostedURL()
@@ -146,34 +88,19 @@ namespace Timeline.Objects.Auth.Cognito
             attributeType1.Value = email;
             signUpRequest.UserAttributes.Add(attributeType1);
 
-            SignUpResponse result = await provider.SignUpAsync(signUpRequest);
-
-            return result;
+            return await provider.SignUpAsync(signUpRequest);
         }
 
-        public async Task<CognitoUser> VerifyAccessCode(string username, string code)
+        public async Task<ConfirmSignUpResponse> VerifyAccessCode(string username, string code)
         {
-            try
-            {
-                AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
-                ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
-                confirmSignUpRequest.Username = username;
-                confirmSignUpRequest.ConfirmationCode = code;
-                confirmSignUpRequest.ClientId = CLIENTAPP_ID;
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
+            ConfirmSignUpRequest confirmSignUpRequest = new ConfirmSignUpRequest();
+            confirmSignUpRequest.Username = username;
+            confirmSignUpRequest.ConfirmationCode = code;
+            confirmSignUpRequest.ClientId = CLIENTAPP_ID;
 
-                Task<ConfirmSignUpResponse> task = provider.ConfirmSignUpAsync(confirmSignUpRequest);
-                task.Wait();
-                ConfirmSignUpResponse confirmSignUpResult = task.Result; //provider.ConfirmSignUpAsync(confirmSignUpRequest);
-                Console.WriteLine(confirmSignUpResult.ToString());
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return null;
-            }
-
-            return null;
+            ConfirmSignUpResponse confirmSignUpResult = await provider.ConfirmSignUpAsync(confirmSignUpRequest);
+            return confirmSignUpResult;
         }
 
         //internal async Task<CognitoUser> ResetPassword(string username)
@@ -198,28 +125,46 @@ namespace Timeline.Objects.Auth.Cognito
         //    return user;
         //}
 
-        public async Task<CognitoUser> ValidateUser(string username, string password)
+        public async Task<MUser> ValidateUser(string username, string password)
         {
             AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
-
-            CognitoUserPool userPool = new CognitoUserPool(this.POOL_ID, this.CLIENTAPP_ID, provider);
-
+            CognitoUserPool userPool = new CognitoUserPool(this.USERPOOL_ID, this.CLIENTAPP_ID, provider);
             CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
-            InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest()
-            {
-                Password = password
-            };
 
-            AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
+            InitiateSrpAuthRequest authRequest = new InitiateSrpAuthRequest();
+            authRequest.Password = password;
+
+            AuthFlowResponse authFlowResponse = await user.StartWithSrpAuthAsync(authRequest); //.ConfigureAwait(false);
+
+            //https://aws.amazon.com/blogs/developer/cognitoauthentication-extension-library-developer-preview/
+            while (authFlowResponse.AuthenticationResult == null)
+            {
+                if (authFlowResponse.ChallengeName == ChallengeNameType.NEW_PASSWORD_REQUIRED)
+                {
+                    //if user must change password...
+                }
+                else if (authFlowResponse.ChallengeName == ChallengeNameType.SMS_MFA)
+                {
+                    //if SMS code is required...
+                }
+                else
+                {
+                    Console.WriteLine("Unrecognized authentication challenge.");
+                    break;
+                }
+            }
+
+            if (authFlowResponse.AuthenticationResult == null) throw new Exception("Cognito authentication error");
+
+            CognitoAWSCredentials credentials = user.GetCognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
             
-            if (authResponse.AuthenticationResult != null)
-            {
-                return user;
-            }
-            else
-            {
-                return null;
-            }
+            MUser timelineUser = new MUser();
+            timelineUser.AWSCredentials = credentials;
+            timelineUser.UserId = user.UserID;
+            timelineUser.UserName = user.Username;
+            timelineUser.Type = MUser.MUserType.Cognito;
+
+            return timelineUser;
         }
 
     }

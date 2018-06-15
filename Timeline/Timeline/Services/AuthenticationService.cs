@@ -10,46 +10,59 @@ using Timeline.Models;
 using Timeline.Objects.Auth.Cognito;
 using Timeline.Objects.Auth.Google;
 using Amazon.CognitoIdentityProvider.Model;
+using Acr.UserDialogs;
+using Amazon.CognitoIdentityProvider;
+using Amazon.CognitoIdentity;
+using Amazon.CognitoIdentity.Model;
 
 namespace Timeline.Services
 {
     class AuthenticationService : IAuthenticationService, IGoogleAuthenticationDelegate
     {
-        public MUser currentUser;
-
         private IPlatformSpecificGoogleAuth googleAuth;
         private CognitoAuthenticator cognitoAuth;
         private IAuthenticationDelegate authDelegate;
 
+        public MUser CurrentUser { get; private set; }
+        public bool EmailVerificationNeeded { get; private set; }
+
         public AuthenticationService()
         {
-            currentUser = new MUser();
-            currentUser.Type = MUser.MUserType.None;
+            CurrentUser = new MUser();
+            EmailVerificationNeeded = false;
 
             cognitoAuth = new CognitoAuthenticator();
             googleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
         }
 
-        public async Task LoginCognito(IAuthenticationDelegate _delegate, string username, string password)
+        public bool GetCachedCredentials()
         {
-            try
+            CurrentUser.AWSCredentials = cognitoAuth.GetCachedCognitoIdentity();
+            if (CurrentUser.AWSCredentials == null)
             {
-                CognitoUser user = await cognitoAuth.ValidateUser(username, password);
+                CurrentUser.Clear();
+                return false;
             }
-            catch(Exception ex)
-            {
-                _delegate.OnAuthFailed(ex.Message, ex);
-            }
+            CurrentUser.Type = MUser.MUserType.Google;
+            
+            return true;
+        }
+
+        public async Task LoginCognito(string username, string password)
+        {
+            CurrentUser = await cognitoAuth.ValidateUser(username, password);
         }
 
         public async Task SignupCognito(string username, string password, string email)
         {
-            await cognitoAuth.SignupUser(username, password, email);
+            SignUpResponse signUpResponse = await cognitoAuth.SignupUser(username, password, email);
+            if (!signUpResponse.UserConfirmed) EmailVerificationNeeded = true;
         }
 
-        public async Task VerifyUserCognito(string username, string code)
+        public async Task VerifyUserCognito(string username, string verificationCode)
         {
-            await cognitoAuth.VerifyAccessCode(username, code);
+            await cognitoAuth.VerifyAccessCode(username, verificationCode);
+            EmailVerificationNeeded = false;
         }
 
         public void AuthenticateGoogle(IAuthenticationDelegate _delegate)
@@ -60,23 +73,34 @@ namespace Timeline.Services
 
         public void OnGoogleAuthCanceled()
         {
+            CurrentUser.Clear();
             authDelegate.OnAuthFailed("Authentication has been cancelled", null);
         }
 
-        public void OnGoogleAuthCompleted(GoogleOAuthToken token)
+        public async void OnGoogleAuthCompleted(GoogleOAuthToken token)
         {
-            //CONTINUE COGNITO AUTH
-            //_services.Cognito.GetCognitoIdentityWithGoogleToken(token.IdToken);
-
-            //if (_services.Cognito.IsLoggedIn)
-            //{
-            //    LoginResult = "COGNITO SUCCESS";
-            //    Console.WriteLine("LOGGED IN AS: " + _services.Cognito.CognitoId);
-            //}
+            try
+            {
+                using (UserDialogs.Instance.Loading("Logging in..."))
+                {
+                    GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(token.IdToken);
+                
+                    CurrentUser.AWSCredentials = getCredentialResp.Credentials;
+                    CurrentUser.CognitoIdentityId = getCredentialResp.IdentityId;
+                    CurrentUser.Type = MUser.MUserType.Google;
+                }
+                authDelegate.OnAuthCompleted();
+            }
+            catch(Exception ex)
+            {
+                CurrentUser.Clear();
+                authDelegate.OnAuthFailed(ex.Message, ex);
+            }
         }
 
         public void OnGoogleAuthFailed(string message, Exception exception)
         {
+            CurrentUser.Clear();
             authDelegate.OnAuthFailed(message, exception);
         }
 

@@ -52,28 +52,38 @@ namespace Timeline.ViewModels
 
         async void CmdSignupExecute(object obj)
         {
-            UserDialogs.Instance.ShowLoading("Please wait");
-
             try
-            {    
-                await _services.Authentication.SignupCognito(username, password, email);
-
-                PromptConfig pc = new PromptConfig
-                {
-                    OnTextChanged = args => {
-                        args.IsValid = true; // setting this to false will disable the OK/Positive button
-                    }
-                };
-                Task<PromptResult> task = UserDialogs.Instance.PromptAsync(pc);
-                task.Wait();            
-
-                await _services.Authentication.VerifyUserCognito(username, task.Result.Text);
-
-                UserDialogs.Instance.HideLoading();
-            }
-            catch(Exception ex)
             {
-                UserDialogs.Instance.HideLoading();
+                using (UserDialogs.Instance.Loading("Please wait..."))
+                {
+                    await _services.Authentication.SignupCognito(username, password, email);
+                }
+
+                if (_services.Authentication.EmailVerificationNeeded)
+                {
+                    PromptConfig pc = new PromptConfig
+                    {    
+                        Title = "Check your email for the verification code!",
+                    };
+                    
+                    PromptResult pr = await UserDialogs.Instance.PromptAsync(pc);
+
+                    using (UserDialogs.Instance.Loading("Confirming verification code..."))
+                    {
+                        await _services.Authentication.VerifyUserCognito(username, pr.Text);
+                    }
+                }
+
+                using (UserDialogs.Instance.Loading("Logging in..."))
+                {
+                    await _services.Authentication.LoginCognito(username, password);
+                }
+
+                //SUCCESS
+                UserDialogs.Instance.Alert("Login successful. Username: " + _services.Authentication.CurrentUser.UserName);
+            }
+            catch (Exception ex)
+            {
                 UserDialogs.Instance.Alert(ex.Message, "Timeline Signup error");
             }
         }
