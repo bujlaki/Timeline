@@ -25,62 +25,85 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Label Text="LOGIN" VerticalOptions="CenterAndExpand" FontSize="28"/>
+                <Label Text="LOGIN" 
+                       VerticalOptions="Center"
+                       FontSize="28"
+                       TextColor="#ffbc42"/>
 
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Text="Username"/>
-                    <Entry Grid.Column="1" Text="{Binding Username, Mode=OneWayToSource}"/>
-                </Grid>
+                <Entry Grid.Row="1" 
+                       VerticalOptions="FillAndExpand"
+                       Text="{Binding Username, Mode=OneWayToSource}" 
+                       TextColor="#d0cfcf" 
+                       FontSize="14"
+                       Placeholder="username"/>
 
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Text="Password"/>
-                    <Entry Grid.Column="1" IsPassword="true" Text="{Binding Password, Mode=OneWayToSource}"/>
-                </Grid>
+                <Entry Grid.Row="2" 
+                       VerticalOptions="FillAndExpand"
+                       IsPassword="true" 
+                       Text="{Binding Password, Mode=OneWayToSource}"
+                       TextColor="#d0cfcf"
+                       FontSize="14"
+                       Placeholder="password"/>
+               
 
                 <Button Grid.Row="3" 
                         Text="Login" 
+                        TextColor="#d0cfcf"
+                        BackgroundColor="#114b5f"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
-                        Command="{Binding CmdUserPassLogin}"/>
+                        Command="{Binding CmdUserPassLogin}"
+                        BorderRadius="10"
+                        BorderWidth="1"
+                        BorderColor="#ffbc42"/>
 
-                <Label Grid.Row="4" 
-                       Text="Forgot password" 
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" 
+                       Text="Forgot password?" 
                        HorizontalOptions="Center"
-                       FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
-                    </Label.GestureRecognizers>
-                </Label>
+                       VerticalOptions="Center"
+                       FontAttributes="Bold" 
+                       TextColor="#ffbc42">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
 
-                <Label Grid.Row="5" 
-                       Text="Create new account" 
+                    <Label Grid.Column="1" 
+                       Text="New account" 
                        HorizontalOptions="Center"
-                       FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding CmdSignup}"/>
-                    </Label.GestureRecognizers>
-                </Label>
+                       VerticalOptions="Center"
+                       FontAttributes="Bold" 
+                       TextColor="#ffbc42">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdSignup}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
 
-                <BoxView Grid.Row="6" 
+
+                <BoxView Grid.Row="5" 
                          HorizontalOptions="FillAndExpand"
-                         VerticalOptions="Center"
-                         Color="White"
+                         VerticalOptions="End"
+                         Color="#114b5f"
                          HeightRequest="2"/>
 
-                <Button Grid.Row="7" 
-                        Text="Login using GMail" 
+                <Button Grid.Row="6" 
+                        Text="Login with Google"
+                        BackgroundColor="#114b5f"
+                        TextColor="#d0cfcf"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Image="google"
-                        Command="{Binding CmdGoogleLogin}"/>
+                        Command="{Binding CmdGoogleLogin}"
+                        BorderRadius="10"
+                        BorderWidth="1"
+                        BorderColor="#ffbc42"/>
 
             </Grid>
         </Grid>

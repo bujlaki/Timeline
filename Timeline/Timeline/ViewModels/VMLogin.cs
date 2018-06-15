@@ -52,10 +52,12 @@ namespace Timeline.ViewModels
             //LoginResult = "TRY GMAIL";
 
             //CHECK CACHED COGNITO IDENTITY
-            Console.WriteLine("Checking cached Cognito credentials");
-            if(_services.Authentication.GetCachedCredentials())
+            if (!DesignMode.IsDesignModeEnabled)
             {
-                UserDialogs.Instance.Alert("Login successful. Cached credentials");
+                if (_services.Authentication.GetCachedCredentials())
+                {
+                    UserDialogs.Instance.Alert("Login successful. Cached credentials");
+                }
             }
         }
 

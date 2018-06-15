@@ -26,7 +26,8 @@ namespace Timeline
 			AWSConfigs.CorrectForClockSkew = true;
 
 			MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
-		}
+
+        }
 
 		protected override void OnStart ()
 		{
