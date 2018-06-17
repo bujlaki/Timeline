@@ -4,7 +4,7 @@
              x:Class="Timeline.Views.VLogin"
              Title="LOGIN"
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="bkg">
+             BackgroundImage="bkg3">
     <ContentPage.Content>
         <Grid IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
             <Grid.ColumnDefinitions>
@@ -28,34 +28,36 @@
                 <Label Text="LOGIN" 
                        VerticalOptions="Center"
                        FontSize="28"
-                       TextColor="#ffbc42"/>
+                       TextColor="#dad0c8"/>
 
                 <Entry Grid.Row="1" 
                        VerticalOptions="FillAndExpand"
                        Text="{Binding Username, Mode=OneWayToSource}" 
-                       TextColor="#d0cfcf" 
-                       FontSize="14"
-                       Placeholder="username"/>
+                       TextColor="#dad0c8" 
+                       FontSize="18"
+                       Placeholder="username"
+                       PlaceholderColor="#dad0c8"/>
 
                 <Entry Grid.Row="2" 
                        VerticalOptions="FillAndExpand"
                        IsPassword="true" 
                        Text="{Binding Password, Mode=OneWayToSource}"
-                       TextColor="#d0cfcf"
-                       FontSize="14"
-                       Placeholder="password"/>
+                       TextColor="#dad0c8"
+                       FontSize="18"
+                       Placeholder="password"
+                       PlaceholderColor="#dad0c8"/>
                
 
                 <Button Grid.Row="3" 
                         Text="Login" 
-                        TextColor="#d0cfcf"
-                        BackgroundColor="#114b5f"
+                        TextColor="#dad0c8"
+                        BackgroundColor="#8E5158"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Command="{Binding CmdUserPassLogin}"
                         BorderRadius="10"
-                        BorderWidth="1"
-                        BorderColor="#ffbc42"/>
+                        BorderWidth="2"
+                        BorderColor="#dad0c8"/>
 
                 <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
@@ -64,22 +66,24 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" 
-                       Text="Forgot password?" 
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       FontAttributes="Bold" 
-                       TextColor="#ffbc42">
+                           Text="Forgot password?" 
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           FontAttributes="Bold" 
+                           TextColor="#dad0c8"
+                           FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
                         </Label.GestureRecognizers>
                     </Label>
 
-                    <Label Grid.Column="1" 
-                       Text="New account" 
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       FontAttributes="Bold" 
-                       TextColor="#ffbc42">
+                    <Label Grid.Column="1"
+                           Text="New account" 
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           FontAttributes="Bold" 
+                           TextColor="#dad0c8"
+                           FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdSignup}"/>
                         </Label.GestureRecognizers>
@@ -87,23 +91,23 @@
                 </Grid>
 
 
-                <BoxView Grid.Row="5" 
+                <BoxView Grid.Row="4" 
                          HorizontalOptions="FillAndExpand"
                          VerticalOptions="End"
-                         Color="#114b5f"
+                         Color="#dad0c8"
                          HeightRequest="2"/>
 
                 <Button Grid.Row="6" 
                         Text="Login with Google"
-                        BackgroundColor="#114b5f"
-                        TextColor="#d0cfcf"
+                        BackgroundColor="#8E5158"
+                        TextColor="#dad0c8"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
                         BorderRadius="10"
-                        BorderWidth="1"
-                        BorderColor="#ffbc42"/>
+                        BorderWidth="2"
+                        BorderColor="#dad0c8"/>
 
             </Grid>
         </Grid>
