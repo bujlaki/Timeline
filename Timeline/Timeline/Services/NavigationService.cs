@@ -21,6 +21,9 @@ namespace Timeline.Services
         //REAL
         private Lazy<VLogin> loginView;
         private Lazy<VSignup> signupView;
+        private Lazy<VUserPages> userpagesView;
+        private Lazy<VTimelineList> timelinelistView;
+        private Lazy<VOptions> optionsView;
 		private Lazy<VMainPage> mainpageView;
         private Lazy<VTimeline> timelineView;
 
@@ -34,15 +37,33 @@ namespace Timeline.Services
             //REAL
             loginView = new Lazy<VLogin>(() => new VLogin());
             signupView = new Lazy<VSignup>(() => new VSignup());
+            userpagesView = new Lazy<VUserPages>(() => new VUserPages());
+            timelinelistView = new Lazy<VTimelineList>(() => new VTimelineList());
+            optionsView = new Lazy<VOptions>(() => new VOptions());
             mainpageView = new Lazy<VMainPage>(() => new VMainPage());
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
         }
 
-		public Page RootPage()
+		public Page RootPage(bool isLoggedIn = false)
 		{
-            //return mainpageView.Value;
+            if (isLoggedIn) { return userpagesView.Value; }
             return loginView.Value;
 		}
+
+        public Page UserPagesView()
+        {
+            return userpagesView.Value;
+        }
+
+        public Page TimelineListView()
+        {
+            return timelinelistView.Value;
+        }
+
+        public Page OptionsView()
+        {
+            return optionsView.Value;
+        }
 
         public void GoToTestPage()
 		{
@@ -52,6 +73,11 @@ namespace Timeline.Services
         public void GoToSignupPage()
         {
             _navigation.PushModalAsync(signupView.Value);
+        }
+
+        public void GoToUserPagesPage()
+        {
+            _navigation.PushModalAsync(userpagesView.Value);
         }
 
         public void GoToTimelineView(Models.MTimeline timeline)

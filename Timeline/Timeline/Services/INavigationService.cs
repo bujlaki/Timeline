@@ -7,8 +7,12 @@ namespace Timeline.Services
 {
     public interface INavigationService
     {
-		Page RootPage();
+		Page RootPage(bool isLoggedIn = false);
+        Page UserPagesView();
+        Page TimelineListView();
+        Page OptionsView();
         void GoToSignupPage();
+        void GoToUserPagesPage();
         void GoToTestPage();
 		void GoToTimelineView(Models.MTimeline timeline);
 		void GoBack();

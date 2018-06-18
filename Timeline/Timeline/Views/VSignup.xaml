@@ -4,7 +4,7 @@
              x:Class="Timeline.Views.VSignup"
              Title="SIGNUP"
              BindingContext="{Binding SignupViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="bkg3">
+             BackgroundImage="bkg4">
     <ContentPage.Content>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -25,44 +25,44 @@
                 <Label Text="SIGNUP" 
                        VerticalOptions="Center"
                        FontSize="28"
-                       TextColor="#dad0c8"/>
+                       TextColor="#FBF0D2"/>
 
                 <Entry Grid.Row="1" 
                        VerticalOptions="FillAndExpand"
                        Text="{Binding Username, Mode=OneWayToSource}" 
-                       TextColor="#dad0c8" 
+                       TextColor="#FBF0D2" 
                        FontSize="18"
                        Placeholder="username"
-                       PlaceholderColor="#dad0c8"/>
+                       PlaceholderColor="#FBF0D2"/>
 
                 <Entry Grid.Row="2" 
                        VerticalOptions="FillAndExpand"
                        IsPassword="true" 
                        Text="{Binding Password, Mode=OneWayToSource}"
-                       TextColor="#dad0c8"
+                       TextColor="#FBF0D2"
                        FontSize="18"
                        Placeholder="password"
-                       PlaceholderColor="#dad0c8"/>
+                       PlaceholderColor="#FBF0D2"/>
 
                 <Entry Grid.Row="3" 
                        VerticalOptions="FillAndExpand"
                        IsPassword="true" 
                        Text="{Binding Email, Mode=OneWayToSource}"
-                       TextColor="#dad0c8"
+                       TextColor="#FBF0D2"
                        FontSize="18"
                        Placeholder="e-mail"
-                       PlaceholderColor="#dad0c8"/>
+                       PlaceholderColor="#FBF0D2"/>
 
                 <Button Grid.Row="4" 
                         Text="Submit" 
                         Command="{Binding CmdSignup}"
-                        TextColor="#dad0c8"
-                        BackgroundColor="#8E5158"
+                        TextColor="#FBF0D2"
+                        BackgroundColor="#B27A63"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#dad0c8"/>
+                        BorderColor="#C7AC8E"/>
                 
 
             </Grid>

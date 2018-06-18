@@ -4,7 +4,7 @@
              x:Class="Timeline.Views.VLogin"
              Title="LOGIN"
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="bkg3">
+             BackgroundImage="bkg4">
     <ContentPage.Content>
         <Grid IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
             <Grid.ColumnDefinitions>
@@ -28,36 +28,36 @@
                 <Label Text="LOGIN" 
                        VerticalOptions="Center"
                        FontSize="28"
-                       TextColor="#dad0c8"/>
+                       TextColor="#FBF0D2"/>
 
                 <Entry Grid.Row="1" 
                        VerticalOptions="FillAndExpand"
                        Text="{Binding Username, Mode=OneWayToSource}" 
-                       TextColor="#dad0c8" 
+                       TextColor="#FBF0D2" 
                        FontSize="18"
                        Placeholder="username"
-                       PlaceholderColor="#dad0c8"/>
+                       PlaceholderColor="#FBF0D2"/>
 
                 <Entry Grid.Row="2" 
                        VerticalOptions="FillAndExpand"
                        IsPassword="true" 
                        Text="{Binding Password, Mode=OneWayToSource}"
-                       TextColor="#dad0c8"
+                       TextColor="#FBF0D2"
                        FontSize="18"
                        Placeholder="password"
-                       PlaceholderColor="#dad0c8"/>
+                       PlaceholderColor="#FBF0D2"/>
                
 
                 <Button Grid.Row="3" 
                         Text="Login" 
-                        TextColor="#dad0c8"
-                        BackgroundColor="#8E5158"
+                        TextColor="#FBF0D2"
+                        BackgroundColor="#B27A63"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Command="{Binding CmdUserPassLogin}"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#dad0c8"/>
+                        BorderColor="#C7AC8E"/>
 
                 <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
@@ -70,7 +70,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            FontAttributes="Bold" 
-                           TextColor="#dad0c8"
+                           TextColor="#C7AC8E"
                            FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
@@ -82,7 +82,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            FontAttributes="Bold" 
-                           TextColor="#dad0c8"
+                           TextColor="#C7AC8E"
                            FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdSignup}"/>
@@ -94,20 +94,20 @@
                 <BoxView Grid.Row="4" 
                          HorizontalOptions="FillAndExpand"
                          VerticalOptions="End"
-                         Color="#dad0c8"
+                         Color="#FBF0D2"
                          HeightRequest="2"/>
 
                 <Button Grid.Row="6" 
                         Text="Login with Google"
-                        BackgroundColor="#8E5158"
-                        TextColor="#dad0c8"
+                        BackgroundColor="#B27A63"
+                        TextColor="#FBF0D2"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#dad0c8"/>
+                        BorderColor="#C7AC8E"/>
 
             </Grid>
         </Grid>

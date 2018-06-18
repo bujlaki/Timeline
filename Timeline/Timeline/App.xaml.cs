@@ -25,8 +25,22 @@ namespace Timeline
 			AWSConfigs.AWSRegion = AwsRegion.EUCentral1.Name;
 			AWSConfigs.CorrectForClockSkew = true;
 
-			MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
-
+            //CHECK CACHED COGNITO IDENTITY
+            if (!DesignMode.IsDesignModeEnabled)
+            {
+                if (((VMLocator)Current.Resources["vmLocator"]).Services.Authentication.GetCachedCredentials())
+                {
+                    MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage(true);
+                }
+                else
+                {
+                    MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
+                }
+            }
+            else
+            {
+                //MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
+            }
         }
 
 		protected override void OnStart ()

@@ -48,17 +48,6 @@ namespace Timeline.ViewModels
             CmdUserPassLogin = new Command(CmdUserPassLoginExecute);
             CmdForgotPassword = new Command(CmdForgotPasswordExecute);
             CmdSignup = new Command(CmdSignupExecute);
-
-            //LoginResult = "TRY GMAIL";
-
-            //CHECK CACHED COGNITO IDENTITY
-            if (!DesignMode.IsDesignModeEnabled)
-            {
-                if (_services.Authentication.GetCachedCredentials())
-                {
-                    UserDialogs.Instance.Alert("Login successful. Cached credentials");
-                }
-            }
         }
 
         void CmdGoogleLoginExecute(object obj)
@@ -110,6 +99,7 @@ namespace Timeline.ViewModels
         public void OnAuthCompleted()
         {
             UserDialogs.Instance.Alert("Login successful. CognitoIdentityId: " + _services.Authentication.CurrentUser.CognitoIdentityId);
+            _services.Navigation.GoToUserPagesPage();
         }
 
         public void OnAuthFailed(string message, Exception exception)
