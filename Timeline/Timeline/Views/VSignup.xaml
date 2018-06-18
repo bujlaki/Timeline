@@ -56,13 +56,13 @@
                 <Button Grid.Row="4" 
                         Text="Submit" 
                         Command="{Binding CmdSignup}"
-                        TextColor="#FBF0D2"
-                        BackgroundColor="#B27A63"
+                        TextColor="#234b64"
+                        BackgroundColor="#849d9a"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#C7AC8E"/>
+                        BorderColor="#fbf0d2"/>
                 
 
             </Grid>

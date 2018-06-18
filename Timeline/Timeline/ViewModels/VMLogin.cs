@@ -74,6 +74,7 @@ namespace Timeline.ViewModels
                 }
 
                 UserDialogs.Instance.Alert("Login successful. Username: " + _services.Authentication.CurrentUser.UserName);
+                _services.Navigation.GoToUserPagesPage();
             }
             catch (Exception ex)
             {

@@ -4,7 +4,7 @@
              x:Class="Timeline.Views.VUserPagesMaster"
              Title="Master"
              BindingContext="{Binding UserPagesViewModel, Source={StaticResource vmLocator}}"
-             BackgroundColor="#B27A63">
+             BackgroundColor="#234b64">
     <StackLayout>
         <ListView x:Name="MenuItemsListView"
                   SeparatorVisibility="None"
@@ -12,7 +12,7 @@
                   ItemsSource="{Binding MenuItems}"
                   SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
             <ListView.Header>
-                <Grid BackgroundColor="#C7AC8E">
+                <Grid BackgroundColor="#c7ac8e">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10"/>
                         <ColumnDefinition Width="*"/>

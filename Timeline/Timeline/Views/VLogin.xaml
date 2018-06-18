@@ -50,14 +50,14 @@
 
                 <Button Grid.Row="3" 
                         Text="Login" 
-                        TextColor="#FBF0D2"
-                        BackgroundColor="#B27A63"
+                        TextColor="#234b64"
+                        BackgroundColor="#849d9a"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Command="{Binding CmdUserPassLogin}"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#C7AC8E"/>
+                        BorderColor="#fbf0d2"/>
 
                 <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
@@ -70,7 +70,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            FontAttributes="Bold" 
-                           TextColor="#C7AC8E"
+                           TextColor="#b27a63"
                            FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
@@ -82,7 +82,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            FontAttributes="Bold" 
-                           TextColor="#C7AC8E"
+                           TextColor="#b27a63"
                            FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdSignup}"/>
@@ -99,15 +99,15 @@
 
                 <Button Grid.Row="6" 
                         Text="Login with Google"
-                        BackgroundColor="#B27A63"
-                        TextColor="#FBF0D2"
+                        BackgroundColor="#849d9a"
+                        TextColor="#234b64"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#C7AC8E"/>
+                        BorderColor="#fbf0d2"/>
 
             </Grid>
         </Grid>

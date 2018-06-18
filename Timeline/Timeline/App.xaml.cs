@@ -41,6 +41,8 @@ namespace Timeline
             {
                 //MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
             }
+
+            MainPage.SetValue(NavigationPage.BarBackgroundColorProperty, Color.Black);
         }
 
 		protected override void OnStart ()
