@@ -3,6 +3,7 @@ using Amazon.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xamarin.Auth;
 
 namespace Timeline.Models
 {
@@ -17,8 +18,11 @@ namespace Timeline.Models
 
         public string UserId { get; set; }
         public string UserName { get; set; }
+        public string Email { get; set; }
+        public string PhotoUrl { get; set; }
         public string CognitoIdentityId { get; set; }
         public MUserType Type { get; set; }
+        public Account GoogleAccount { get; set; }
         public AWSCredentials AWSCredentials { get; set; }
         
 
@@ -31,8 +35,11 @@ namespace Timeline.Models
         {
             UserId = "";
             UserName = "";
+            Email = "";
+            PhotoUrl = "";
             CognitoIdentityId = "";
             Type = MUserType.None;
+            GoogleAccount = null;
             AWSCredentials = null;
         }
     }

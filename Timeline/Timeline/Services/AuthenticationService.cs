@@ -14,6 +14,8 @@ using Acr.UserDialogs;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentity;
 using Amazon.CognitoIdentity.Model;
+using Xamarin.Auth;
+using Newtonsoft.Json.Linq;
 
 namespace Timeline.Services
 {
@@ -69,6 +71,7 @@ namespace Timeline.Services
         {
             authDelegate = _delegate;
             googleAuth.AuthenticateGoogle(this);
+            
         }
 
         public void OnGoogleAuthCanceled()
@@ -77,18 +80,29 @@ namespace Timeline.Services
             authDelegate.OnAuthFailed("Authentication has been cancelled", null);
         }
 
-        public async void OnGoogleAuthCompleted(GoogleOAuthToken token)
+        public async void OnGoogleAuthCompleted(Account account)
         {
             try
             {
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(token.IdToken);
-                
+                    //get GOOGLE userinfo
+                    var req = new OAuth2Request("GET", new Uri("https://www.googleapis.com/oauth2/v2/userinfo"), null, account);
+                    var resp = await req.GetResponseAsync();
+                    var obj = JObject.Parse(resp.GetResponseText());
+                    CurrentUser.UserId = obj["id"].ToString().Replace("\"", "");
+                    CurrentUser.UserName = obj["given_name"].ToString().Replace("\"", "");
+                    CurrentUser.Email = obj["email"].ToString().Replace("\"", "");
+                    CurrentUser.PhotoUrl = obj["picture"].ToString().Replace("\"", "");
+
+                    //get AWS credentials
+                    GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(account.Properties["id_token"]);
                     CurrentUser.AWSCredentials = getCredentialResp.Credentials;
                     CurrentUser.CognitoIdentityId = getCredentialResp.IdentityId;
+
                     CurrentUser.Type = MUser.MUserType.Google;
                 }
+
                 authDelegate.OnAuthCompleted();
             }
             catch(Exception ex)

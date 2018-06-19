@@ -25,7 +25,7 @@ namespace Timeline.Droid.Objects.Auth.Google
         {
             //android client id:
             string clientId = "597410249897-e5iqvca2pnvg6hlm4i5t4h5tgk8liutk.apps.googleusercontent.com";
-            string scope = "email";
+            string scope = "email profile";
             string redirectUrl = "hu.iqtech.timeline:/oauth2redirect";
             Auth = new GoogleAuthenticator(clientId, scope, redirectUrl, _delegate);
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Threading.Tasks;
 using Xamarin.Auth;
 
 namespace Timeline.Objects.Auth.Google
@@ -9,54 +11,48 @@ namespace Timeline.Objects.Auth.Google
         private const string AccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
         private const bool IsUsingNativeUI = true;
 
-        private OAuth2Authenticator _auth;
-        private IGoogleAuthenticationDelegate _authenticationDelegate;
+        private OAuth2Authenticator auth;
+        private IGoogleAuthenticationDelegate authDelegate;
 
         public GoogleAuthenticator(string clientId, string scope, string redirectUrl, IGoogleAuthenticationDelegate authenticationDelegate)
         {
-            _authenticationDelegate = authenticationDelegate;
+            authDelegate = authenticationDelegate;
 
-            _auth = new OAuth2Authenticator(clientId, string.Empty, scope,
+            auth = new OAuth2Authenticator(clientId, string.Empty, scope,
                                             new Uri(AuthorizeUrl),
                                             new Uri(redirectUrl),
                                             new Uri(AccessTokenUrl),
                                             null, IsUsingNativeUI);
 
-            _auth.Completed += OnAuthenticationCompleted;
-            _auth.Error += OnAuthenticationFailed;
+            auth.Completed += OnAuthenticationCompleted;
+            auth.Error += OnAuthenticationFailed;
         }
 
         public OAuth2Authenticator GetAuthenticator()
         {
-            return _auth;
+            return auth;
         }
 
         public void OnPageLoading(Uri uri)
         {
-            _auth.OnPageLoading(uri);
+            auth.OnPageLoading(uri);
         }
 
         private void OnAuthenticationCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
             if (e.IsAuthenticated)
             {
-                var token = new GoogleOAuthToken
-                {
-                    TokenType = e.Account.Properties["token_type"],
-                    AccessToken = e.Account.Properties["access_token"],
-                    IdToken = e.Account.Properties["id_token"]
-                };
-                _authenticationDelegate.OnGoogleAuthCompleted(token);
+                authDelegate.OnGoogleAuthCompleted(e.Account);
             }
             else
             {
-                _authenticationDelegate.OnGoogleAuthCanceled();
+                authDelegate.OnGoogleAuthCanceled();
             }
         }
 
         private void OnAuthenticationFailed(object sender, AuthenticatorErrorEventArgs e)
         {
-            _authenticationDelegate.OnGoogleAuthFailed(e.Message, e.Exception);
+            authDelegate.OnGoogleAuthFailed(e.Message, e.Exception);
         }
     }
 }

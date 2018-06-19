@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 
 using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
 
 using Timeline.ViewModels.Base;
 using Amazon;
 
+[assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Timeline
 {
 	public partial class App : Application

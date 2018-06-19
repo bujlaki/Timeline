@@ -99,7 +99,7 @@ namespace Timeline.ViewModels
 
         public void OnAuthCompleted()
         {
-            UserDialogs.Instance.Alert("Login successful. CognitoIdentityId: " + _services.Authentication.CurrentUser.CognitoIdentityId);
+            UserDialogs.Instance.Alert("Login successful. Welcome " + _services.Authentication.CurrentUser.UserName + " !");
             _services.Navigation.GoToUserPagesPage();
         }
 
