@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Timeline.Controls"
              x:Class="Timeline.Views.VLogin"
              Title="LOGIN"
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="bkg4">
+             BackgroundImage="bkg4"
+             NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
         <Grid IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
             <Grid.ColumnDefinitions>
@@ -30,24 +32,23 @@
                        FontSize="28"
                        TextColor="#FBF0D2"/>
 
-                <Entry Grid.Row="1" 
+                <controls:XEntry Grid.Row="1" 
                        VerticalOptions="FillAndExpand"
                        Text="{Binding Username, Mode=OneWayToSource}" 
                        TextColor="#FBF0D2" 
                        FontSize="18"
                        Placeholder="username"
-                       PlaceholderColor="#FBF0D2"/>
+                       PlaceholderColor="#c7ac8e"/>
 
-                <Entry Grid.Row="2" 
+                <controls:XEntry Grid.Row="2" 
                        VerticalOptions="FillAndExpand"
                        IsPassword="true" 
                        Text="{Binding Password, Mode=OneWayToSource}"
                        TextColor="#FBF0D2"
                        FontSize="18"
                        Placeholder="password"
-                       PlaceholderColor="#FBF0D2"/>
+                       PlaceholderColor="#c7ac8e"/>
                
-
                 <Button Grid.Row="3" 
                         Text="Login" 
                         TextColor="#234b64"

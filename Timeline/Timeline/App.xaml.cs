@@ -32,19 +32,25 @@ namespace Timeline
             {
                 if (((VMLocator)Current.Resources["vmLocator"]).Services.Authentication.GetCachedCredentials())
                 {
-                    MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage(true);
+                    MainPage = new NavigationPage(
+                        ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.UserPagesView()
+                        );
                 }
                 else
                 {
-                    MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
+                    MainPage = new NavigationPage(
+                        ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage()
+                        );
                 }
             }
             else
             {
-                //MainPage = ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage();
+                MainPage = new NavigationPage(
+                    ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage()
+                    );
             }
 
-            MainPage.SetValue(NavigationPage.BarBackgroundColorProperty, Color.Black);
+            //MainPage.SetValue(NavigationPage.BarBackgroundColorProperty, Color.Black);
         }
 
 		protected override void OnStart ()

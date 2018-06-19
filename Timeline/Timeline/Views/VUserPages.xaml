@@ -3,7 +3,7 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   x:Class="Timeline.Views.VUserPages"
                   xmlns:pages="clr-namespace:Timeline.Views"
-                  Title="LOGIN"
+                  Title="USERPAGES"
                   BindingContext="{Binding UserPagesViewModel, Source={StaticResource vmLocator}}">
     <MasterDetailPage.Master>
         <pages:VUserPagesMaster x:Name="MasterPage" />

@@ -44,11 +44,28 @@ namespace Timeline.Services
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
         }
 
-		public Page RootPage(bool isLoggedIn = false)
+		public Page RootPage()
 		{
-            if (isLoggedIn) { return userpagesView.Value; }
             return loginView.Value;
 		}
+
+        public void ClearStackBelow(Page belowPage)
+        {
+            var existingPages = _navigation.NavigationStack.ToList();
+            foreach (var page in existingPages)
+            {
+                if(page!=belowPage) _navigation.RemovePage(page);
+            }
+        }
+
+        public void ClearModalStackBelow(Page belowPage)
+        {
+            var existingPages = _navigation.ModalStack.ToList();
+            foreach (var page in existingPages)
+            {
+                if (page != belowPage) _navigation.RemovePage(page);
+            }
+        }
 
         public Page UserPagesView()
         {
@@ -75,9 +92,19 @@ namespace Timeline.Services
             _navigation.PushModalAsync(signupView.Value);
         }
 
-        public void GoToUserPagesPage()
+        public void GoToUserPagesPage(bool clearStack = false)
         {
-            _navigation.PushModalAsync(userpagesView.Value);
+            //_navigation.PushModalAsync(userpagesView.Value);
+
+            if(clearStack)
+            {
+                Application.Current.MainPage = new NavigationPage(userpagesView.Value);
+                _navigation.PopToRootAsync();
+            }
+            else
+            {
+                _navigation.PushModalAsync(userpagesView.Value);
+            }
         }
 
         public void GoToTimelineView(Models.MTimeline timeline)
