@@ -4,7 +4,8 @@
                   x:Class="Timeline.Views.VUserPages"
                   xmlns:pages="clr-namespace:Timeline.Views"
                   Title="USERPAGES"
-                  BindingContext="{Binding UserPagesViewModel, Source={StaticResource vmLocator}}">
+                  BindingContext="{Binding UserPagesViewModel, Source={StaticResource vmLocator}}"
+                  NavigationPage.HasNavigationBar="False">
     <MasterDetailPage.Master>
         <pages:VUserPagesMaster x:Name="MasterPage" />
     </MasterDetailPage.Master>

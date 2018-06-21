@@ -5,11 +5,11 @@
              Title="TimelineList"
              BackgroundImage="bkg4raw"
              NavigationPage.HasNavigationBar="False">
-    <ContentPage.Content>
+    <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
         <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+            <Label Text="TIMELINELIST"
+                   VerticalOptions="CenterAndExpand" 
+                   HorizontalOptions="CenterAndExpand" />
         </StackLayout>
-    </ContentPage.Content>
+    </ContentView>
 </ContentPage>

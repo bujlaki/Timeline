@@ -30,6 +30,8 @@ namespace Timeline.ViewModels
     {
         private UserPagesMenuItem _selectedItem;
 
+        public Command CmdMenu { get; set; }
+
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
         public UserPagesMenuItem SelectedItem
         {
@@ -40,12 +42,9 @@ namespace Timeline.ViewModels
             set
             {
                 _selectedItem = value;
-
                 if (_selectedItem == null)
                     return;
-
                 SetDetailPage(_selectedItem.Id);
-
                 SelectedItem = null;
             }
         }
@@ -59,7 +58,14 @@ namespace Timeline.ViewModels
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.SignOut, "Sign out" ),
             });
 
+            CmdMenu = new Command(CmdMenuExecute);
             //SetDetailPage(UserPagesMenuItem.MenuItemID.Timelines);
+        }
+
+        public void CmdMenuExecute(object obj)
+        {
+            Views.VUserPages mainPage = (_services.Navigation.UserPagesView() as Views.VUserPages);
+            mainPage.IsPresented = true;
         }
 
         private void SetDetailPage(UserPagesMenuItem.MenuItemID id)

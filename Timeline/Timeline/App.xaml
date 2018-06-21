@@ -9,6 +9,35 @@
         <ResourceDictionary MergedWith="styles:SMain">
             <viewmodel:VMLocator x:Key="vmLocator" />
             <converters:InverseBoolConverter x:Key="inverseBoolConverter" />
+
+            <ControlTemplate x:Key="UserPagesTemplate">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="9*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="7*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image Grid.Column="0" Source="menu">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{TemplateBinding Parent.BindingContext.CmdMenu}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Label Grid.Column="1" 
+                               Text="TITLE" 
+                               TextColor="#fbf0d2"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"/>
+                    </Grid>
+
+                    <ContentPresenter Grid.Row="1" />
+                </Grid>
+            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
