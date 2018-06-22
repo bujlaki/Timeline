@@ -80,7 +80,7 @@ namespace Timeline.ViewModels
                 }
 
                 //SUCCESS
-                UserDialogs.Instance.Alert("Login successful. Username: " + _services.Authentication.CurrentUser.UserName);
+                _services.Navigation.GoToUserPagesPage(true);
             }
             catch (Exception ex)
             {

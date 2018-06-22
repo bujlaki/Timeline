@@ -5,6 +5,8 @@ using System.Text;
 
 using Xamarin.Forms;
 
+using Timeline.Models;
+
 namespace Timeline.ViewModels
 {
     public class UserPagesMenuItem
@@ -31,6 +33,7 @@ namespace Timeline.ViewModels
         private UserPagesMenuItem _selectedItem;
 
         public Command CmdMenu { get; set; }
+        public MUser LoggedInUser { get; set; }        
 
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
         public UserPagesMenuItem SelectedItem
@@ -59,6 +62,7 @@ namespace Timeline.ViewModels
             });
 
             CmdMenu = new Command(CmdMenuExecute);
+            LoggedInUser = _services.Authentication.CurrentUser;
             //SetDetailPage(UserPagesMenuItem.MenuItemID.Timelines);
         }
 

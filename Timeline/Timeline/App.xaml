@@ -14,13 +14,14 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="9*"/>
+                        <RowDefinition Height="7*"/>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
 
                         <Image Grid.Column="0" Source="menu">
@@ -28,13 +29,32 @@
                                 <TapGestureRecognizer Command="{TemplateBinding Parent.BindingContext.CmdMenu}"/>
                             </Image.GestureRecognizers>
                         </Image>
-                        <Label Grid.Column="1" 
-                               Text="TITLE" 
-                               TextColor="#fbf0d2"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Center"/>
+
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Label Grid.Row="0" 
+                                   Text="{TemplateBinding Parent.BindingContext.LoggedInUser.UserName}" 
+                                   TextColor="#fbf0d2"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Start"/>
+                            
+                            <Label Grid.Row="1" 
+                                   Text="{TemplateBinding Parent.BindingContext.LoggedInUser.Email}" 
+                                   TextColor="#fbf0d2"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Start"/>
+                        </Grid>
+
+                        <Image Grid.Column="2" Source="{TemplateBinding Parent.BindingContext.LoggedInUser.PhotoUrl}" />
+
                     </Grid>
 
+                    <BoxView Grid.Row="0" VerticalOptions="End" HeightRequest="2" BackgroundColor="White" />
+                    
                     <ContentPresenter Grid.Row="1" />
                 </Grid>
             </ControlTemplate>

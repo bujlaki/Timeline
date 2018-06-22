@@ -73,7 +73,6 @@ namespace Timeline.ViewModels
                     await _services.Authentication.LoginCognito(username, password);
                 }
 
-                UserDialogs.Instance.Alert("Login successful. Username: " + _services.Authentication.CurrentUser.UserName);
                 _services.Navigation.GoToUserPagesPage(true);
             }
             catch (Exception ex)
@@ -99,7 +98,6 @@ namespace Timeline.ViewModels
 
         public void OnAuthCompleted()
         {
-            UserDialogs.Instance.Alert("Login successful. Welcome " + _services.Authentication.CurrentUser.UserName + " !");
             _services.Navigation.GoToUserPagesPage();
         }
 

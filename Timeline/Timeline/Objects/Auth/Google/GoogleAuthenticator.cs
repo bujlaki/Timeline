@@ -42,6 +42,8 @@ namespace Timeline.Objects.Auth.Google
         {
             if (e.IsAuthenticated)
             {
+                //save the account
+                AccountStore.Create().Save(e.Account, "Google");
                 authDelegate.OnGoogleAuthCompleted(e.Account);
             }
             else

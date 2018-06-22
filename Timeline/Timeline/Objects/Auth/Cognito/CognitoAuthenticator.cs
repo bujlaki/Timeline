@@ -156,12 +156,16 @@ namespace Timeline.Objects.Auth.Cognito
 
             if (authFlowResponse.AuthenticationResult == null) throw new Exception("Cognito authentication error");
 
+            GetUserResponse userDetails = await user.GetUserDetailsAsync();
+
             CognitoAWSCredentials credentials = user.GetCognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
             
             MUser timelineUser = new MUser();
             timelineUser.AWSCredentials = credentials;
-            timelineUser.UserId = user.UserID;
+            timelineUser.UserId = userDetails.UserAttributes.Find(x => x.Name.ToLower()=="sub").Value;
             timelineUser.UserName = user.Username;
+            timelineUser.Email = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "email").Value;
+            timelineUser.PhotoUrl = "userphoto";
             timelineUser.Type = MUser.MUserType.Cognito;
 
             return timelineUser;

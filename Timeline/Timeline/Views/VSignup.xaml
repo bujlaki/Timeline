@@ -48,7 +48,6 @@
 
                 <controls:XEntry Grid.Row="3" 
                        VerticalOptions="FillAndExpand"
-                       IsPassword="true" 
                        Text="{Binding Email, Mode=OneWayToSource}"
                        TextColor="#FBF0D2"
                        FontSize="18"
