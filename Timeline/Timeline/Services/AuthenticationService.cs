@@ -39,6 +39,8 @@ namespace Timeline.Services
 
         public bool GetCachedCredentials()
         {
+            IEnumerable<Account> accounts = AccountStore.Create().FindAccountsForService("Google");
+
             CurrentUser.AWSCredentials = cognitoAuth.GetCachedCognitoIdentity();
             if (CurrentUser.AWSCredentials == null)
             {
