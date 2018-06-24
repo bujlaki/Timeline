@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ using Amazon.CognitoIdentity;
 using Amazon.CognitoIdentity.Model;
 using Xamarin.Auth;
 using Newtonsoft.Json.Linq;
+
 
 namespace Timeline.Services
 {
@@ -37,19 +39,27 @@ namespace Timeline.Services
             googleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
         }
 
-        public bool GetCachedCredentials()
+        public async Task<bool> GetCachedCredentials()
         {
-            IEnumerable<Account> accounts = AccountStore.Create().FindAccountsForService("Google");
+            try
+            {
+                IEnumerable<Account> accounts = AccountStore.Create().FindAccountsForService("Google");
+                Account account = accounts.FirstOrDefault();
+                if (account == null) return false;
 
-            CurrentUser.AWSCredentials = cognitoAuth.GetCachedCognitoIdentity();
-            if (CurrentUser.AWSCredentials == null)
+                using (UserDialogs.Instance.Loading("Logging in..."))
+                {
+                    await GetGoogleUserinfo(account);
+                    await GetAWSCredentialsForGoogleToken(account);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
             {
                 CurrentUser.Clear();
                 return false;
             }
-            CurrentUser.Type = MUser.MUserType.Google;
-            
-            return true;
         }
 
         public async Task LoginCognito(string username, string password)
@@ -88,21 +98,8 @@ namespace Timeline.Services
             {
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    //get GOOGLE userinfo
-                    var req = new OAuth2Request("GET", new Uri("https://www.googleapis.com/oauth2/v2/userinfo"), null, account);
-                    var resp = await req.GetResponseAsync();
-                    var obj = JObject.Parse(resp.GetResponseText());
-                    CurrentUser.UserId = obj["id"].ToString().Replace("\"", "");
-                    CurrentUser.UserName = obj["given_name"].ToString().Replace("\"", "");
-                    CurrentUser.Email = obj["email"].ToString().Replace("\"", "");
-                    CurrentUser.PhotoUrl = obj["picture"].ToString().Replace("\"", "");
-
-                    //get AWS credentials
-                    GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(account.Properties["id_token"]);
-                    CurrentUser.AWSCredentials = getCredentialResp.Credentials;
-                    CurrentUser.CognitoIdentityId = getCredentialResp.IdentityId;
-
-                    CurrentUser.Type = MUser.MUserType.Google;
+                    await GetGoogleUserinfo(account);
+                    await GetAWSCredentialsForGoogleToken(account);
                 }
 
                 authDelegate.OnAuthCompleted();
@@ -120,6 +117,25 @@ namespace Timeline.Services
             authDelegate.OnAuthFailed(message, exception);
         }
 
+        private async Task GetGoogleUserinfo(Account account)
+        {
+            //get GOOGLE userinfo
+            var req = new OAuth2Request("GET", new Uri("https://www.googleapis.com/oauth2/v2/userinfo"), null, account);
+            var resp = await req.GetResponseAsync();
+            var obj = JObject.Parse(resp.GetResponseText());
+            CurrentUser.UserId = obj["id"].ToString().Replace("\"", "");
+            CurrentUser.UserName = obj["given_name"].ToString().Replace("\"", "");
+            CurrentUser.Email = obj["email"].ToString().Replace("\"", "");
+            CurrentUser.PhotoUrl = obj["picture"].ToString().Replace("\"", "");
+            CurrentUser.Type = MUser.MUserType.Google;
+        }
 
+        private async Task GetAWSCredentialsForGoogleToken(Account account)
+        {
+            //get AWS credentials
+            GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(account.Properties["id_token"]);
+            CurrentUser.AWSCredentials = getCredentialResp.Credentials;
+            CurrentUser.CognitoIdentityId = getCredentialResp.IdentityId;
+        }
     }
 }

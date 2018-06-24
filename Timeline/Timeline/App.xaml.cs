@@ -8,6 +8,7 @@ using Xamarin.Forms.Xaml;
 
 using Timeline.ViewModels.Base;
 using Amazon;
+using System.Threading.Tasks;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Timeline
@@ -27,27 +28,25 @@ namespace Timeline
 			AWSConfigs.AWSRegion = AwsRegion.EUCentral1.Name;
 			AWSConfigs.CorrectForClockSkew = true;
 
-            //CHECK CACHED COGNITO IDENTITY
+            //CHECK CACHED IDENTITY
+            VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
+            Task<bool> task = locator.Services.Authentication.GetCachedCredentials();
+            task.Wait();
+
             if (!DesignMode.IsDesignModeEnabled)
             {
-                if (((VMLocator)Current.Resources["vmLocator"]).Services.Authentication.GetCachedCredentials())
+                if (task.Result)
                 {
-                    MainPage = new NavigationPage(
-                        ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.UserPagesView()
-                        );
+                    MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
                 }
                 else
                 {
-                    MainPage = new NavigationPage(
-                        ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage()
-                        );
+                    MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
                 }
             }
             else
             {
-                MainPage = new NavigationPage(
-                    ((VMLocator)Current.Resources["vmLocator"]).Services.Navigation.RootPage()
-                    );
+                MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
             }
 
             //MainPage.SetValue(NavigationPage.BarBackgroundColorProperty, Color.Black);

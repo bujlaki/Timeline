@@ -12,7 +12,7 @@
     <MasterDetailPage.Detail>
         <NavigationPage>
             <x:Arguments>
-                <pages:VUserPagesDetail />
+                <pages:VTimelineList />
             </x:Arguments>
         </NavigationPage>
     </MasterDetailPage.Detail>
