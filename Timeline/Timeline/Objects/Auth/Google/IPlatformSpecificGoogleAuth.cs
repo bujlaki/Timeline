@@ -6,6 +6,8 @@ namespace Timeline.Objects.Auth.Google
 {
     public interface IPlatformSpecificGoogleAuth
     {
-        void AuthenticateGoogle(IGoogleAuthenticationDelegate _delegate);
+        string PlatformClientID { get; }
+        void AuthenticateGoogle(GoogleAuthenticator googleAuthenticator);
+        void ClearStaticAuth();
     }
 }

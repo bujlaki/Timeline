@@ -110,6 +110,10 @@
                         BorderWidth="2"
                         BorderColor="#fbf0d2"/>
 
+                <Button Grid.Row="7"
+                        Text="DEBUG: clear cached identity"
+                        Command="{Binding CmdDebugClearCachedID}"/>
+
             </Grid>
         </Grid>
 

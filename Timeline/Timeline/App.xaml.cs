@@ -28,23 +28,20 @@ namespace Timeline
 			AWSConfigs.AWSRegion = AwsRegion.EUCentral1.Name;
 			AWSConfigs.CorrectForClockSkew = true;
 
-            //CHECK CACHED IDENTITY
             VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
-            Task<bool> task = locator.Services.Authentication.GetCachedCredentials();
-            task.Wait();
 
-            if (!DesignMode.IsDesignModeEnabled)
-            {
-                if (task.Result)
-                {
-                    MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
-                }
-                else
-                {
-                    MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
-                }
-            }
-            else
+            //if (!DesignMode.IsDesignModeEnabled)
+            //{
+            //    if (task.Result)
+            //    {
+            //        MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
+            //    }
+            //    else
+            //    {
+            //        MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
+            //    }
+            //}
+            //else
             {
                 MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
             }
@@ -52,10 +49,18 @@ namespace Timeline
             //MainPage.SetValue(NavigationPage.BarBackgroundColorProperty, Color.Black);
         }
 
-		protected override void OnStart ()
+		protected override async void OnStart ()
 		{
-			// Handle when your app starts
-		}
+            // Handle when your app starts
+            //CHECK CACHED IDENTITY
+            VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
+            bool iscached = await locator.Services.Authentication.GetCachedCredentials();
+
+            if(iscached)
+            {
+                locator.Services.Navigation.GoToUserPagesPage(true);
+            }
+        }
 
 		protected override void OnSleep ()
 		{

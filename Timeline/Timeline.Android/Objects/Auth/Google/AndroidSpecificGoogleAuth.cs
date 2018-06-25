@@ -19,19 +19,27 @@ namespace Timeline.Droid.Objects.Auth.Google
     class AndroidSpecificGoogleAuth : IPlatformSpecificGoogleAuth
     {
         // Need to be static because we need to access it in GoogleAuthInterceptor for continuation
-        public static GoogleAuthenticator Auth;
+        public static GoogleAuthenticator staticAuth;
 
-        public void AuthenticateGoogle(IGoogleAuthenticationDelegate _delegate)
+        public string PlatformClientID { get; private set; }
+
+        public AndroidSpecificGoogleAuth()
         {
             //android client id:
-            string clientId = "597410249897-e5iqvca2pnvg6hlm4i5t4h5tgk8liutk.apps.googleusercontent.com";
-            string scope = "email profile";
-            string redirectUrl = "hu.iqtech.timeline:/oauth2redirect";
-            Auth = new GoogleAuthenticator(clientId, scope, redirectUrl, _delegate);
+            PlatformClientID = "597410249897-e5iqvca2pnvg6hlm4i5t4h5tgk8liutk.apps.googleusercontent.com";
+        }
 
-            var authenticator = Auth.GetAuthenticator();
+        public void AuthenticateGoogle(GoogleAuthenticator googleAuthenticator)
+        {
+            staticAuth = googleAuthenticator; //saving it as static, so the interceptor can call it
+            var authenticator = googleAuthenticator.GetAuthenticator();
             var intent = authenticator.GetUI(CrossCurrentActivity.Current.AppContext);
             CrossCurrentActivity.Current.AppContext.StartActivity(intent);
+        }
+
+        public void ClearStaticAuth()
+        {
+            staticAuth = null;
         }
     }
 }

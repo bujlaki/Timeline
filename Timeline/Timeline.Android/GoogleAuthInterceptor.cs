@@ -35,7 +35,7 @@ namespace Timeline.Droid
             Android.Net.Uri uri_android = Intent.Data;
             Uri uri_netfx = new Uri(uri_android.ToString());
             
-            Timeline.Droid.Objects.Auth.Google.AndroidSpecificGoogleAuth.Auth?.OnPageLoading(uri_netfx);
+            Timeline.Droid.Objects.Auth.Google.AndroidSpecificGoogleAuth.staticAuth?.OnPageLoading(uri_netfx);
 
             var intent = new Intent(this, typeof(MainActivity));
             intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop);

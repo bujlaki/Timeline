@@ -23,8 +23,10 @@ namespace Timeline.Services
 {
     class AuthenticationService : IAuthenticationService, IGoogleAuthenticationDelegate
     {
-        private IPlatformSpecificGoogleAuth googleAuth;
+        private GoogleAuthenticator googleAuth;
         private CognitoAuthenticator cognitoAuth;
+
+        private IPlatformSpecificGoogleAuth platformGoogleAuth;
         private IAuthenticationDelegate authDelegate;
 
         public MUser CurrentUser { get; private set; }
@@ -35,8 +37,11 @@ namespace Timeline.Services
             CurrentUser = new MUser();
             EmailVerificationNeeded = false;
 
+            platformGoogleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
+
+            googleAuth = new GoogleAuthenticator(platformGoogleAuth.PlatformClientID, "email profile", "hu.iqtech.timeline:/oauth2redirect", this);
+
             cognitoAuth = new CognitoAuthenticator();
-            googleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
         }
 
         public async Task<bool> GetCachedCredentials()
@@ -49,7 +54,13 @@ namespace Timeline.Services
 
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    await GetGoogleUserinfo(account);
+                    var info = await googleAuth.GetGoogleUserInfo(account);
+                    CurrentUser.UserId = info.UserId;
+                    CurrentUser.UserName = info.UserName;
+                    CurrentUser.Email = info.Email;
+                    CurrentUser.PhotoUrl = info.Picture;
+                    CurrentUser.Type = MUser.MUserType.Google;
+
                     await GetAWSCredentialsForGoogleToken(account);
                 }
 
@@ -60,6 +71,16 @@ namespace Timeline.Services
                 CurrentUser.Clear();
                 return false;
             }
+        }
+
+        public void ClearCachedCredentials()
+        {
+            AccountStore accountStore = AccountStore.Create();
+            IEnumerable<Account> accounts = accountStore.FindAccountsForService("Google");
+            Account account = accounts.FirstOrDefault();
+            if (account == null) return;
+
+            accountStore.Delete(account, "Google");
         }
 
         public async Task LoginCognito(string username, string password)
@@ -82,8 +103,7 @@ namespace Timeline.Services
         public void AuthenticateGoogle(IAuthenticationDelegate _delegate)
         {
             authDelegate = _delegate;
-            googleAuth.AuthenticateGoogle(this);
-            
+            platformGoogleAuth.AuthenticateGoogle(googleAuth);
         }
 
         public void OnGoogleAuthCanceled()
@@ -96,9 +116,17 @@ namespace Timeline.Services
         {
             try
             {
+                platformGoogleAuth.ClearStaticAuth();
+
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    await GetGoogleUserinfo(account);
+                    var info = await googleAuth.GetGoogleUserInfo(account);
+                    CurrentUser.UserId = info.UserId;
+                    CurrentUser.UserName = info.UserName;
+                    CurrentUser.Email = info.Email;
+                    CurrentUser.PhotoUrl = info.Picture;
+                    CurrentUser.Type = MUser.MUserType.Google;
+
                     await GetAWSCredentialsForGoogleToken(account);
                 }
 
@@ -117,18 +145,7 @@ namespace Timeline.Services
             authDelegate.OnAuthFailed(message, exception);
         }
 
-        private async Task GetGoogleUserinfo(Account account)
-        {
-            //get GOOGLE userinfo
-            var req = new OAuth2Request("GET", new Uri("https://www.googleapis.com/oauth2/v2/userinfo"), null, account);
-            var resp = await req.GetResponseAsync();
-            var obj = JObject.Parse(resp.GetResponseText());
-            CurrentUser.UserId = obj["id"].ToString().Replace("\"", "");
-            CurrentUser.UserName = obj["given_name"].ToString().Replace("\"", "");
-            CurrentUser.Email = obj["email"].ToString().Replace("\"", "");
-            CurrentUser.PhotoUrl = obj["picture"].ToString().Replace("\"", "");
-            CurrentUser.Type = MUser.MUserType.Google;
-        }
+
 
         private async Task GetAWSCredentialsForGoogleToken(Account account)
         {
