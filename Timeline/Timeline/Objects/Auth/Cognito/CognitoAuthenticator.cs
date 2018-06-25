@@ -68,11 +68,6 @@ namespace Timeline.Objects.Auth.Cognito
             return await cli.GetCredentialsForIdentityAsync(getCredentialReq);
         }
 
-        //internal string GetCustomHostedURL()
-        //{
-        //    return string.Format("https://{0}.auth.{1}.amazoncognito.com/login?response_type=code&client_id={2}&redirect_uri=https://sid343.reinvent-workshop.com/", CUSTOM_DOMAIN, REGION, CLIENTAPP_ID);
-        //}
-
         //public async Task<bool> SignUpUser(string username, string password, string email, string phonenumber)
         public async Task<SignUpResponse> SignupUser(string username, string password, string email)
         {
