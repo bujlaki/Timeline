@@ -28,47 +28,49 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Label Text="TIMELINE" 
-                       VerticalOptions="Center"
-                       HorizontalOptions="CenterAndExpand"
-                       FontAttributes="Bold"
-                       FontSize="28"
-                       TextColor="#b0b0b0"/>
+                <Image Source="title"/>
 
-                <Frame Grid.Row="1" Grid.RowSpan="4"
-                       BackgroundColor="#fbf0d2"
-                       CornerRadius="20"
-                       Margin="-25,-25,-25,-25">
-                    <Frame BackgroundColor="#4b6b80" CornerRadius="20" Margin="-15"/>
+                <Frame Grid.Row="1" Grid.RowSpan="3"
+                       BackgroundColor="#307496"
+                       CornerRadius="20" 
+                       Margin="-10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <controls:XEntry Grid.Row="0" 
+                                         VerticalOptions="FillAndExpand"
+                                         Text="{Binding Username, Mode=OneWayToSource}" 
+                                         TextColor="#eeebd3" 
+                                         FontSize="18"
+                                         Placeholder="username"
+                                         PlaceholderColor="#bfd9f3"/>
+
+                        <controls:XEntry Grid.Row="1" 
+                                         VerticalOptions="FillAndExpand"
+                                         IsPassword="true" 
+                                         Text="{Binding Password, Mode=OneWayToSource}"
+                                         TextColor="#eeebd3"
+                                         FontSize="18"
+                                         Placeholder="password"
+                                         PlaceholderColor="#bfd9f3"/>
+
+                        <Button Grid.Row="2" 
+                                Text="Login" 
+                                TextColor="#234B64"
+                                BackgroundColor="#bfd9f3"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"
+                                Command="{Binding CmdUserPassLogin}"
+                                BorderRadius="10"
+                                BorderWidth="2"
+                                BorderColor="#eeebd3"/>
+
+                    </Grid>
                 </Frame>
-                
-                <controls:XEntry Grid.Row="1" 
-                       VerticalOptions="FillAndExpand"
-                       Text="{Binding Username, Mode=OneWayToSource}" 
-                       TextColor="#FBF0D2" 
-                       FontSize="18"
-                       Placeholder="username"
-                       PlaceholderColor="#c7ac8e"/>
-
-                <controls:XEntry Grid.Row="2" 
-                       VerticalOptions="FillAndExpand"
-                       IsPassword="true" 
-                       Text="{Binding Password, Mode=OneWayToSource}"
-                       TextColor="#FBF0D2"
-                       FontSize="18"
-                       Placeholder="password"
-                       PlaceholderColor="#c7ac8e"/>
-               
-                <Button Grid.Row="3" 
-                        Text="Login" 
-                        TextColor="#234b64"
-                        BackgroundColor="#849d9a"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
-                        Command="{Binding CmdUserPassLogin}"
-                        BorderRadius="10"
-                        BorderWidth="2"
-                        BorderColor="#fbf0d2"/>
 
                 <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
@@ -78,10 +80,10 @@
 
                     <Label Grid.Column="0" 
                            Text="Forgot password?" 
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
+                           HorizontalOptions="Start"
+                           VerticalOptions="End"
                            FontAttributes="Bold" 
-                           TextColor="#b27a63"
+                           TextColor="#f4bd4f"
                            FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
@@ -90,10 +92,10 @@
 
                     <Label Grid.Column="1"
                            Text="New account" 
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
+                           HorizontalOptions="End"
+                           VerticalOptions="End"
                            FontAttributes="Bold" 
-                           TextColor="#b27a63"
+                           TextColor="#f4bd4f"
                            FontSize="16">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdSignup}"/>
@@ -102,23 +104,17 @@
                 </Grid>
 
 
-                <BoxView Grid.Row="5" 
-                         HorizontalOptions="FillAndExpand"
-                         VerticalOptions="End"
-                         Color="#FBF0D2"
-                         HeightRequest="2"/>
-
                 <Button Grid.Row="6" 
                         Text="Login with Google"
-                        BackgroundColor="#849d9a"
-                        TextColor="#234b64"
+                        BackgroundColor="#bfd9f3"
+                        TextColor="#234B64"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
                         BorderRadius="10"
                         BorderWidth="2"
-                        BorderColor="#fbf0d2"/>
+                        BorderColor="#eeebd3"/>
 
                 <Button Grid.Row="7"
                         Text="DEBUG: clear cached identity"

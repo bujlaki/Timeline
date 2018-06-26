@@ -12,21 +12,22 @@
                   ItemsSource="{Binding MenuItems}"
                   SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
             <ListView.Header>
-                <Grid BackgroundColor="#c7ac8e">
+                <Grid BackgroundColor="#bfd9f3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="10"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="10"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="10"/>
                     </Grid.RowDefinitions>
                     <Label Grid.Column="1"
                            Grid.Row="1"
                            Text="MENU"
-                           TextColor="#234B64"
+                           FontSize="16"
+                           TextColor="#307496"
                            Style="{DynamicResource SubtitleStyle}"/>
                 </Grid>
             </ListView.Header>
@@ -37,7 +38,7 @@
                             <Label VerticalOptions="FillAndExpand" 
                                    VerticalTextAlignment="Center" 
                                    Text="{Binding Title}" 
-                                   TextColor="#FBF0D2"
+                                   TextColor="#ffffff"
                                    FontSize="24"/>
                         </StackLayout>
                     </ViewCell>

@@ -22,49 +22,70 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
 
-                <Label Text="SIGNUP" 
-                       VerticalOptions="Center"
+                <Image Source="title"/>
+                
+                <Label Grid.Row="1" Text="SIGNUP" 
+                       VerticalOptions="Start"
+                       HorizontalOptions="Center"
                        FontSize="28"
                        TextColor="#FBF0D2"/>
 
-                <controls:XEntry Grid.Row="1" 
-                       VerticalOptions="FillAndExpand"
-                       Text="{Binding Username, Mode=OneWayToSource}" 
-                       TextColor="#FBF0D2" 
-                       FontSize="18"
-                       Placeholder="username"
-                       PlaceholderColor="#c7ac8e"/>
+                <Frame Grid.Row="2" Grid.RowSpan="4"
+                       BackgroundColor="#307496"
+                       CornerRadius="20" 
+                       Margin="-10">
 
-                <controls:XEntry Grid.Row="2" 
-                       VerticalOptions="FillAndExpand"
-                       IsPassword="true" 
-                       Text="{Binding Password, Mode=OneWayToSource}"
-                       TextColor="#FBF0D2"
-                       FontSize="18"
-                       Placeholder="password"
-                       PlaceholderColor="#c7ac8e"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                <controls:XEntry Grid.Row="3" 
-                       VerticalOptions="FillAndExpand"
-                       Text="{Binding Email, Mode=OneWayToSource}"
-                       TextColor="#FBF0D2"
-                       FontSize="18"
-                       Placeholder="e-mail"
-                       PlaceholderColor="#c7ac8e"/>
+                        <controls:XEntry Grid.Row="0" 
+                                         VerticalOptions="FillAndExpand"
+                                         Text="{Binding Username, Mode=OneWayToSource}" 
+                                         TextColor="#eeebd3" 
+                                         FontSize="18"
+                                         Placeholder="username"
+                                         PlaceholderColor="#bfd9f3"/>
 
-                <Button Grid.Row="4" 
-                        Text="Submit" 
-                        Command="{Binding CmdSignup}"
-                        TextColor="#234b64"
-                        BackgroundColor="#849d9a"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
-                        BorderRadius="10"
-                        BorderWidth="2"
-                        BorderColor="#fbf0d2"/>
+                        <controls:XEntry Grid.Row="1" 
+                                         VerticalOptions="FillAndExpand"
+                                         IsPassword="true" 
+                                         Text="{Binding Password, Mode=OneWayToSource}"
+                                         TextColor="#eeebd3"
+                                         FontSize="18"
+                                         Placeholder="password"
+                                         PlaceholderColor="#bfd9f3"/>
+
+                        <controls:XEntry Grid.Row="2" 
+                                         VerticalOptions="FillAndExpand"
+                                         Text="{Binding Email, Mode=OneWayToSource}"
+                                         TextColor="#eeebd3"
+                                         FontSize="18"
+                                         Placeholder="e-mail"
+                                         PlaceholderColor="#bfd9f3"/>
+
+                        <Button Grid.Row="3" 
+                                Text="Submit" 
+                                Command="{Binding CmdSignup}"
+                                TextColor="#234B64"
+                                BackgroundColor="#bfd9f3"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"
+                                BorderRadius="10"
+                                BorderWidth="2"
+                                BorderColor="#eeebd3"/>
+                        
+                    </Grid>
+                </Frame>
+
                 
 
             </Grid>

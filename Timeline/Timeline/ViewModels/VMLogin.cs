@@ -106,7 +106,7 @@ namespace Timeline.ViewModels
 
         public void OnAuthCompleted()
         {
-            _services.Navigation.GoToUserPagesPage();
+            _services.Navigation.GoToUserPagesPage(true);
         }
 
         public void OnAuthFailed(string message, Exception exception)

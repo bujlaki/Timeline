@@ -33,7 +33,7 @@ namespace Timeline.ViewModels
         private UserPagesMenuItem _selectedItem;
 
         public Command CmdMenu { get; set; }
-        public MUser LoggedInUser { get; set; }        
+        public MUser LoggedInUser { get { return _services.Authentication.CurrentUser; }  }        
 
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
         public UserPagesMenuItem SelectedItem
@@ -45,9 +45,10 @@ namespace Timeline.ViewModels
             set
             {
                 _selectedItem = value;
+                RaisePropertyChanged("SelectedItem");
                 if (_selectedItem == null)
                     return;
-                SetDetailPage(_selectedItem.Id);
+                HandleMenuItem(_selectedItem.Id);
                 SelectedItem = null;
             }
         }
@@ -62,7 +63,7 @@ namespace Timeline.ViewModels
             });
 
             CmdMenu = new Command(CmdMenuExecute);
-            LoggedInUser = _services.Authentication.CurrentUser;
+            //LoggedInUser = _services.Authentication.CurrentUser;
             //SetDetailPage(UserPagesMenuItem.MenuItemID.Timelines);
         }
 
@@ -72,7 +73,7 @@ namespace Timeline.ViewModels
             mainPage.IsPresented = true;
         }
 
-        private void SetDetailPage(UserPagesMenuItem.MenuItemID id)
+        private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)
         {
             Views.VUserPages mainPage = (_services.Navigation.UserPagesView() as Views.VUserPages);
             switch (id)
@@ -82,6 +83,11 @@ namespace Timeline.ViewModels
                     break;
                 case UserPagesMenuItem.MenuItemID.Options:
                     mainPage.Detail = new NavigationPage(_services.Navigation.OptionsView());
+                    break;
+                case UserPagesMenuItem.MenuItemID.SignOut:
+                    _services.Authentication.CurrentUser.Clear();
+                    _services.Authentication.ClearCachedCredentials();
+                    App.Current.MainPage = new NavigationPage(_services.Navigation.RootPage());
                     break;
             }
             mainPage.IsPresented = false;

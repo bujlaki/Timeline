@@ -9,6 +9,9 @@ namespace Timeline.Objects.Auth.Google
 {
     public class GoogleAuthenticator
     {
+        private string current_clientId;
+        private string current_scope;
+        private string current_RedirectUrl;
         private const string AuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string AccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
         private const bool IsUsingNativeUI = true;
@@ -19,12 +22,30 @@ namespace Timeline.Objects.Auth.Google
         public GoogleAuthenticator(string clientId, string scope, string redirectUrl, IGoogleAuthenticationDelegate authenticationDelegate)
         {
             authDelegate = authenticationDelegate;
+            current_clientId = clientId;
+            current_scope = scope;
+            current_RedirectUrl = redirectUrl;
 
             auth = new OAuth2Authenticator(clientId, string.Empty, scope,
                                             new Uri(AuthorizeUrl),
                                             new Uri(redirectUrl),
                                             new Uri(AccessTokenUrl),
                                             null, IsUsingNativeUI);
+
+            auth.Completed += OnAuthenticationCompleted;
+            auth.Error += OnAuthenticationFailed;
+        }
+
+        public void ReInit()
+        {
+            auth.Completed -= OnAuthenticationCompleted;
+            auth.Error -= OnAuthenticationFailed;
+
+            auth = new OAuth2Authenticator(current_clientId, string.Empty, current_scope,
+                                new Uri(AuthorizeUrl),
+                                new Uri(current_RedirectUrl),
+                                new Uri(AccessTokenUrl),
+                                null, IsUsingNativeUI);
 
             auth.Completed += OnAuthenticationCompleted;
             auth.Error += OnAuthenticationFailed;

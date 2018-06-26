@@ -17,7 +17,7 @@
                         <RowDefinition Height="7*"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" BackgroundColor="#234B64">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="5*"/>
@@ -36,17 +36,18 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             
-                            <Label Grid.Row="0" 
+                            <Label Grid.Row="0" Grid.RowSpan="2"
                                    Text="{TemplateBinding Parent.BindingContext.LoggedInUser.UserName}" 
-                                   TextColor="#fbf0d2"
+                                   TextColor="#f4bd4f"
+                                   FontSize="24"
                                    VerticalOptions="Center"
-                                   HorizontalOptions="Start"/>
+                                   HorizontalOptions="Center"/>
                             
-                            <Label Grid.Row="1" 
+                            <!--<Label Grid.Row="1" 
                                    Text="{TemplateBinding Parent.BindingContext.LoggedInUser.Email}" 
-                                   TextColor="#fbf0d2"
+                                   TextColor="#234B64"
                                    VerticalOptions="Center"
-                                   HorizontalOptions="Start"/>
+                                   HorizontalOptions="Start"/>-->
                         </Grid>
 
                         <Image Grid.Column="2" Source="{TemplateBinding Parent.BindingContext.LoggedInUser.PhotoUrl}" />
