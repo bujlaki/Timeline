@@ -5,13 +5,14 @@
              x:Class="Timeline.Views.VLogin"
              Title="LOGIN"
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="bkg4"
-             NavigationPage.HasNavigationBar="False">
-    <ContentPage.Content>
-        <Grid IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#234b64">
+    <ContentPage.Content IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="1">
@@ -27,11 +28,20 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Label Text="LOGIN" 
+                <Label Text="TIMELINE" 
                        VerticalOptions="Center"
+                       HorizontalOptions="CenterAndExpand"
+                       FontAttributes="Bold"
                        FontSize="28"
-                       TextColor="#FBF0D2"/>
+                       TextColor="#b0b0b0"/>
 
+                <Frame Grid.Row="1" Grid.RowSpan="4"
+                       BackgroundColor="#fbf0d2"
+                       CornerRadius="20"
+                       Margin="-25,-25,-25,-25">
+                    <Frame BackgroundColor="#4b6b80" CornerRadius="20" Margin="-15"/>
+                </Frame>
+                
                 <controls:XEntry Grid.Row="1" 
                        VerticalOptions="FillAndExpand"
                        Text="{Binding Username, Mode=OneWayToSource}" 
@@ -92,7 +102,7 @@
                 </Grid>
 
 
-                <BoxView Grid.Row="4" 
+                <BoxView Grid.Row="5" 
                          HorizontalOptions="FillAndExpand"
                          VerticalOptions="End"
                          Color="#FBF0D2"
@@ -112,7 +122,8 @@
 
                 <Button Grid.Row="7"
                         Text="DEBUG: clear cached identity"
-                        Command="{Binding CmdDebugClearCachedID}"/>
+                        Command="{Binding CmdDebugClearCachedID}"
+                        IsVisible="False"/>
 
             </Grid>
         </Grid>

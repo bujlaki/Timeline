@@ -13,7 +13,7 @@ using Acr.UserDialogs;
 
 namespace Timeline.Droid
 {
-    [Activity(Label = "Timeline", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Timeline", Icon = "@drawable/icon", Theme = "@style/MainTheme", ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
 
@@ -32,7 +32,6 @@ namespace Timeline.Droid
 
             //initialize UserDialogs
             UserDialogs.Init(this);
-            //UserDialogs.Init(() => (Activity)CrossCurrentActivity.Current.Activity);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());

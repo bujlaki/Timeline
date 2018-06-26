@@ -52,17 +52,14 @@ namespace Timeline.Services
                 Account account = accounts.FirstOrDefault();
                 if (account == null) return false;
 
-                using (UserDialogs.Instance.Loading("Logging in..."))
-                {
-                    var info = await googleAuth.GetGoogleUserInfo(account);
-                    CurrentUser.UserId = info.UserId;
-                    CurrentUser.UserName = info.UserName;
-                    CurrentUser.Email = info.Email;
-                    CurrentUser.PhotoUrl = info.Picture;
-                    CurrentUser.Type = MUser.MUserType.Google;
+                var info = await googleAuth.GetGoogleUserInfo(account);
+                CurrentUser.UserId = info.UserId;
+                CurrentUser.UserName = info.UserName;
+                CurrentUser.Email = info.Email;
+                CurrentUser.PhotoUrl = info.Picture;
+                CurrentUser.Type = MUser.MUserType.Google;
 
-                    await GetAWSCredentialsForGoogleToken(account);
-                }
+                await GetAWSCredentialsForGoogleToken(account);
 
                 return true;
             }

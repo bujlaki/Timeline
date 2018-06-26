@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Timeline.Views.VTimelineList"
              Title="TimelineList"
-             BackgroundImage="bkg4raw"
-             NavigationPage.HasNavigationBar="False">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#234b64">
     <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
         <StackLayout>
             <Label Text="TIMELINELIST"

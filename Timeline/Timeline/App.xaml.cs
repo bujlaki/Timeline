@@ -30,36 +30,28 @@ namespace Timeline
 
             VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
 
-            //if (!DesignMode.IsDesignModeEnabled)
-            //{
-            //    if (task.Result)
-            //    {
-            //        MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
-            //    }
-            //    else
-            //    {
-            //        MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
-            //    }
-            //}
-            //else
+            if (!DesignMode.IsDesignModeEnabled)
+            {
+                Task.Run(async ()=> await locator.Services.Authentication.GetCachedCredentials()).Wait();
+
+                if (locator.Services.Authentication.CurrentUser.Type == Models.MUser.MUserType.Google)
+                {
+                    MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
+                }
+                else
+                {
+                    MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
+                }
+            }
+            else
             {
                 MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
             }
-
-            //MainPage.SetValue(NavigationPage.BarBackgroundColorProperty, Color.Black);
         }
 
-		protected override async void OnStart ()
+		protected override void OnStart ()
 		{
             // Handle when your app starts
-            //CHECK CACHED IDENTITY
-            VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
-            bool iscached = await locator.Services.Authentication.GetCachedCredentials();
-
-            if(iscached)
-            {
-                locator.Services.Navigation.GoToUserPagesPage(true);
-            }
         }
 
 		protected override void OnSleep ()

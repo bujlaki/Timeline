@@ -5,13 +5,14 @@
              x:Class="Timeline.Views.VSignup"
              Title="SIGNUP"
              BindingContext="{Binding SignupViewModel, Source={StaticResource vmLocator}}"
-             BackgroundImage="bkg4"
-             NavigationPage.HasNavigationBar="False">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#234b64">
     <ContentPage.Content>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
             <Grid Grid.Column="1">
