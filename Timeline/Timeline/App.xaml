@@ -37,20 +37,20 @@
                             </Grid.RowDefinitions>
                             
                             <Label Grid.Row="0" Grid.RowSpan="2"
-                                   Text="{TemplateBinding Parent.BindingContext.LoggedInUser.UserName}" 
+                                   Text="{TemplateBinding Parent.BindingContext.User.UserName}" 
                                    TextColor="#f4bd4f"
                                    FontSize="24"
                                    VerticalOptions="Center"
                                    HorizontalOptions="Center"/>
                             
                             <!--<Label Grid.Row="1" 
-                                   Text="{TemplateBinding Parent.BindingContext.LoggedInUser.Email}" 
+                                   Text="{TemplateBinding Parent.BindingContext.User.Email}" 
                                    TextColor="#234B64"
                                    VerticalOptions="Center"
                                    HorizontalOptions="Start"/>-->
                         </Grid>
 
-                        <Image Grid.Column="2" Source="{TemplateBinding Parent.BindingContext.LoggedInUser.PhotoUrl}" />
+                        <Image Grid.Column="2" Source="{TemplateBinding Parent.BindingContext.User.PhotoUrl}" />
 
                     </Grid>
 

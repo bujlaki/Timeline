@@ -7,13 +7,14 @@ using Xamarin.Forms;
 using Timeline.ViewModels.Base;
 using Timeline.Views;
 using Timeline.Views.TestPages;
+using Timeline.Models;
 
 namespace Timeline.Services
 {
 	public class NavigationService : INavigationService
     {
         public INavigation _navigation => Application.Current.MainPage.Navigation;
-        private VMLocator _vMLocator;
+        private VMLocator _vmLocator;
         
 		//TEST
 		private Lazy<VTestPage> testView;
@@ -29,7 +30,7 @@ namespace Timeline.Services
 
         public NavigationService(VMLocator loc)
         {
-            _vMLocator = loc;
+            _vmLocator = loc;
             
 			//TEST
 			testView = new Lazy<VTestPage>(() => new VTestPage());
@@ -87,14 +88,21 @@ namespace Timeline.Services
 			_navigation.PushModalAsync(testView.Value);	
 		}
 
+        public void GoToLoginPage()
+        {
+            Application.Current.MainPage = new NavigationPage(loginView.Value);
+            _navigation.PopToRootAsync();
+        }
+
         public void GoToSignupPage()
         {
             _navigation.PushModalAsync(signupView.Value);
         }
 
-        public void GoToUserPagesPage(bool clearStack = false)
+        public void GoToUserPagesPage(MUser _user, bool clearStack = false)
         {
-            //_navigation.PushModalAsync(userpagesView.Value);
+            //set the user
+            _vmLocator.UserPagesViewModel.User = _user;
 
             if(clearStack)
             {

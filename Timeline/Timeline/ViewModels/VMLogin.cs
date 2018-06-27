@@ -4,7 +4,6 @@ using System.Text;
 
 using Xamarin.Forms;
 
-using Timeline.Objects.Auth.Google;
 using Timeline.Services;
 using Acr.UserDialogs;
 
@@ -12,25 +11,14 @@ namespace Timeline.ViewModels
 {
     public class VMLogin : Base.VMBase, IAuthenticationDelegate
     {
-        bool busy;
         string username;
         string password;
 
         public Command CmdDebugClearCachedID { get; set; }
-
         public Command CmdGoogleLogin { get; set; }
-
         public Command CmdUserPassLogin { get; set; }
-
         public Command CmdForgotPassword { get; set; }
-
         public Command CmdSignup { get; set; }
-
-        public bool Busy
-        {
-            get { return busy; }
-            set { busy = value; RaisePropertyChanged("Busy"); }
-        }
 
         public string Username
         {
@@ -55,19 +43,20 @@ namespace Timeline.ViewModels
 
         void CmdDebugClearCachedIDExecute(object obj)
         {
-            _services.Authentication.ClearCachedCredentials();
+            _services.Authentication.SignOut();
         }
 
         void CmdGoogleLoginExecute(object obj)
         {
             try
             {
-                Busy = true;
-                _services.Authentication.AuthenticateGoogle(this);
+                if (!Lock()) return;
+                _services.Authentication.AuthenticateGoogle(this);      
+                Unlock();
             }
-            finally
+            catch
             {
-                Busy = false;
+
             }
         }
 
@@ -75,38 +64,40 @@ namespace Timeline.ViewModels
         {
             try
             {
-                Busy = true;
+                if (!Lock()) return;
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
                     await _services.Authentication.LoginCognito(username, password);
                 }
 
-                _services.Navigation.GoToUserPagesPage(true);
+                _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
+                Unlock();
             }
             catch (Exception ex)
             {
+                Unlock();
                 UserDialogs.Instance.Alert(ex.Message, "Timeline Signup error");
-            }
-            finally
-            {
-                Busy = false;
             }
             
         }
 
         async void CmdForgotPasswordExecute(object obj)
         {
-            
+            if (!Lock()) return;
+
+            Unlock();
         }
 
         void CmdSignupExecute(object obj)
         {
+            if (!Lock()) return;
             _services.Navigation.GoToSignupPage();
+            Unlock();
         }
 
         public void OnAuthCompleted()
         {
-            _services.Navigation.GoToUserPagesPage(true);
+            _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
         }
 
         public void OnAuthFailed(string message, Exception exception)

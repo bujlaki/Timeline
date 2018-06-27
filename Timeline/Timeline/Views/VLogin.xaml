@@ -7,7 +7,7 @@
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
-    <ContentPage.Content IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}">
+    <ContentPage.Content> <!--" IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}"-->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -65,6 +65,7 @@
                                 VerticalOptions="Center"
                                 HorizontalOptions="Center"
                                 Command="{Binding CmdUserPassLogin}"
+                                CommandParameter="1"
                                 BorderRadius="10"
                                 BorderWidth="2"
                                 BorderColor="#eeebd3"/>
@@ -86,7 +87,7 @@
                            TextColor="#f4bd4f"
                            FontSize="16">
                         <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdForgotPassword}"/>
+                            <TapGestureRecognizer Command="{Binding CmdForgotPassword}" CommandParameter="1"/>
                         </Label.GestureRecognizers>
                     </Label>
 
@@ -98,7 +99,7 @@
                            TextColor="#f4bd4f"
                            FontSize="16">
                         <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdSignup}"/>
+                            <TapGestureRecognizer Command="{Binding CmdSignup}" CommandParameter="1"/>
                         </Label.GestureRecognizers>
                     </Label>
                 </Grid>
@@ -112,6 +113,7 @@
                         HorizontalOptions="Center"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
+                        CommandParameter="1"
                         BorderRadius="10"
                         BorderWidth="2"
                         BorderColor="#eeebd3"/>

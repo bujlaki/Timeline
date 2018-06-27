@@ -70,18 +70,6 @@ namespace Timeline.Services
             }
         }
 
-        public void ClearCachedCredentials()
-        {
-            AccountStore accountStore = AccountStore.Create();
-            IEnumerable<Account> accounts = accountStore.FindAccountsForService("Google");
-            Account account = accounts.FirstOrDefault();
-            if (account == null) return;
-
-            accountStore.Delete(account, "Google");
-
-            googleAuth.ReInit();
-        }
-
         public async Task LoginCognito(string username, string password)
         {
             CurrentUser = await cognitoAuth.ValidateUser(username, password);
@@ -141,7 +129,12 @@ namespace Timeline.Services
             authDelegate.OnAuthFailed(message, exception);
         }
 
-
+        public void SignOut()
+        {
+            CurrentUser.Clear();
+            ClearCachedCredentials();
+            googleAuth.ReInit();
+        }
 
         private async Task GetAWSCredentialsForGoogleToken(Account account)
         {
@@ -149,6 +142,16 @@ namespace Timeline.Services
             GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(account.Properties["id_token"]);
             CurrentUser.AWSCredentials = getCredentialResp.Credentials;
             CurrentUser.CognitoIdentityId = getCredentialResp.IdentityId;
+        }
+
+        public void ClearCachedCredentials()
+        {
+            AccountStore accountStore = AccountStore.Create();
+            IEnumerable<Account> accounts = accountStore.FindAccountsForService("Google");
+            Account account = accounts.FirstOrDefault();
+            if (account == null) return;
+
+            accountStore.Delete(account, "Google");
         }
     }
 }

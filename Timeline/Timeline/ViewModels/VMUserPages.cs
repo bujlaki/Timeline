@@ -31,10 +31,13 @@ namespace Timeline.ViewModels
     public class VMUserPages : Base.VMBase
     {
         private UserPagesMenuItem _selectedItem;
+        private MUser _user;
 
         public Command CmdMenu { get; set; }
-        public MUser LoggedInUser { get { return _services.Authentication.CurrentUser; }  }        
-
+        public MUser User {
+            get { return _user; }
+            set { _user = value; RaisePropertyChanged("User"); }
+        }        
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
         public UserPagesMenuItem SelectedItem
         {
@@ -63,8 +66,6 @@ namespace Timeline.ViewModels
             });
 
             CmdMenu = new Command(CmdMenuExecute);
-            //LoggedInUser = _services.Authentication.CurrentUser;
-            //SetDetailPage(UserPagesMenuItem.MenuItemID.Timelines);
         }
 
         public void CmdMenuExecute(object obj)
@@ -85,9 +86,8 @@ namespace Timeline.ViewModels
                     mainPage.Detail = new NavigationPage(_services.Navigation.OptionsView());
                     break;
                 case UserPagesMenuItem.MenuItemID.SignOut:
-                    _services.Authentication.CurrentUser.Clear();
-                    _services.Authentication.ClearCachedCredentials();
-                    App.Current.MainPage = new NavigationPage(_services.Navigation.RootPage());
+                    _services.Authentication.SignOut();
+                    _services.Navigation.GoToLoginPage();
                     break;
             }
             mainPage.IsPresented = false;

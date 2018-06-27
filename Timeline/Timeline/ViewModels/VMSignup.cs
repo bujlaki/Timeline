@@ -80,7 +80,7 @@ namespace Timeline.ViewModels
                 }
 
                 //SUCCESS
-                _services.Navigation.GoToUserPagesPage(true);
+                _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
             }
             catch (Exception ex)
             {
