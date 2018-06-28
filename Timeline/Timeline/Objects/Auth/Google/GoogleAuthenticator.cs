@@ -19,12 +19,15 @@ namespace Timeline.Objects.Auth.Google
         private OAuth2Authenticator auth;
         private IGoogleAuthenticationDelegate authDelegate;
 
+        public GoogleUserInfo UserInfo { get; private set; }
+
         public GoogleAuthenticator(string clientId, string scope, string redirectUrl, IGoogleAuthenticationDelegate authenticationDelegate)
         {
             authDelegate = authenticationDelegate;
             current_clientId = clientId;
             current_scope = scope;
             current_RedirectUrl = redirectUrl;
+            UserInfo = new GoogleUserInfo();
 
             auth = new OAuth2Authenticator(clientId, string.Empty, scope,
                                             new Uri(AuthorizeUrl),
@@ -114,20 +117,18 @@ namespace Timeline.Objects.Auth.Google
             var response = await request.GetResponseAsync();
         }
 
-        public async Task<GoogleUserInfo> GetGoogleUserInfo(Account account)
+        public async Task GetGoogleUserInfo(Account account)
         {
             //get GOOGLE userinfo
             var req = new OAuth2Request("GET", new Uri("https://www.googleapis.com/oauth2/v2/userinfo"), null, account);
             var resp = await req.GetResponseAsync();
             var obj = JObject.Parse(resp.GetResponseText());
 
-            GoogleUserInfo userInfo = new GoogleUserInfo();
-            userInfo.UserId = obj["id"].ToString().Replace("\"", "");
-            userInfo.UserName = obj["given_name"].ToString().Replace("\"", "");
-            userInfo.Email = obj["email"].ToString().Replace("\"", "");
-            userInfo.Picture = obj["picture"].ToString().Replace("\"", "");
-
-            return userInfo;
+            UserInfo.Clear();
+            UserInfo.UserId = obj["id"].ToString().Replace("\"", "");
+            UserInfo.UserName = obj["given_name"].ToString().Replace("\"", "");
+            UserInfo.Email = obj["email"].ToString().Replace("\"", "");
+            UserInfo.Picture = obj["picture"].ToString().Replace("\"", "");
         }
     }
 }

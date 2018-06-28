@@ -54,9 +54,10 @@ namespace Timeline.ViewModels
                 _services.Authentication.AuthenticateGoogle(this);      
                 Unlock();
             }
-            catch
+            catch (Exception ex)
             {
-
+                Unlock();
+                UserDialogs.Instance.Alert(ex.Message, "Login error");
             }
         }
 
@@ -76,7 +77,7 @@ namespace Timeline.ViewModels
             catch (Exception ex)
             {
                 Unlock();
-                UserDialogs.Instance.Alert(ex.Message, "Timeline Signup error");
+                UserDialogs.Instance.Alert(ex.Message, "Login error");
             }
             
         }

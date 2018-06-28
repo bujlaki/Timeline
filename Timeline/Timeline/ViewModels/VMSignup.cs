@@ -59,19 +59,16 @@ namespace Timeline.ViewModels
                     await _services.Authentication.SignupCognito(username, password, email);
                 }
 
-                if (_services.Authentication.EmailVerificationNeeded)
-                {
-                    PromptConfig pc = new PromptConfig
-                    {    
-                        Title = "Check your email for the verification code!",
-                    };
+                PromptConfig pc = new PromptConfig
+                {    
+                    Title = "Check your email for the verification code!",
+                };
                     
-                    PromptResult pr = await UserDialogs.Instance.PromptAsync(pc);
+                PromptResult pr = await UserDialogs.Instance.PromptAsync(pc);
 
-                    using (UserDialogs.Instance.Loading("Confirming verification code..."))
-                    {
-                        await _services.Authentication.VerifyUserCognito(username, pr.Text);
-                    }
+                using (UserDialogs.Instance.Loading("Confirming verification code..."))
+                {
+                    await _services.Authentication.VerifyUserCognito(username, pr.Text);
                 }
 
                 using (UserDialogs.Instance.Loading("Logging in..."))
@@ -84,7 +81,7 @@ namespace Timeline.ViewModels
             }
             catch (Exception ex)
             {
-                UserDialogs.Instance.Alert(ex.Message, "Timeline Signup error");
+                UserDialogs.Instance.Alert(ex.Message, "Signup error");
             }
         }
 

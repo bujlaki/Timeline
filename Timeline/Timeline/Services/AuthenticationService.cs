@@ -30,67 +30,104 @@ namespace Timeline.Services
         private IAuthenticationDelegate authDelegate;
 
         public MUser CurrentUser { get; private set; }
-        public bool EmailVerificationNeeded { get; private set; }
 
         public AuthenticationService()
         {
             CurrentUser = new MUser();
-            EmailVerificationNeeded = false;
 
             platformGoogleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
-
             googleAuth = new GoogleAuthenticator(platformGoogleAuth.PlatformClientID, "email profile", "hu.iqtech.timeline:/oauth2redirect", this);
-
             cognitoAuth = new CognitoAuthenticator();
         }
 
-        public async Task<bool> GetCachedCredentials()
+        public async Task GetCachedCredentials()
         {
             try
             {
                 IEnumerable<Account> accounts = AccountStore.Create().FindAccountsForService("Google");
                 Account account = accounts.FirstOrDefault();
-                if (account == null) return false;
+                if (account == null) return;
 
-                var info = await googleAuth.GetGoogleUserInfo(account);
-                CurrentUser.UserId = info.UserId;
-                CurrentUser.UserName = info.UserName;
-                CurrentUser.Email = info.Email;
-                CurrentUser.PhotoUrl = info.Picture;
+                await googleAuth.GetGoogleUserInfo(account);
+                CurrentUser.UserId = googleAuth.UserInfo.UserId;
+                CurrentUser.UserName = googleAuth.UserInfo.UserName;
+                CurrentUser.Email = googleAuth.UserInfo.Email;
+                CurrentUser.PhotoUrl = googleAuth.UserInfo.Picture;
                 CurrentUser.Type = MUser.MUserType.Google;
 
-                await GetAWSCredentialsForGoogleToken(account);
+                await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"]);
+                CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
+                CurrentUser.CognitoIdentityId = cognitoAuth.UserInfo.IdentityId;
 
-                return true;
+                CurrentUser.LoggedIn = true;
             }
             catch (Exception ex)
             {
+                Console.WriteLine("GetCachedCredentials ERROR: " + ex.Message);
                 CurrentUser.Clear();
-                return false;
+
+                throw ex;
             }
         }
 
         public async Task LoginCognito(string username, string password)
         {
-            CurrentUser = await cognitoAuth.ValidateUser(username, password);
+            try
+            {
+                await cognitoAuth.ValidateUser(username, password);
+                CurrentUser.UserId = cognitoAuth.UserInfo.UserId;
+                CurrentUser.UserName = cognitoAuth.UserInfo.UserName;
+                CurrentUser.Email = cognitoAuth.UserInfo.Email;
+                CurrentUser.PhotoUrl = cognitoAuth.UserInfo.Picture;
+                CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
+                CurrentUser.Type = MUser.MUserType.Cognito;
+                CurrentUser.LoggedIn = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("LoginCognito Exception: " + ex.Message);
+                throw ex;
+            }
         }
 
         public async Task SignupCognito(string username, string password, string email)
         {
-            SignUpResponse signUpResponse = await cognitoAuth.SignupUser(username, password, email);
-            if (!signUpResponse.UserConfirmed) EmailVerificationNeeded = true;
+            try
+            {
+                CurrentUser.Clear();
+                await cognitoAuth.SignupUser(username, password, email);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("SignupCognito Exception: " + ex.Message);
+                throw ex;
+            }
         }
 
         public async Task VerifyUserCognito(string username, string verificationCode)
         {
-            await cognitoAuth.VerifyAccessCode(username, verificationCode);
-            EmailVerificationNeeded = false;
+            try
+            {
+                await cognitoAuth.VerifyAccessCode(username, verificationCode);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("VerifyUserCognito Exception: " + ex.Message);
+                throw ex;
+            }
         }
 
         public void AuthenticateGoogle(IAuthenticationDelegate _delegate)
         {
             authDelegate = _delegate;
             platformGoogleAuth.AuthenticateGoogle(googleAuth);
+        }
+
+        public void SignOut()
+        {
+            CurrentUser.Clear();
+            ClearCachedCredentials();
+            googleAuth.ReInit();
         }
 
         public void OnGoogleAuthCanceled()
@@ -105,19 +142,23 @@ namespace Timeline.Services
             {
                 platformGoogleAuth.ClearStaticAuth();
 
-                var info = await googleAuth.GetGoogleUserInfo(account);
-                CurrentUser.UserId = info.UserId;
-                CurrentUser.UserName = info.UserName;
-                CurrentUser.Email = info.Email;
-                CurrentUser.PhotoUrl = info.Picture;
+                await googleAuth.GetGoogleUserInfo(account);
+                CurrentUser.UserId = googleAuth.UserInfo.UserId;
+                CurrentUser.UserName = googleAuth.UserInfo.UserName;
+                CurrentUser.Email = googleAuth.UserInfo.Email;
+                CurrentUser.PhotoUrl = googleAuth.UserInfo.Picture;
                 CurrentUser.Type = MUser.MUserType.Google;
 
-                await GetAWSCredentialsForGoogleToken(account);
+                await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"]);
+                CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
+                CurrentUser.CognitoIdentityId = cognitoAuth.UserInfo.IdentityId;
 
+                CurrentUser.LoggedIn = true;
                 authDelegate.OnAuthCompleted();
             }
             catch(Exception ex)
             {
+                Console.WriteLine("OnGoogleAuthCompleted ERROR: " + ex.Message);
                 CurrentUser.Clear();
                 authDelegate.OnAuthFailed(ex.Message, ex);
             }
@@ -127,21 +168,6 @@ namespace Timeline.Services
         {
             CurrentUser.Clear();
             authDelegate.OnAuthFailed(message, exception);
-        }
-
-        public void SignOut()
-        {
-            CurrentUser.Clear();
-            ClearCachedCredentials();
-            googleAuth.ReInit();
-        }
-
-        private async Task GetAWSCredentialsForGoogleToken(Account account)
-        {
-            //get AWS credentials
-            GetCredentialsForIdentityResponse getCredentialResp = await cognitoAuth.GetCognitoIdentityWithGoogleToken(account.Properties["id_token"]);
-            CurrentUser.AWSCredentials = getCredentialResp.Credentials;
-            CurrentUser.CognitoIdentityId = getCredentialResp.IdentityId;
         }
 
         public void ClearCachedCredentials()

@@ -24,6 +24,7 @@ namespace Timeline.Models
         public MUserType Type { get; set; }
         public Account GoogleAccount { get; set; }
         public AWSCredentials AWSCredentials { get; set; }
+        public bool LoggedIn { get; set; }
         
 
         public MUser()
@@ -41,6 +42,7 @@ namespace Timeline.Models
             Type = MUserType.None;
             GoogleAccount = null;
             AWSCredentials = null;
+            LoggedIn = false;
         }
     }
 }

@@ -33,6 +33,8 @@ namespace Timeline.ViewModels
         private UserPagesMenuItem _selectedItem;
         private MUser _user;
 
+        public ObservableCollection<MTimeline> Timelines;
+
         public Command CmdMenu { get; set; }
         public MUser User {
             get { return _user; }

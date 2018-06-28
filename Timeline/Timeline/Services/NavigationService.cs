@@ -45,7 +45,7 @@ namespace Timeline.Services
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
         }
 
-		public Page RootPage()
+		public Page LoginPage()
 		{
             return loginView.Value;
 		}

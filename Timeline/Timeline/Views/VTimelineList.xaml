@@ -6,10 +6,19 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
-        <StackLayout>
+        <StackLayout Orientation="Vertical">
             <Label Text="TIMELINELIST"
-                   VerticalOptions="CenterAndExpand" 
+                   VerticalOptions="Start" 
                    HorizontalOptions="CenterAndExpand" />
+            <ListView ItemsSource="{Binding Timelines}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Label Text="{Binding Name}"/>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackLayout>
     </ContentView>
 </ContentPage>

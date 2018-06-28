@@ -7,7 +7,7 @@ namespace Timeline.Services
 {
     public interface INavigationService
     {
-		Page RootPage();
+		Page LoginPage();
         void ClearStackBelow(Page belowPage);
         void ClearModalStackBelow(Page belowPage);
         Page UserPagesView();

@@ -34,18 +34,18 @@ namespace Timeline
             {
                 Task.Run(async ()=> await locator.Services.Authentication.GetCachedCredentials()).Wait();
 
-                if (locator.Services.Authentication.CurrentUser.Type == Models.MUser.MUserType.Google)
+                if (locator.Services.Authentication.CurrentUser.LoggedIn)
                 {
                     MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
                 }
                 else
                 {
-                    MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
+                    MainPage = new NavigationPage(locator.Services.Navigation.LoginPage());
                 }
             }
             else
             {
-                MainPage = new NavigationPage(locator.Services.Navigation.RootPage());
+                MainPage = new NavigationPage(locator.Services.Navigation.LoginPage());
             }
         }
 

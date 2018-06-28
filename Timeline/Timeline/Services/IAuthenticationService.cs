@@ -10,8 +10,7 @@ namespace Timeline.Services
     public interface IAuthenticationService
     {
         MUser CurrentUser { get; }
-        bool EmailVerificationNeeded { get; }
-        Task<bool> GetCachedCredentials();
+        Task GetCachedCredentials();
         void AuthenticateGoogle(IAuthenticationDelegate _delegate);
         Task LoginCognito(string username, string password);
         Task SignupCognito(string username, string password, string email);
