@@ -35,9 +35,7 @@ namespace Timeline.Droid.Objects.TouchTracking
             view = Control == null ? Container : Control;
 
             // Get access to the TouchEffect class in the PCL
-            TouchEffect touchEffect =
-                (TouchEffect)Element.Effects.
-                    FirstOrDefault(e => e is TouchEffect);
+            TouchEffect touchEffect = (TouchEffect)Element.Effects.FirstOrDefault(e => e is TouchEffect);
 
             if (touchEffect != null && view != null)
             {
@@ -57,10 +55,17 @@ namespace Timeline.Droid.Objects.TouchTracking
 
         protected override void OnDetached()
         {
-            if (viewDictionary.ContainsKey(view))
+            try
             {
-                viewDictionary.Remove(view);
-                view.Touch -= OnTouch;
+                if (viewDictionary.ContainsKey(view))
+                {
+                    viewDictionary.Remove(view);
+                    view.Touch -= OnTouch;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("OnDetached ERROR: " + ex.Message);
             }
         }
 

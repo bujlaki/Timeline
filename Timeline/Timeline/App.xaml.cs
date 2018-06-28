@@ -37,6 +37,7 @@ namespace Timeline
                 if (locator.Services.Authentication.CurrentUser.LoggedIn)
                 {
                     MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
+                    locator.UserPagesViewModel.User = locator.Services.Authentication.CurrentUser;
                 }
                 else
                 {

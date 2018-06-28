@@ -5,8 +5,12 @@
              xmlns:converters="clr-namespace:Timeline.Converters"
              x:Class="Timeline.Views.TestPages.VTestPage"
              Title="TestPage"
-             BindingContext="{Binding TestViewModel, Source={StaticResource vmLocator}}">
+             BindingContext="{Binding TestViewModel, Source={StaticResource vmLocator}}"
+             NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
-        <Button Text="RUN TESTS" Command="{Binding CMDRunTests}"/>
+        <StackLayout Orientation="Vertical">
+            <Button Text="RUN TESTS" Command="{Binding CMDRunTests}"/>
+            <Button Text="OPEN TIMELINE TEST" Command="{Binding CmdOpenTimeline}"/>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

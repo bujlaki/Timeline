@@ -119,9 +119,9 @@
                         BorderColor="#eeebd3"/>
 
                 <Button Grid.Row="7"
-                        Text="DEBUG: clear cached identity"
-                        Command="{Binding CmdDebugClearCachedID}"
-                        IsVisible="False"/>
+                        Text="GO TO TESTPAGE"
+                        Command="{Binding CmdTest}"
+                        IsVisible="True"/>
 
             </Grid>
         </Grid>

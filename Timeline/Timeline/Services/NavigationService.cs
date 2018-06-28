@@ -25,7 +25,6 @@ namespace Timeline.Services
         private Lazy<VUserPages> userpagesView;
         private Lazy<VTimelineList> timelinelistView;
         private Lazy<VOptions> optionsView;
-		private Lazy<VMainPage> mainpageView;
         private Lazy<VTimeline> timelineView;
 
         public NavigationService(VMLocator loc)
@@ -41,7 +40,6 @@ namespace Timeline.Services
             userpagesView = new Lazy<VUserPages>(() => new VUserPages());
             timelinelistView = new Lazy<VTimelineList>(() => new VTimelineList());
             optionsView = new Lazy<VOptions>(() => new VOptions());
-            mainpageView = new Lazy<VMainPage>(() => new VMainPage());
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
         }
 
@@ -85,7 +83,7 @@ namespace Timeline.Services
 
         public void GoToTestPage()
 		{
-			_navigation.PushModalAsync(testView.Value);	
+			_navigation.PushAsync(testView.Value);	
 		}
 
         public void GoToLoginPage()
@@ -118,7 +116,7 @@ namespace Timeline.Services
         public void GoToTimelineView(Models.MTimeline timeline)
         {
             //_vMLocator.DetailMovieViewModel.Film = itemMovie;
-			_navigation.PushModalAsync(timelineView.Value);
+			_navigation.PushAsync(timelineView.Value);
         }
 
         public void GoBack() => _navigation.PopModalAsync();

@@ -6,13 +6,13 @@
 
   <ItemGroup>
     <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.10.2" />
     <PackageReference Include="AWSSDK.Extensions.CognitoAuthentication" Version="0.9.4" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Xamarin.Auth" Version="1.6.0.2" />
     <PackageReference Include="Xamarin.Forms" Version="3.0.0.550146" />
     <PackageReference Include="SkiaSharp" Version="1.60.1" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.60.1" />
-    <PackageReference Include="Amazon.DynamoDb" Version="0.11.0" />
     <PackageReference Include="AWSSDK.CognitoIdentity" Version="3.3.2.23" />
   </ItemGroup>
 

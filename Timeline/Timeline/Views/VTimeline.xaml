@@ -5,7 +5,8 @@
              xmlns:converters="clr-namespace:Timeline.Converters"
              x:Class="Timeline.Views.VTimeline"
              Title="Timeline"
-             BindingContext="{Binding TimelineViewModel, Source={StaticResource vmLocator}}">
+             BindingContext="{Binding TimelineViewModel, Source={StaticResource vmLocator}}"
+             NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
         <Grid Margin="0,20,0,0">
             <Grid.RowDefinitions>

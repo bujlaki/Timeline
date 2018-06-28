@@ -17,7 +17,6 @@ namespace Timeline.ViewModels.Base
         private Lazy<VMLogin> loginViewModel;
         private Lazy<VMSignup> signupViewModel;
         private Lazy<VMUserPages> userpagesViewModel;
-        private Lazy<VMMainPage> mainPageViewModel;
 		private Lazy<VMTimeline> timelineViewModel;
         
         private ServiceContainer _services;
@@ -37,7 +36,6 @@ namespace Timeline.ViewModels.Base
             loginViewModel = new Lazy<VMLogin>(() => new VMLogin(_services));
             signupViewModel = new Lazy<VMSignup>(() => new VMSignup(_services));
             userpagesViewModel = new Lazy<VMUserPages>(() => new VMUserPages(_services));
-            mainPageViewModel = new Lazy<VMMainPage>(() => new VMMainPage(_services));
             timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline(_services));
         }
         
@@ -55,10 +53,6 @@ namespace Timeline.ViewModels.Base
 
         public VMUserPages UserPagesViewModel {
             get { return userpagesViewModel.Value; }
-        }
-
-        public VMMainPage MainPageViewModel {
-            get { return mainPageViewModel.Value; }
         }
 
 		public VMTimeline TimelineViewModel {

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Xamarin.Forms;
-
+﻿using Acr.UserDialogs;
+using System;
 using Timeline.Services;
-using Acr.UserDialogs;
+using Xamarin.Forms;
 
 namespace Timeline.ViewModels
 {
@@ -14,7 +10,7 @@ namespace Timeline.ViewModels
         string username;
         string password;
 
-        public Command CmdDebugClearCachedID { get; set; }
+        public Command CmdTest { get; set; }
         public Command CmdGoogleLogin { get; set; }
         public Command CmdUserPassLogin { get; set; }
         public Command CmdForgotPassword { get; set; }
@@ -34,16 +30,16 @@ namespace Timeline.ViewModels
 
         public VMLogin(Services.Base.ServiceContainer services) : base(services)
         {
-            CmdDebugClearCachedID = new Command(CmdDebugClearCachedIDExecute);
+            CmdTest = new Command(CmdTestExecute);
             CmdGoogleLogin = new Command(CmdGoogleLoginExecute);
             CmdUserPassLogin = new Command(CmdUserPassLoginExecute);
             CmdForgotPassword = new Command(CmdForgotPasswordExecute);
             CmdSignup = new Command(CmdSignupExecute);
         }
 
-        void CmdDebugClearCachedIDExecute(object obj)
+        void CmdTestExecute(object obj)
         {
-            _services.Authentication.SignOut();
+            _services.Navigation.GoToTestPage();
         }
 
         void CmdGoogleLoginExecute(object obj)

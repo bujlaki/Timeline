@@ -8,21 +8,23 @@ namespace Timeline.ViewModels.TestViewModels
 {
 	public class VMTestPage : Timeline.ViewModels.Base.VMBase
     {
-		public Command CMDRunTests { get; set; }
+		public Command CmdRunTests { get; set; }
+        public Command CmdOpenTimeline { get; set; }
 
-		public VMTestPage(Services.Base.ServiceContainer services) : base(services)
+        public VMTestPage(Services.Base.ServiceContainer services) : base(services)
         {
-			CMDRunTests = new Command(CMDRunTestsExecute, CMDRunTestsCanExecute);
+			CmdRunTests = new Command(CmdRunTestsExecute);
+            CmdOpenTimeline = new Command(CmdOpenTimelineExecute);
         }
 
-		void CMDRunTestsExecute(object obj)
+		void CmdRunTestsExecute(object obj)
         {
 			PerformTests();
         }
 
-		bool CMDRunTestsCanExecute(object arg)
+        void CmdOpenTimelineExecute(object obj)
         {
-            return true;
+            _services.Navigation.GoToTimelineView(null);
         }
 
         private void PerformTests()
