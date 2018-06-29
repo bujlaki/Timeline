@@ -9,7 +9,7 @@
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
-            <Button Text="RUN TESTS" Command="{Binding CMDRunTests}"/>
+            <Button Text="RUN TESTS" Command="{Binding CmdRunTests}"/>
             <Button Text="OPEN TIMELINE TEST" Command="{Binding CmdOpenTimeline}"/>
         </StackLayout>
     </ContentPage.Content>

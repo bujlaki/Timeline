@@ -123,6 +123,11 @@
                         Command="{Binding CmdTest}"
                         IsVisible="True"/>
 
+                <Button Grid.Row="8"
+                        Text="LOGIN BAZ"
+                        Command="{Binding CmdBazLogin}"
+                        IsVisible="True"/>
+
             </Grid>
         </Grid>
 

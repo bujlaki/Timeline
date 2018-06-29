@@ -11,6 +11,7 @@ namespace Timeline.ViewModels
         string password;
 
         public Command CmdTest { get; set; }
+        public Command CmdBazLogin { get; set; }
         public Command CmdGoogleLogin { get; set; }
         public Command CmdUserPassLogin { get; set; }
         public Command CmdForgotPassword { get; set; }
@@ -31,6 +32,7 @@ namespace Timeline.ViewModels
         public VMLogin(Services.Base.ServiceContainer services) : base(services)
         {
             CmdTest = new Command(CmdTestExecute);
+            CmdBazLogin = new Command(CmdBazLoginExecute);
             CmdGoogleLogin = new Command(CmdGoogleLoginExecute);
             CmdUserPassLogin = new Command(CmdUserPassLoginExecute);
             CmdForgotPassword = new Command(CmdForgotPasswordExecute);
@@ -40,6 +42,26 @@ namespace Timeline.ViewModels
         void CmdTestExecute(object obj)
         {
             _services.Navigation.GoToTestPage();
+        }
+
+        async void CmdBazLoginExecute(object obj)
+        {
+            try
+            {
+                if (!Lock()) return;
+                using (UserDialogs.Instance.Loading("Logging in..."))
+                {
+                    await _services.Authentication.LoginCognito("baz", "password");
+                }
+
+                _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
+                Unlock();
+            }
+            catch (Exception ex)
+            {
+                Unlock();
+                UserDialogs.Instance.Alert(ex.Message, "Login error");
+            }
         }
 
         void CmdGoogleLoginExecute(object obj)
@@ -75,7 +97,6 @@ namespace Timeline.ViewModels
                 Unlock();
                 UserDialogs.Instance.Alert(ex.Message, "Login error");
             }
-            
         }
 
         async void CmdForgotPasswordExecute(object obj)

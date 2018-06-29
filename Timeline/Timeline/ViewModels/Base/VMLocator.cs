@@ -27,6 +27,7 @@ namespace Timeline.ViewModels.Base
         {
             _services = new ServiceContainer();
             _services.Navigation = new NavigationService(this);
+            _services.Database = new DBService();
 
             //XAML Preview doesn't work if this is directly created
             if (!DesignMode.IsDesignModeEnabled) _services.Authentication = new AuthenticationService();

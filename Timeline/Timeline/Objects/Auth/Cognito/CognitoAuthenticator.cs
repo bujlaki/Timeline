@@ -46,6 +46,7 @@ namespace Timeline.Objects.Auth.Cognito
             try
             {
                 CognitoAWSCredentials credentials = new CognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
+                credentials.Clear();
                 credentials.AddLogin("accounts.google.com", token);
 
                 AmazonCognitoIdentityClient cli = new AmazonCognitoIdentityClient(credentials, RegionEndpoint.EUCentral1);
@@ -159,7 +160,14 @@ namespace Timeline.Objects.Auth.Cognito
 
                 GetUserResponse userDetails = await user.GetUserDetailsAsync();
 
-                CognitoAWSCredentials creds = user.GetCognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
+                string idtoken = authFlowResponse.AuthenticationResult.IdToken;
+
+                //CognitoAWSCredentials creds = user.GetCognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
+                CognitoAWSCredentials creds = new CognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
+                creds.Clear();
+                //creds.CurrentLoginProviders.SetValue(idtoken, 0);
+                //creds.CurrentLoginProviders.SetValue(idtoken, 1);
+                creds.AddLogin("cognito-idp." + RegionEndpoint.EUCentral1.SystemName + ".amazonaws.com/" + this.USERPOOL_ID, idtoken);
 
                 UserInfo.Clear();
                 UserInfo.Credentials = creds;

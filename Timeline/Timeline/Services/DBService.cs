@@ -1,25 +1,48 @@
-﻿using System;
+﻿using Amazon.Runtime;
+using System;
+using System.Threading.Tasks;
+using Timeline.Models.DynamoDBModels;
 using Timeline.Objects.Database;
 
 namespace Timeline.Services
 {
 	public class DBService : IDBService
     {
-        private DynamoDBConnector dynamo;
+        private DynamoDBConnector ddb;
 
         public DBService()
         {
-            dynamo = new DynamoDBConnector();
+            ddb = new DynamoDBConnector();
         }
 
-        public bool Connect()
+        public void Connect(AWSCredentials credential)
         {
-            throw new NotImplementedException();
+            try
+            {
+                ddb.Initialize(credential);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Connect ERROR: " + ex.Message);
+                throw ex;
+            }   
+        }
+
+        public async Task SaveUser(MDBUser user)
+        {
+            await ddb.SaveUser(user);
+        }
+
+        public async Task<MDBUser> GetUser(string userId)
+        {
+            return await ddb.GetUserById(userId);
         }
 
         public void CreateTimeline(string userId)
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

@@ -15,7 +15,8 @@ namespace Timeline.ViewModels
         {
             Timelines,
             Options,
-            SignOut
+            SignOut,
+            Test
         }
 
         public MenuItemID Id { get; set; }
@@ -65,6 +66,7 @@ namespace Timeline.ViewModels
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.Timelines, "My Timelines"),
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.Options, "Options" ),
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.SignOut, "Sign out" ),
+                    new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.Test, "Test"),
             });
 
             CmdMenu = new Command(CmdMenuExecute);
@@ -90,6 +92,9 @@ namespace Timeline.ViewModels
                 case UserPagesMenuItem.MenuItemID.SignOut:
                     _services.Authentication.SignOut();
                     _services.Navigation.GoToLoginPage();
+                    break;
+                case UserPagesMenuItem.MenuItemID.Test:
+                    _services.Navigation.GoToTestPage();
                     break;
             }
             mainPage.IsPresented = false;

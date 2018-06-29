@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using Xamarin.Forms;
 
+using Acr.UserDialogs;
 using Timeline.Models;
+using Timeline.Models.DynamoDBModels;
+
 
 namespace Timeline.ViewModels.TestViewModels
 {
@@ -30,7 +34,18 @@ namespace Timeline.ViewModels.TestViewModels
         private void PerformTests()
 		{
 			Console.WriteLine("Starting TESTS for 'MTimelineDate'");
-			MTimelineDate d1 = new MTimelineDate(1);
+
+            MDBUser dbuser;
+            _services.Database.Connect(_services.Authentication.CurrentUser.AWSCredentials);
+            dbuser = Task.Run(async () => await _services.Database.GetUser("1")).Result;
+
+            UserDialogs.Instance.Alert(dbuser.username);
+
+            dbuser.username = "bali2";
+
+            Task.Run(async () => await _services.Database.SaveUser(dbuser));
+
+            UserDialogs.Instance.Alert("done");
 		}
     }
 }

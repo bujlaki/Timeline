@@ -5,5 +5,6 @@ namespace Timeline.Services.Base
     {
         public INavigationService Navigation;
         public IAuthenticationService Authentication;
+        public IDBService Database;
     }
 }

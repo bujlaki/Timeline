@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 using Timeline.ViewModels.Base;
 using Amazon;
-using System.Threading.Tasks;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Timeline
@@ -25,8 +25,9 @@ namespace Timeline
             loggingConfig.LogMetricsFormat = LogMetricsFormatOption.JSON;
             loggingConfig.LogTo = LoggingOptions.SystemDiagnostics;
             
-			AWSConfigs.AWSRegion = AwsRegion.EUCentral1.Name;
+			AWSConfigs.AWSRegion = RegionEndpoint.EUCentral1.SystemName;
 			AWSConfigs.CorrectForClockSkew = true;
+            AWSConfigs.UseSdkCache = false;
 
             VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
 
