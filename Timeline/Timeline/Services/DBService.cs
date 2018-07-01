@@ -28,9 +28,14 @@ namespace Timeline.Services
             }   
         }
 
-        public async Task SaveUser(MDBUser user)
+        public async Task CreateUser(MDBUser user)
         {
-            await ddb.SaveUser(user);
+            await ddb.CreateUser(user);
+        }
+
+        public async Task UpdateUser(MDBUser user)
+        {
+            await ddb.UpdateUser(user);
         }
 
         public async Task<MDBUser> GetUser(string userId)

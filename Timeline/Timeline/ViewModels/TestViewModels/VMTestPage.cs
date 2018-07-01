@@ -39,11 +39,11 @@ namespace Timeline.ViewModels.TestViewModels
             _services.Database.Connect(_services.Authentication.CurrentUser.AWSCredentials);
             dbuser = Task.Run(async () => await _services.Database.GetUser("1")).Result;
 
-            UserDialogs.Instance.Alert(dbuser.username);
+            UserDialogs.Instance.Alert(dbuser.UserName);
 
-            dbuser.username = "bali2";
+            dbuser.Timelines.Add(new MDBTimelineInfo("1","my timeline1","just a test"));
 
-            Task.Run(async () => await _services.Database.SaveUser(dbuser));
+            Task.Run(async () => await _services.Database.UpdateUser(dbuser));
 
             UserDialogs.Instance.Alert("done");
 		}

@@ -8,7 +8,8 @@ namespace Timeline.Services
     public interface IDBService
     {
         void Connect(AWSCredentials credential);
-        Task SaveUser(MDBUser user);
+        Task CreateUser(MDBUser user);
+        Task UpdateUser(MDBUser user);
         Task<MDBUser> GetUser(string userId);
         void CreateTimeline(string userId);
     }
