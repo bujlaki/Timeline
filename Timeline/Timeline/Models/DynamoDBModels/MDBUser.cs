@@ -30,8 +30,9 @@ namespace Timeline.Models.DynamoDBModels
             UserName = userdoc["username"];
             Email = userdoc["email"];
             Timelines = new List<MDBTimelineInfo>();
-            var listdoc = userdoc["timelines"].AsListOfDocument();
-            foreach (Document item in listdoc) Timelines.Add(new MDBTimelineInfo(item));
+            var listdoc = userdoc["timelines"].AsDocument();
+            
+            foreach (Document item in listdoc.Values) Timelines.Add(new MDBTimelineInfo(item));
         }
 
         public MDBUser(string id, string name, string email)
@@ -56,8 +57,9 @@ namespace Timeline.Models.DynamoDBModels
             doc["userid"] = UserId;
             doc["username"] = UserName;
             doc["email"] = Email;
-            var timelines = doc["timelines"].AsListOfDocument();
-            foreach (MDBTimelineInfo tli in Timelines) timelines.Add(tli.AsDynamoDocument());
+            Document timelines = new Document();
+            foreach (MDBTimelineInfo tli in Timelines) timelines.Add(tli.TimelineId, tli.AsDynamoDocument());
+            doc["timelines"] = timelines;            
             return doc;
         }
     }

@@ -13,9 +13,9 @@ namespace Timeline.Models.DynamoDBModels
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public MDBTimelineInfo(string id, string name, string description)
+        public MDBTimelineInfo(string name, string description)
         {
-            TimelineId = id;
+            TimelineId = Guid.NewGuid().ToString();
             Name = name;
             Description = description;
         }
@@ -30,9 +30,12 @@ namespace Timeline.Models.DynamoDBModels
         public Document AsDynamoDocument()
         {
             var doc = new Document();
-            doc["timelineid"] = TimelineId;
-            doc["name"] = Name;
-            doc["description"] = Description;
+            doc.Add("timelineid", TimelineId);
+            doc.Add("name", Name);
+            doc.Add("description", Description);
+            //doc["timelineid"] = TimelineId;
+            //doc["name"] = Name;
+            //doc["description"] = Description;
             return doc;
         }
     }

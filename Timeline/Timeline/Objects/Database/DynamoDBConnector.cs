@@ -58,7 +58,7 @@ namespace Timeline.Objects.Database
             }
             catch (Exception ex)
             {
-                Console.WriteLine("CreateUser ERROR: " + ex.Message);
+                Console.WriteLine("UpdateUser ERROR: " + ex.Message);
                 throw ex;
             }
         }
