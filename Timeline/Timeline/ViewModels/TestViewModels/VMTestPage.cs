@@ -43,6 +43,7 @@ namespace Timeline.ViewModels.TestViewModels
 
             dbuser.Timelines.Add(new MDBTimelineInfo("my timeline1","just a test"));
 
+
             Task.Run(async () => await _services.Database.UpdateUser(dbuser));
 
             UserDialogs.Instance.Alert("done");

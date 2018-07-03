@@ -1,5 +1,6 @@
 ﻿using Amazon.Runtime;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Timeline.Models.DynamoDBModels;
 using Timeline.Objects.Database;
@@ -43,11 +44,14 @@ namespace Timeline.Services
             return await ddb.GetUserById(userId);
         }
 
-        public void CreateTimeline(string userId)
+        public async Task StoreEvents(List<MDBTimelineEvent> timelineEvents)
         {
-            throw new NotImplementedException();
+            await ddb.StoreEvents(timelineEvents);
         }
 
-
+        public async Task<List<MDBTimelineEvent>> GetEvents(string timelineId)
+        {
+            return await ddb.GetEvents(timelineId);
+        }
     }
 }

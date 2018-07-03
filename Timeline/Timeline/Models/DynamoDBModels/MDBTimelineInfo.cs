@@ -33,9 +33,6 @@ namespace Timeline.Models.DynamoDBModels
             doc.Add("timelineid", TimelineId);
             doc.Add("name", Name);
             doc.Add("description", Description);
-            //doc["timelineid"] = TimelineId;
-            //doc["name"] = Name;
-            //doc["description"] = Description;
             return doc;
         }
     }

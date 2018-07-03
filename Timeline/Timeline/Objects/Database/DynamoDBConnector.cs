@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
+
 using Timeline.Models.DynamoDBModels;
 
 namespace Timeline.Objects.Database
@@ -77,27 +79,41 @@ namespace Timeline.Objects.Database
         #endregion
 
         #region "MDBTimelineEvent"
-        public async Task CreateEvent(MDBTimelineEvent timelineEvent)
+        public async Task StoreEvents(List<MDBTimelineEvent> timelineEvents)
         {
             try
             {
                 Table table = Table.LoadTable(client, "TimelineEvents");
-                //await table.PutItemAsync(timelineEvent.AsDynamoDocument());
+                DocumentBatchWrite batchWrite = table.CreateBatchWrite();
+                foreach (MDBTimelineEvent tlevent in timelineEvents) batchWrite.AddDocumentToPut(tlevent.AsDynamoDocument());
+
+                await batchWrite.ExecuteAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("CreateEvent ERROR: " + ex.Message);
+                Console.WriteLine("StoreEvents ERROR: " + ex.Message);
                 throw ex;
             }
         }
 
-        public async Task<List<MDBTimelineEvent>> GetEvents(string id)
+        public async Task<List<MDBTimelineEvent>> GetEvents(string timelineId)
         {
             try
             {
+                List<MDBTimelineEvent> results = new List<MDBTimelineEvent>();
+
                 Table table = Table.LoadTable(client, "TimelineEvents");
-                Document doc = await table.GetItemAsync(id);
-                //return new MDBUser(doc);
+                QueryFilter filter = new QueryFilter("timelineid", QueryOperator.Equal, timelineId);
+                Search search = table.Query(filter);
+
+                do
+                {
+                    var docSet = await search.GetNextSetAsync();
+                    foreach (Document doc in docSet) results.Add(new MDBTimelineEvent(doc));
+
+                } while (!search.IsDone);
+
+                return results;
             }
             catch (Exception ex)
             {
