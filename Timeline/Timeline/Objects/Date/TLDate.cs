@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Timeline.Objects.Date
 {
@@ -25,101 +23,170 @@ namespace Timeline.Objects.Date
         BYear
     }
 
-    class TLDate : RollingDateTime
+    class TLDate : BCACDateTime
     {
-        
-        private long kkyear;
+        private const TLDatePrecision PRECISION_MIN = TLDatePrecision.Minute;
+        private const TLDatePrecision PRECISION_MAX = TLDatePrecision.BYear;
+        private const long MAX_YEAR = 99000000000;
+
+        private Int64 exactYear;
         private TLDatePrecision precision;
 
         public bool AD { get; set; }
         public Int64 TotalSeconds { get; set; }
 
+        public Int64 Year
+        {
+            get
+            {
+                return exactYear;
+            }
+            set
+            {
+                exactYear = value;
+                bcac = exactYear < 0 ? BCAC.BC : BCAC.AC;
+            }
+        }
         public TLDate(string yearstr)
         {
             if (yearstr.ToLower().EndsWith("b"))
             {
+                //billion years
                 yearstr = yearstr.ToLower().Replace("b", "");
                 precision = TLDatePrecision.BYear;
-                kkyear = int.Parse(yearstr) * 100000;
-            }
-            else if (yearstr.ToLower().EndsWith("kkm"))
-            {
-                yearstr = yearstr.ToLower().Replace("kkm", "");
-                precision = TLDatePrecision.KKMYear;
-                kkyear = int.Parse(yearstr) * 10000;
-            }
-            else if (yearstr.ToLower().EndsWith("km"))
-            {
-                yearstr = yearstr.ToLower().Replace("km", "");
-                precision = TLDatePrecision.KMYear;
-                kkyear = int.Parse(yearstr) * 1000;
+                bcacDate = null;
+
+                Year = int.Parse(yearstr) * MultiplierForPrecision(precision);
+                if (Math.Abs(exactYear) > MAX_YEAR)
+                {
+                    exactYear = 0;
+                    throw new OverflowException("Maximum 99 billion years");
+                }
             }
             else if (yearstr.ToLower().EndsWith("m"))
             {
+                //million years
                 yearstr = yearstr.ToLower().Replace("m", "");
                 precision = TLDatePrecision.MYear;
-                kkyear = int.Parse(yearstr) * 100;
+                bcacDate = null;
+
+                while (yearstr.EndsWith("0") && precision < PRECISION_MAX) {
+                    precision += 1;
+                    yearstr = yearstr.Substring(0, yearstr.Length - 1);
+                    if (String.IsNullOrEmpty(yearstr)) throw new ArgumentException("Incorrect value");
+                }
+
+                Year = int.Parse(yearstr) * MultiplierForPrecision(precision);
+                if (Math.Abs(exactYear) > MAX_YEAR)
+                {
+                    exactYear = 0;
+                    throw new OverflowException("Maximum 99 billion years");
+                }
             }
-            else if (yearstr.ToLower().EndsWith("kkk"))
+            else if (yearstr.ToLower().EndsWith("k"))
             {
-                yearstr = yearstr.ToLower().Replace("kkk", "");
-                precision = TLDatePrecision.KKKYear;
-                kkyear = int.Parse(yearstr) * 10;
+                //thousand years
+                yearstr = yearstr.ToLower().Replace("k", ""); 
+                precision = TLDatePrecision.KYear;
+                bcacDate = null;
+
+                while (yearstr.EndsWith("0") && precision < PRECISION_MAX)
+                {
+                    precision += 1;
+                    yearstr = yearstr.Substring(0, yearstr.Length - 1);
+                    if (String.IsNullOrEmpty(yearstr)) throw new ArgumentException("Incorrect value");
+                }
+
+                Year = long.Parse(yearstr) * MultiplierForPrecision(precision);
+                if (Math.Abs(exactYear) > MAX_YEAR)
+                {
+                    exactYear = 0;
+                    throw new OverflowException("Maximum 99 billion years");
+                }
+
+                if (exactYear < 10000)
+                {
+                    initBCACDate((int)exactYear, -1, -1, -1, -1, false);
+                }
             }
-            else if (yearstr.ToLower().EndsWith("kk"))
-            {
-                yearstr = yearstr.ToLower().Replace("kk", "");
-                precision = TLDatePrecision.KKYear;
-                kkyear = int.Parse(yearstr);
-            }
+
         }
 
-        public TLDate(long year, int month = -1, int day = -1, int hour = -1, int minute = -1)
+        public TLDate(int year, int month = -1, int day = -1, int hour = -1, int minute = -1)
         {
-            kkyear = year / 10000;
-            year -= (kkyear * 10000);
+            initBCACDate(year, month, day, hour, minute);
+        }
 
-            if (month == -1)
+        public TLDate(Int64 year)
+        {
+            if(Math.Abs(year)<10000)
             {
-                Value = new DateTime((int)year, 1, 1);
-                precision = TLDatePrecision.Year;
-            }
-            else if (day == -1)
-            {
-                Value = new DateTime((int)year, month, 1);
-                precision = TLDatePrecision.Month;
-            }
-            else if (hour == -1)
-            {
-                Value = new DateTime((int)year, month, day);
-                precision = TLDatePrecision.Day;
-            }
-            else if (minute == -1)
-            {
-                Value = new DateTime((int)year, month, day, hour, 0, 0);
-                precision = TLDatePrecision.Hour;
+                initBCACDate((int)year);
             }
             else
             {
-                Value = new DateTime((int)year, month, day, hour, minute, 0);
-                precision = TLDatePrecision.Minute;
+                bcacDate = null;
+                precision = TLDatePrecision.Year;
+                if (year<0) {
+                    exactYear = -year;
+                    bcac = BCAC.BC;
+                }
+                else {
+                    exactYear = year;
+                    bcac = BCAC.AC;
+                }
             }
         }
 
-        public TLDate(long kkyear, DateTime dateTime)
+        private void initBCACDate(int year, int month = -1, int day = -1, int hour = -1, int minute = -1, bool setPrecision = true)
         {
+            year = year % 10000;
+
+            if (month == -1)
+            {
+                bcacDate = new DateTime(year, 1, 1);
+                if(setPrecision) precision = TLDatePrecision.Year;
+            }
+            else if (day == -1)
+            {
+                bcacDate = new DateTime(year, month, 1);
+                if (setPrecision) precision = TLDatePrecision.Month;
+            }
+            else if (hour == -1)
+            {
+                bcacDate = new DateTime(year, month, day);
+                if (setPrecision) precision = TLDatePrecision.Day;
+            }
+            else if (minute == -1)
+            {
+                bcacDate = new DateTime(year, month, day, hour, 0, 0);
+                if (setPrecision) precision = TLDatePrecision.Hour;
+            }
+            else
+            {
+                bcacDate = new DateTime(year, month, day, hour, minute, 0);
+                if (setPrecision) precision = TLDatePrecision.Minute;
+            }
         }
 
-        protected override void RollOver(int count)
+        private long MultiplierForPrecision(TLDatePrecision precision)
         {
-            base.RollOver(count);
+            switch (precision)
+            {
+                case TLDatePrecision.KKYear: return 10000;
+                case TLDatePrecision.KKKYear: return 100000;
+                case TLDatePrecision.MYear: return 1000000;
+                case TLDatePrecision.KMYear: return 10000000;
+                case TLDatePrecision.KKMYear: return 100000000;
+                case TLDatePrecision.BYear: return 1000000000;
+                default: return 0;
+            }
         }
 
-        protected override void DateChanged()
+        protected override void BCACDateChanged(DateChangedArgs args)
         {
-            base.DateChanged();
-
-
+            
+            base.BCACDateChanged(args);
         }
     }
 }
