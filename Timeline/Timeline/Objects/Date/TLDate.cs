@@ -166,14 +166,6 @@ namespace Timeline.Objects.Date
             BCACDateChanged();
         }
 
-        public static TLDate FromTotalMinutes(Int64 minutes)
-        {
-            if (minutes > MINUTES_PER_KKYEAR)
-            {
-
-            }
-        }
-
         private void Initialize(int year, int month = -1, int day = -1, int hour = -1, int minute = -1)
         {
             if (year < 0) year = year + 10000;
@@ -258,7 +250,7 @@ namespace Timeline.Objects.Date
             try { base.AddMonths(count); }
             catch (OverflowException)
             {
-                exactYear = rawYear + (count / 12);
+                exactYear = Year + (count / 12);
                 if (count > 0)
                     if (bcacDate.Value.Month + (count % 12) > 12) exactYear++;
                 if (count < 0)

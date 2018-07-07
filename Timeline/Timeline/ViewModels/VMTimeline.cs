@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Timeline.Models;
+using Timeline.Objects.Date;
 
 namespace Timeline.ViewModels
 {
@@ -11,7 +12,7 @@ namespace Timeline.ViewModels
 		public VMTimeline(Services.Base.ServiceContainer services) : base(services)
         {
 			Timeline = new MTimeline();
-			MTimelineDate tld = new MTimelineDate(2018, 1);
+            TimelineDateTime tld = new TimelineDateTime(2018, 1);
 			for (int i = 0; i < 10; i++)
 			{
 				Timeline.Events.Add(new MTimelineEvent("event1", tld, 2));

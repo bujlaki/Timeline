@@ -27,9 +27,6 @@
     <Folder Include="ViewModels\TestViewModels\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Controls\TimelineControl2.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="Views\VLogin.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>

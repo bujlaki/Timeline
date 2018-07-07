@@ -5,6 +5,7 @@ using SkiaSharp;
 using SkiaSharp.Views.Forms;
 
 using Timeline.Models;
+using Timeline.Objects.Date;
 using Timeline.Objects.TouchTracking;
 
 namespace Timeline.Controls
@@ -159,7 +160,8 @@ namespace Timeline.Controls
 
 		private static void OnDateChanged(BindableObject bindable, object oldValue, object newValue)
         {
-			((TimelineControl)bindable).date.BaseDate = (DateTime)newValue;
+            ((TimelineDateTime)newValue).CopyTo(ref ((TimelineControl)bindable).date);
+			//((TimelineControl)bindable).date.BaseDate = (DateTime)newValue;
 			((TimelineControl)bindable).InvalidateLayout();
         }
         
@@ -236,9 +238,9 @@ namespace Timeline.Controls
         TouchGestureRecognizer gestureRecognizer;
         TimelineOrientation orientation;
 
-        MTimelineDate date;
-        MTimelineDate unitDate;
-        MTimelineDate subUnitDate;
+        TimelineDateTime date;
+        TimelineDateTime unitDate;
+        TimelineDateTime subUnitDate;
 
         SKPaint timelinePaint;
         SKPaint unitMarkPaint;
@@ -289,7 +291,7 @@ namespace Timeline.Controls
 		float eventsTopY;
 		float laneHeight;
 		bool[] laneBusy;
-		MTimelineDate[] laneBusyUntil;
+		TimelineDateTime[] laneBusyUntil;
 
         bool initialOrientationCheck;
 
@@ -299,9 +301,9 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new MTimelineDate(DateTime.UtcNow);
-			unitDate = new MTimelineDate(DateTime.UtcNow);
-			subUnitDate = new MTimelineDate(DateTime.UtcNow);
+			date = new TimelineDateTime(9900);
+			unitDate = new TimelineDateTime();
+			subUnitDate = new TimelineDateTime();
 			DateStr = date.DateStr(ZoomUnit);
 
 			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
@@ -344,8 +346,18 @@ namespace Timeline.Controls
                     break;
 
                 case TouchGestureType.Pan:
-					//Console.WriteLine("PAN");
-					date.BaseDate = date.BaseDate.AddTicks(-2 * (long)args.Data.X * pixeltime);
+                    //Console.WriteLine("PAN");
+                    try
+                    {
+                        date.AddTicks(-2 * (long)args.Data.X * pixeltime);
+                    }
+					catch(OverflowException)
+                    {
+                        if (args.Data.X < 0)
+                            date = TimelineDateTime.MaxValue;
+                        else
+                            date = TimelineDateTime.MinValue;
+                    }
                     DateStr = date.DateStr(ZoomUnit-1);
                     canvasView.InvalidateSurface();
                     break;
@@ -397,16 +409,34 @@ namespace Timeline.Controls
             float unitPos;
             float subUnitPos;
 
-			DateTime minDate = new DateTime(date.BaseDate.Ticks - halfWidth * pixeltime);
-			DateTime maxDate = new DateTime(date.BaseDate.Ticks + halfWidth * pixeltime);
+            TimelineDateTime minDate;
+            try
+            {
+                minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                minDate = TimelineDateTime.MinValue;
+            }
+
+            TimelineDateTime maxDate;
+            try
+            {
+                maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                maxDate = TimelineDateTime.MaxValue;
+            }
+            
 
             date.CopyTo(ref unitDate, ZoomUnit);
 
-			while (unitDate.BaseDate.Ticks > minDate.Ticks) unitDate.Add(ZoomUnit, -1);
+			while (unitDate.Ticks > minDate.Ticks) unitDate.Add(ZoomUnit, -1);
 
-			while (unitDate.BaseDate.Ticks < maxDate.Ticks)
+			while (unitDate.Ticks < maxDate.Ticks)
             {
-				unitPos = (unitDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
+				unitPos = (unitDate.Ticks - minDate.Ticks) / pixeltime;
 
                 //UNIT MARK
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);
@@ -414,11 +444,19 @@ namespace Timeline.Controls
 				canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);
 
                 unitDate.CopyTo(ref subUnitDate, ZoomUnit - 1);
-				unitDate.Add(ZoomUnit);
-                
-				while (subUnitDate.BaseDate.Ticks < unitDate.BaseDate.Ticks && subUnitDate.BaseDate.Ticks < maxDate.Ticks)
+                try
                 {
-					subUnitPos = (subUnitDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
+                    unitDate.Add(ZoomUnit);
+                }
+                catch (OverflowException)
+                {
+                    unitDate = (TimelineDateTime)TimelineDateTime.MaxValue;
+                }
+				
+                
+				while (subUnitDate.Ticks < unitDate.Ticks && subUnitDate.Ticks < maxDate.Ticks)
+                {
+					subUnitPos = (subUnitDate.Ticks - minDate.Ticks) / pixeltime;
                     
                     //SUBUNIT MARK
                     canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);
@@ -426,25 +464,33 @@ namespace Timeline.Controls
 					//SUBUNIT TEXT
 					if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);
 
-                    subUnitDate.Add(ZoomUnit - 1);
+                    try
+                    {
+                        subUnitDate.Add(ZoomUnit-1);
+                    }
+                    catch (OverflowException)
+                    {
+                        subUnitDate = (TimelineDateTime)TimelineDateTime.MaxValue;
+                    }
+                    //subUnitDate.Add(ZoomUnit - 1);
                 }
             }
         }
 
-        private string GetUnitText(MTimelineDate tlcdate)
+        private string GetUnitText(TimelineDateTime tlcdate)
         {
             switch (this.ZoomUnit)
             {
                 case TimelineUnits.Minute:
                     return "";
                 case TimelineUnits.Hour:
-					return tlcdate.BaseDate.Hour.ToString() + ":00";
+					return tlcdate.Hour.ToString() + ":00";
                 case TimelineUnits.Day:
-					return tlcdate.BaseDate.Day.ToString() + "." + shortMonthNames[tlcdate.BaseDate.Month - 1];
+					return tlcdate.Day.ToString() + "." + shortMonthNames[tlcdate.Month - 1];
                 case TimelineUnits.Month:
-					return shortMonthNames[tlcdate.BaseDate.Month - 1];
+					return shortMonthNames[tlcdate.Month - 1];
                 case TimelineUnits.Year:
-					return tlcdate.BaseDate.Year.ToString();
+					return tlcdate.Year.ToString();
                 case TimelineUnits.Decade:
                     return tlcdate.Decade.ToString() + "0";
                 case TimelineUnits.Century:
@@ -454,25 +500,25 @@ namespace Timeline.Controls
             }
         }
         
-		private string GetSubUnitText(MTimelineDate tlcdate)
+		private string GetSubUnitText(TimelineDateTime tlcdate)
 		{
 			switch (this.ZoomUnit)
             {
                 case TimelineUnits.Minute:
                     return "";
                 case TimelineUnits.Hour:
-					if (tlcdate.BaseDate.Minute == 0) return "";
-					if (tlcdate.BaseDate.Minute % 5 == 0) return tlcdate.BaseDate.Minute.ToString("00");
+					if (tlcdate.Minute == 0) return "";
+					if (tlcdate.Minute % 5 == 0) return tlcdate.Minute.ToString("00");
                     return "";
                 case TimelineUnits.Day:
-					if (tlcdate.BaseDate.Hour == 0) return "";
-					return tlcdate.BaseDate.Hour.ToString();
+					if (tlcdate.Hour == 0) return "";
+					return tlcdate.Hour.ToString();
                 case TimelineUnits.Month:
-					return tlcdate.BaseDate.Day.ToString();
+					return tlcdate.Day.ToString();
                 case TimelineUnits.Year:
-					return shortMonthNames[tlcdate.BaseDate.Month - 1];
+					return shortMonthNames[tlcdate.Month - 1];
                 case TimelineUnits.Decade:
-					return tlcdate.BaseDate.Year.ToString();
+					return tlcdate.Year.ToString();
                 case TimelineUnits.Century:
                     return tlcdate.Decade.ToString() + "0";
                 default:
@@ -483,19 +529,38 @@ namespace Timeline.Controls
 
 		private void DrawTimelineEvents(SKCanvas canvas)
 		{
-			DateTime minDate = new DateTime(date.BaseDate.Ticks - halfWidth * pixeltime);
-			DateTime maxDate = new DateTime(date.BaseDate.Ticks + halfWidth * pixeltime);
-            
-			foreach(MTimelineEvent e in this.Timeline1.Events)
+            //TimelineDateTime minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
+            //TimelineDateTime maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
+            TimelineDateTime minDate;
+            try
+            {
+                minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                minDate = TimelineDateTime.MinValue;
+            }
+
+            TimelineDateTime maxDate;
+            try
+            {
+                maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                maxDate = TimelineDateTime.MaxValue;
+            }
+
+            foreach (MTimelineEvent e in this.Timeline1.Events)
 			{
-				if((e.EndDate.BaseDate.Ticks>minDate.Ticks)&&(e.StartDate.BaseDate.Ticks<maxDate.Ticks))
+				if((e.EndDate.Ticks>minDate.Ticks)&&(e.StartDate.Ticks<maxDate.Ticks))
 				{
 					DrawTimelineEvent(e, canvas, minDate);
 				}
 			}
 		}
 
-		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, DateTime minDate)
+		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, TimelineDateTime minDate)
 		{
 			float startX;
 			float endX;
@@ -505,8 +570,8 @@ namespace Timeline.Controls
 
 			int lane = GetFreeLane(e.StartDate);
 			SetLaneBusy(lane, e.EndDate);
-			startX = (e.StartDate.BaseDate.Ticks - minDate.Ticks) / pixeltime;
-			endX = (e.EndDate.BaseDate.Ticks - minDate.Ticks) / pixeltime - 1;
+			startX = (e.StartDate.Ticks - minDate.Ticks) / pixeltime;
+			endX = (e.EndDate.Ticks - minDate.Ticks) / pixeltime - 1;
 			eventWidth = endX - startX;
 			eventTop = eventsTopY + lane * laneHeight;
 			eventBottom = eventTop + laneHeight - 1;
@@ -514,13 +579,13 @@ namespace Timeline.Controls
 			canvas.DrawRect(startX, eventTop, endX - startX, eventBottom - eventTop, eventBorderPaint);
 		}
 
-		private void SetLaneBusy(int lane, MTimelineDate tld)
+		private void SetLaneBusy(int lane, TimelineDateTime tld)
 		{
-			if (laneBusyUntil[lane] == null) laneBusyUntil[lane] = new MTimelineDate(DateTime.UtcNow);
+			if (laneBusyUntil[lane] == null) laneBusyUntil[lane] = new TimelineDateTime(DateTime.UtcNow);
 			tld.CopyTo(ref laneBusyUntil[lane]);
 		}
 
-		private int GetFreeLane(MTimelineDate tld)
+		private int GetFreeLane(TimelineDateTime tld)
 		{
 			for (int i = 0; i < 8;i++)
 				if((laneBusyUntil[i]==null)||(laneBusyUntil[i]<tld)) return i;
@@ -626,7 +691,7 @@ namespace Timeline.Controls
 				eventsHeight = info.Height - eventsTopY;
 				laneHeight = eventsHeight / eventLanes;
 				laneBusy = new bool[eventLanes];
-				laneBusyUntil = new MTimelineDate[eventLanes];
+				laneBusyUntil = new TimelineDateTime[eventLanes];
                 
                 initialOrientationCheck = false;
             }

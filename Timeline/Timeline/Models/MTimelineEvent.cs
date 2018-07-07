@@ -1,14 +1,14 @@
 ﻿using System;
 using Xamarin.Forms;
 
-using Timeline.Controls;
+using Timeline.Objects.Date;
 
 namespace Timeline.Models
 {
     public class MTimelineEvent
     {
-		private MTimelineDate startDate;
-		private MTimelineDate endDate;
+		private TimelineDateTime startDate;
+		private TimelineDateTime endDate;
 
         public string Title { get; set; }
 
@@ -16,21 +16,21 @@ namespace Timeline.Models
 
         public Image Image { get; set; }
 
-		public MTimelineDate StartDate { 
+		public TimelineDateTime StartDate { 
 			get { return startDate; } 
 			set { startDate = value; } 
 		}
 
-		public MTimelineDate EndDate { 
+		public TimelineDateTime EndDate { 
 			get { return endDate; } 
 			set { endDate = value; }
 		}
         
-		public MTimelineEvent(string _title, MTimelineDate _startdate, int _length=1)
+		public MTimelineEvent(string _title, TimelineDateTime _startdate, int _length=1)
         {
 			Title = _title;
 			startDate = _startdate;
-			endDate = new MTimelineDate(DateTime.UtcNow);
+			endDate = new TimelineDateTime(DateTime.UtcNow);
 			startDate.CopyTo(ref endDate);
 			endDate.Add(_length);
         }
