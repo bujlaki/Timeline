@@ -6,7 +6,6 @@ namespace Timeline.Objects.Date
 {
     public class TimelineDateTime : BCACDateTime
     {
-        //public DateTime BaseDate { get; set; }
         public int Decade { get; set; }
         public int Century { get; set; }
 		public TimelineUnits Precision { get; set; }
@@ -47,6 +46,13 @@ namespace Timeline.Objects.Date
                 tldate.bcacDate = new DateTime(ticks + DateTime.MaxValue.Ticks);
             }
             return tldate;
+        }
+
+        public static TimelineDateTime FromTicksCapped(Int64 ticks)
+        {
+            if (ticks > MaxTicks) ticks = MaxTicks;
+            if (ticks < MinTicks) ticks = MinTicks;
+            return TimelineDateTime.FromTicks(ticks);
         }
 
         public TimelineDateTime() : base() { }
@@ -164,54 +170,49 @@ namespace Timeline.Objects.Date
 			Add(this.Precision, value);
 		}
 
-        //BC -- add -value
-        //AD -- add value
         public void Add(TimelineUnits unit, int value = 1)
         {
-            switch(unit)
+            switch (unit)
             {
-                case TimelineUnits.Minute:
-					try
-					{
-						AddMinutes(value);
-					}
-					catch (ArgumentOutOfRangeException ex)
-					{
-						if(value<0){
-							//AD to BC
-
-						} else {
-							//BC to AD
-						}
-					}
-                    break;
-                case TimelineUnits.Hour:
-					AddHours(value);
-                    break;
-                case TimelineUnits.Day:
-					AddDays(value);
-                    break;
-                case TimelineUnits.Month:
-					AddMonths(value);
-					Decade = Year / 10;
-					Century = Year / 100;
-                    break;
-                case TimelineUnits.Year:
-					AddYears(value);
-					Decade = Year / 10;
-					Century = Year / 100;
-                    break;
-                case TimelineUnits.Decade:
-					AddYears(10 * value);
-					Decade = Year / 10;
-					Century = Year / 100;
-                    break;
-                case TimelineUnits.Century:
-					AddYears(100 * value);
-					Decade = Year / 10;
-					Century = Year / 100;
-                    break;
+                case TimelineUnits.Minute: AddMinutes(value); break;
+                case TimelineUnits.Hour: AddHours(value); break;
+                case TimelineUnits.Day: AddDays(value); break;
+                case TimelineUnits.Month: AddMonths(value); break;
+                case TimelineUnits.Year: AddYears(value); break;
+                case TimelineUnits.Decade: AddYears(10 * value); break;
+                case TimelineUnits.Century: AddYears(100 * value); break;
             }
+            Decade = Year / 10;
+            Century = Year / 100;
+        }
+
+        public void AddCapped(int value = 1)
+        {
+            AddCapped(this.Precision, value);
+        }
+
+        public void AddCapped(TimelineUnits unit, int value = 1)
+        {
+            try
+            {
+                switch (unit)
+                {
+                    case TimelineUnits.Minute: AddMinutes(value); break;
+                    case TimelineUnits.Hour:   AddHours(value); break;
+                    case TimelineUnits.Day:    AddDays(value); break;
+                    case TimelineUnits.Month:  AddMonths(value); break;
+                    case TimelineUnits.Year:   AddYears(value); break;
+                    case TimelineUnits.Decade: AddYears(10 * value); break;
+                    case TimelineUnits.Century:AddYears(100 * value); break;
+                }
+                Decade = Year / 10;
+                Century = Year / 100;
+            }
+            catch (OverflowException)
+            {
+                Ticks = value > 0 ? MaxTicks : MinTicks;
+            }
+
         }
     }
 }

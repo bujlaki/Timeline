@@ -301,7 +301,7 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new TimelineDateTime(9900);
+			date = new TimelineDateTime(-9900);
 			unitDate = new TimelineDateTime();
 			subUnitDate = new TimelineDateTime();
 			DateStr = date.DateStr(ZoomUnit);
@@ -409,30 +409,11 @@ namespace Timeline.Controls
             float unitPos;
             float subUnitPos;
 
-            TimelineDateTime minDate;
-            try
-            {
-                minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                minDate = TimelineDateTime.MinValue;
-            }
-
-            TimelineDateTime maxDate;
-            try
-            {
-                maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                maxDate = TimelineDateTime.MaxValue;
-            }
-            
+            TimelineDateTime minDate = TimelineDateTime.FromTicksCapped(date.Ticks - halfWidth * pixeltime);
+            TimelineDateTime maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
 
             date.CopyTo(ref unitDate, ZoomUnit);
-
-			while (unitDate.Ticks > minDate.Ticks) unitDate.Add(ZoomUnit, -1);
+            while (unitDate.Ticks > minDate.Ticks) unitDate.AddCapped(ZoomUnit, -1);
 
 			while (unitDate.Ticks < maxDate.Ticks)
             {
@@ -444,16 +425,7 @@ namespace Timeline.Controls
 				canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);
 
                 unitDate.CopyTo(ref subUnitDate, ZoomUnit - 1);
-                try
-                {
-                    unitDate.Add(ZoomUnit);
-                }
-                catch (OverflowException)
-                {
-                    unitDate = (TimelineDateTime)TimelineDateTime.MaxValue;
-                }
-				
-                
+                unitDate.AddCapped(ZoomUnit);
 				while (subUnitDate.Ticks < unitDate.Ticks && subUnitDate.Ticks < maxDate.Ticks)
                 {
 					subUnitPos = (subUnitDate.Ticks - minDate.Ticks) / pixeltime;
@@ -464,15 +436,7 @@ namespace Timeline.Controls
 					//SUBUNIT TEXT
 					if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);
 
-                    try
-                    {
-                        subUnitDate.Add(ZoomUnit-1);
-                    }
-                    catch (OverflowException)
-                    {
-                        subUnitDate = (TimelineDateTime)TimelineDateTime.MaxValue;
-                    }
-                    //subUnitDate.Add(ZoomUnit - 1);
+                    subUnitDate.AddCapped(ZoomUnit - 1);
                 }
             }
         }
@@ -529,27 +493,8 @@ namespace Timeline.Controls
 
 		private void DrawTimelineEvents(SKCanvas canvas)
 		{
-            //TimelineDateTime minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
-            //TimelineDateTime maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
-            TimelineDateTime minDate;
-            try
-            {
-                minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                minDate = TimelineDateTime.MinValue;
-            }
-
-            TimelineDateTime maxDate;
-            try
-            {
-                maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                maxDate = TimelineDateTime.MaxValue;
-            }
+            TimelineDateTime minDate = TimelineDateTime.FromTicksCapped(date.Ticks - halfWidth * pixeltime);
+            TimelineDateTime maxDate = TimelineDateTime.FromTicksCapped(date.Ticks + halfWidth * pixeltime);
 
             foreach (MTimelineEvent e in this.Timeline1.Events)
 			{

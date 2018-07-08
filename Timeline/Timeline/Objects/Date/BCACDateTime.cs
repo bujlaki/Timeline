@@ -46,6 +46,19 @@ namespace Timeline.Objects.Date
                 if (bcac == BCAC.BC) return bcacDate.Value.Ticks - DateTime.MaxValue.Ticks;
                 return bcacDate.Value.Ticks;
             }
+            set
+            {
+                if(value>0)
+                {
+                    bcacDate = new DateTime(Ticks);
+                    bcac = BCAC.AC;
+                }
+                else
+                {
+                    bcacDate = new DateTime(Ticks + DateTime.MaxValue.Ticks);
+                    bcac = BCAC.BC;
+                }
+            }
         }
 
         public int Year
