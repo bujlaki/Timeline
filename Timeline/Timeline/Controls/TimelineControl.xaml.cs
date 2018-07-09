@@ -84,14 +84,14 @@ namespace Timeline.Controls
             nameof(Zoom),
             typeof(double),
             typeof(TimelineControl),
-            (double)10, BindingMode.OneWay,
+            (double)100000, BindingMode.OneWay,
             propertyChanged: OnZoomChanged);
 
         public static readonly BindableProperty ZoomUnitProperty = BindableProperty.Create(
             nameof(ZoomUnit),
             typeof(TimelineUnits),
             typeof(TimelineControl),
-            TimelineUnits.Hour, BindingMode.OneWay,
+            TimelineUnits.Year, BindingMode.OneWay,
             propertyChanged: OnZoomUnitChanged);
 
 		public static readonly BindableProperty DateProperty = BindableProperty.Create(
@@ -150,19 +150,19 @@ namespace Timeline.Controls
 
         private static void OnZoomChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((TimelineControl)bindable).InvalidateLayout();
+            //((TimelineControl)bindable).InvalidateLayout();
         }
 
         private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((TimelineControl)bindable).InvalidateLayout();
+            //((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnDateChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((TimelineDateTime)newValue).CopyTo(ref ((TimelineControl)bindable).date);
+            //((TimelineDateTime)newValue).CopyTo(ref ((TimelineControl)bindable).date);
 			//((TimelineControl)bindable).date.BaseDate = (DateTime)newValue;
-			((TimelineControl)bindable).InvalidateLayout();
+			//((TimelineControl)bindable).InvalidateLayout();
         }
         
 		public MTimeline Timeline1
@@ -301,12 +301,12 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new TimelineDateTime(-9900);
+			date = new TimelineDateTime(9900);
 			unitDate = new TimelineDateTime();
 			subUnitDate = new TimelineDateTime();
 			DateStr = date.DateStr(ZoomUnit);
 
-			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
+			pixeltime = (Int64)(Zoom * TimeSpan.TicksPerSecond);
 			showSubUnitText = false;
 
 			initialOrientationCheck = true;
@@ -349,7 +349,7 @@ namespace Timeline.Controls
                     //Console.WriteLine("PAN");
                     try
                     {
-                        date.AddTicks(-2 * (long)args.Data.X * pixeltime);
+                        date.AddTicks(-2 * (Int64)args.Data.X * pixeltime);
                     }
 					catch(OverflowException)
                     {
@@ -367,7 +367,7 @@ namespace Timeline.Controls
 					Zoom -= Zoom * 0.005 * args.Data.X;
                     if (Zoom < 4) Zoom = 4;
 					if (Zoom > 2073600) Zoom = 2073600;
-                    pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
+                    pixeltime = (Int64)(Zoom * TimeSpan.TicksPerSecond);
                     //Console.WriteLine("Zoom: " + Zoom.ToString() + "  pixeltime: " + pixeltime.ToString());
                     AdjustZoomUnit();
                     DateStr = date.DateStr(ZoomUnit - 1);
@@ -409,15 +409,19 @@ namespace Timeline.Controls
             float unitPos;
             float subUnitPos;
 
-            TimelineDateTime minDate = TimelineDateTime.FromTicksCapped(date.Ticks - halfWidth * pixeltime);
-            TimelineDateTime maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
+            Int64 minTicks = date.Ticks - halfWidth * pixeltime;
+            if (minTicks < BCACDateTime.MinTicks) minTicks = BCACDateTime.MinTicks;
+            Int64 maxTicks = date.Ticks + halfWidth * pixeltime;
+            if (maxTicks > BCACDateTime.MaxTicks) maxTicks = BCACDateTime.MaxTicks;
+            //TimelineDateTime minDate = TimelineDateTime.FromTicksCapped(date.Ticks - halfWidth * pixeltime);
+            //TimelineDateTime maxDate = TimelineDateTime.FromTicksCapped(date.Ticks + halfWidth * pixeltime);
 
             date.CopyTo(ref unitDate, ZoomUnit);
-            while (unitDate.Ticks > minDate.Ticks) unitDate.AddCapped(ZoomUnit, -1);
+            while (unitDate.Ticks > minTicks) unitDate.AddCapped(ZoomUnit, -1);
 
-			while (unitDate.Ticks < maxDate.Ticks)
+			while (unitDate.Ticks < maxTicks)
             {
-				unitPos = (unitDate.Ticks - minDate.Ticks) / pixeltime;
+				unitPos = (unitDate.Ticks - minTicks) / pixeltime;
 
                 //UNIT MARK
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);
@@ -426,15 +430,15 @@ namespace Timeline.Controls
 
                 unitDate.CopyTo(ref subUnitDate, ZoomUnit - 1);
                 unitDate.AddCapped(ZoomUnit);
-				while (subUnitDate.Ticks < unitDate.Ticks && subUnitDate.Ticks < maxDate.Ticks)
+                while (subUnitDate.Ticks < unitDate.Ticks && subUnitDate.Ticks < maxTicks)
                 {
-					subUnitPos = (subUnitDate.Ticks - minDate.Ticks) / pixeltime;
-                    
+                    subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
+
                     //SUBUNIT MARK
                     canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);
-                    
-					//SUBUNIT TEXT
-					if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);
+
+                    //SUBUNIT TEXT
+                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);
 
                     subUnitDate.AddCapped(ZoomUnit - 1);
                 }

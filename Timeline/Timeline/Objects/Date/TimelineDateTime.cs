@@ -12,8 +12,7 @@ namespace Timeline.Objects.Date
 
         public static new TimelineDateTime MaxValue
         {
-            get
-            {
+            get {
                 var ret = TimelineDateTime.FromTicks(DateTime.MaxValue.Ticks);
                 ret.Decade = ret.Year / 10;
                 ret.Century = ret.Year / 100;
@@ -23,8 +22,7 @@ namespace Timeline.Objects.Date
 
         public static new TimelineDateTime MinValue
         {
-            get
-            {
+            get {
                 var ret = TimelineDateTime.FromTicks(-DateTime.MaxValue.Ticks);
                 ret.Decade = ret.Year / 10;
                 ret.Century = ret.Year / 100;
@@ -34,18 +32,23 @@ namespace Timeline.Objects.Date
 
         public static TimelineDateTime FromTicks(Int64 ticks)
         {
-            TimelineDateTime tldate = new TimelineDateTime();
             if (ticks > 0)
-            {
-                tldate.bcac = BCAC.AC;
-                tldate.bcacDate = new DateTime(ticks);
-            }
+                return new TimelineDateTime(new DateTime(ticks));
             else
-            {
-                tldate.bcac = BCAC.BC;
-                tldate.bcacDate = new DateTime(ticks + DateTime.MaxValue.Ticks);
-            }
-            return tldate;
+                return new TimelineDateTime(new DateTime(ticks + DateTime.MaxValue.Ticks), BCAC.BC);
+
+            //TimelineDateTime tldate = new TimelineDateTime();
+            //if (ticks > 0)
+            //{
+            //    tldate.bcac = BCAC.AC;
+            //    tldate.bcacDate = new DateTime(ticks);
+            //}
+            //else
+            //{
+            //    tldate.bcac = BCAC.BC;
+            //    tldate.bcacDate = new DateTime(ticks + DateTime.MaxValue.Ticks);
+            //}
+            //return tldate;
         }
 
         public static TimelineDateTime FromTicksCapped(Int64 ticks)
@@ -165,7 +168,7 @@ namespace Timeline.Objects.Date
 			dstDate.Precision = precision;
 		}
 
-        public void Add(int value=1)
+        public void Add(int value = 1)
 		{
 			Add(this.Precision, value);
 		}
@@ -212,7 +215,6 @@ namespace Timeline.Objects.Date
             {
                 Ticks = value > 0 ? MaxTicks : MinTicks;
             }
-
         }
     }
 }
