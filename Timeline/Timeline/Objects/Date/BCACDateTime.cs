@@ -26,7 +26,7 @@ namespace Timeline.Objects.Date
         const Int64 TICKS_PER_DAY = 864000000000;
         const int MAX_YEARS = 9999;
 
-        protected DateTime? bcacDate { get; set; }
+        protected DateTime bcacDate { get; set; }
         protected BCAC bcac { get; set; }
 
         public static bool operator <(BCACDateTime tld1, BCACDateTime tld2)
@@ -43,8 +43,8 @@ namespace Timeline.Objects.Date
         {
             get
             {
-                if (bcac == BCAC.BC) return bcacDate.Value.Ticks - DateTime.MaxValue.Ticks;
-                return bcacDate.Value.Ticks;
+                if (bcac == BCAC.BC) return bcacDate.Ticks - DateTime.MaxValue.Ticks;
+                return bcacDate.Ticks;
             }
         }
 
@@ -54,23 +54,32 @@ namespace Timeline.Objects.Date
             {
                 if (bcacDate == null) return 0;
                 if (bcac == BCAC.AC)
-                    return bcacDate.Value.Year;
+                    return bcacDate.Year;
                 else
-                    return -10000 + bcacDate.Value.Year;
+                    return -10000 + bcacDate.Year;
             }
         }
         
-        public int Month { get { return bcacDate.Value.Month; } }
-        public int Day { get { return bcacDate.Value.Day; } }
-        public int Hour { get { return bcacDate.Value.Hour; } }
-        public int Minute { get { return bcacDate.Value.Minute; } }
+        public string YearStr
+        {
+            get
+            {
+                int y = Year;
+                if (y < 0) return "BC." + (-y).ToString();
+                return y.ToString();
+            }
+        }
+        public int Month { get { return bcacDate.Month; } }
+        public int Day { get { return bcacDate.Day; } }
+        public int Hour { get { return bcacDate.Hour; } }
+        public int Minute { get { return bcacDate.Minute; } }
 
-        public BCACDateTime() : this(null) { }
-        public BCACDateTime(DateTime? dateTime, BCAC bc_or_ac = BCAC.AC)
+        public BCACDateTime() : this(DateTime.UtcNow) { }
+        public BCACDateTime(DateTime dateTime, BCAC bc_or_ac = BCAC.AC)
         {
             bcac = bc_or_ac;
             if (bcac == BCAC.BC)
-                bcacDate = new DateTime(10000 - dateTime.Value.Year, dateTime.Value.Month, dateTime.Value.Day);
+                bcacDate = new DateTime(10000 - dateTime.Year, dateTime.Month, dateTime.Day);
             else
                 bcacDate = dateTime;
         }
@@ -108,11 +117,11 @@ namespace Timeline.Objects.Date
             }
         }
 
-        public virtual void AddTicks(long count)
+        public virtual void AddTicks(Int64 count)
         {
             try
             {
-                bcacDate = bcacDate?.AddTicks(count);
+                bcacDate = bcacDate.AddTicks(count);
                 BCACDateChanged();
             }
             catch (ArgumentOutOfRangeException)
@@ -120,7 +129,7 @@ namespace Timeline.Objects.Date
                 if (bcac == BCAC.AC && count > 0) throw new OverflowException();
                 if (bcac == BCAC.BC && count < 0) throw new OverflowException();
 
-                Int64 ticks = bcacDate.Value.Ticks + count;
+                Int64 ticks = bcacDate.Ticks + count;
                 if (ticks < 0) ticks += (DateTime.MaxValue.Ticks + 1);
                 if (ticks > DateTime.MaxValue.Ticks) ticks -= (DateTime.MaxValue.Ticks + 1);
                 bcac = count > 0 ? BCAC.AC : BCAC.BC;
@@ -133,7 +142,7 @@ namespace Timeline.Objects.Date
         {
             try
             {
-                bcacDate = bcacDate?.AddMinutes(count);
+                bcacDate = bcacDate.AddMinutes(count);
                 BCACDateChanged();
             }
             catch (ArgumentOutOfRangeException)
@@ -141,7 +150,7 @@ namespace Timeline.Objects.Date
                 if (bcac == BCAC.AC && count > 0) throw new OverflowException();
                 if (bcac == BCAC.BC && count < 0) throw new OverflowException();
 
-                Int64 ticks = bcacDate.Value.Ticks + count * TICKS_PER_MINUTE;
+                Int64 ticks = bcacDate.Ticks + count * TICKS_PER_MINUTE;
                 if (ticks < 0) ticks += (DateTime.MaxValue.Ticks + 1);
                 if (ticks > DateTime.MaxValue.Ticks) ticks -= (DateTime.MaxValue.Ticks + 1);
                 bcac = count > 0 ? BCAC.AC : BCAC.BC;
@@ -154,7 +163,7 @@ namespace Timeline.Objects.Date
         {
             try
             {
-                bcacDate = bcacDate?.AddHours(count);
+                bcacDate = bcacDate.AddHours(count);
                 BCACDateChanged();
             }
             catch (ArgumentOutOfRangeException)
@@ -162,7 +171,7 @@ namespace Timeline.Objects.Date
                 if (bcac == BCAC.AC && count > 0) throw new OverflowException();
                 if (bcac == BCAC.BC && count < 0) throw new OverflowException();
 
-                Int64 ticks = bcacDate.Value.Ticks + count * TICKS_PER_HOUR;
+                Int64 ticks = bcacDate.Ticks + count * TICKS_PER_HOUR;
                 if (ticks < 0) ticks += (DateTime.MaxValue.Ticks + 1);
                 if (ticks > DateTime.MaxValue.Ticks) ticks -= (DateTime.MaxValue.Ticks + 1);
                 bcac = count > 0 ? BCAC.AC : BCAC.BC;
@@ -175,7 +184,7 @@ namespace Timeline.Objects.Date
         {
             try
             {
-                bcacDate = bcacDate?.AddDays(count);
+                bcacDate = bcacDate.AddDays(count);
                 BCACDateChanged();
             }
             catch (ArgumentOutOfRangeException)
@@ -183,7 +192,7 @@ namespace Timeline.Objects.Date
                 if (bcac == BCAC.AC && count > 0) throw new OverflowException();
                 if (bcac == BCAC.BC && count < 0) throw new OverflowException();
 
-                Int64 ticks = bcacDate.Value.Ticks + count * TICKS_PER_DAY;
+                Int64 ticks = bcacDate.Ticks + count * TICKS_PER_DAY;
                 if (ticks < 0) ticks += (DateTime.MaxValue.Ticks + 1);
                 if (ticks > DateTime.MaxValue.Ticks) ticks -= (DateTime.MaxValue.Ticks + 1);
                 bcac = count > 0 ? BCAC.AC : BCAC.BC;
@@ -196,7 +205,7 @@ namespace Timeline.Objects.Date
         {
             try
             {
-                bcacDate = bcacDate?.AddMonths(count);
+                bcacDate = bcacDate.AddMonths(count);
                 BCACDateChanged();
             }
             catch (ArgumentOutOfRangeException)
@@ -205,8 +214,8 @@ namespace Timeline.Objects.Date
                 if (bcac == BCAC.BC && count < 0) throw new OverflowException();
 
                 bcac = count > 0 ? BCAC.AC : BCAC.BC;
-                if (count > 0) bcacDate = bcacDate?.AddMonths(count - MAX_YEARS * 12);
-                if (count < 0) bcacDate = bcacDate?.AddMonths(MAX_YEARS * 12 + count);
+                if (count > 0) bcacDate = bcacDate.AddMonths(count - MAX_YEARS * 12);
+                if (count < 0) bcacDate = bcacDate.AddMonths(MAX_YEARS * 12 + count);
                 BCACDateChanged();
             }
         }
@@ -215,19 +224,19 @@ namespace Timeline.Objects.Date
         {
             try
             {
-                bcacDate = bcacDate?.AddYears(count);
+                bcacDate = bcacDate.AddYears(count);
                 BCACDateChanged();
             }
             catch (ArgumentOutOfRangeException)
             {
                 if (bcac == BCAC.AC && count > 0) throw new OverflowException();
-                if (bcac == BCAC.BC && count >= 2 * MAX_YEARS - bcacDate.Value.Year) throw new OverflowException();
+                if (bcac == BCAC.BC && count >= 2 * MAX_YEARS - bcacDate.Year) throw new OverflowException();
                 if (bcac == BCAC.BC && count < 0) throw new OverflowException();
-                if (bcac == BCAC.AC && count <= -MAX_YEARS - bcacDate.Value.Year) throw new OverflowException();
+                if (bcac == BCAC.AC && count <= -MAX_YEARS - bcacDate.Year) throw new OverflowException();
 
                 bcac = count > 0 ? BCAC.AC : BCAC.BC;
-                if (count > 0) bcacDate = bcacDate?.AddYears(count - MAX_YEARS);
-                if (count < 0) bcacDate = bcacDate?.AddYears(MAX_YEARS + count);
+                if (count > 0) bcacDate = bcacDate.AddYears(count - MAX_YEARS);
+                if (count < 0) bcacDate = bcacDate.AddYears(MAX_YEARS + count);
                 BCACDateChanged();
             }
         }

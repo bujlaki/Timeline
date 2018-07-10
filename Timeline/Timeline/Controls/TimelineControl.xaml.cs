@@ -84,14 +84,14 @@ namespace Timeline.Controls
             nameof(Zoom),
             typeof(double),
             typeof(TimelineControl),
-            (double)10, BindingMode.OneWay,
+            (double)100000, BindingMode.OneWay,
             propertyChanged: OnZoomChanged);
 
         public static readonly BindableProperty ZoomUnitProperty = BindableProperty.Create(
             nameof(ZoomUnit),
             typeof(TimelineUnits),
             typeof(TimelineControl),
-            TimelineUnits.Hour, BindingMode.OneWay,
+            TimelineUnits.Year, BindingMode.OneWay,
             propertyChanged: OnZoomUnitChanged);
 
 		public static readonly BindableProperty DateProperty = BindableProperty.Create(
@@ -240,7 +240,7 @@ namespace Timeline.Controls
 
         TimelineDateTime date;
         TimelineDateTime unitDate;
-        TimelineDateTime subUnitDate;
+        //TimelineDateTime subUnitDate;
 
         SKPaint timelinePaint;
         SKPaint unitMarkPaint;
@@ -301,9 +301,9 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new TimelineDateTime(9900);
+			date = new TimelineDateTime(10);
 			unitDate = new TimelineDateTime();
-			subUnitDate = new TimelineDateTime();
+			//subUnitDate = new TimelineDateTime();
 			DateStr = date.DateStr(ZoomUnit);
 
 			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
@@ -390,111 +390,91 @@ namespace Timeline.Controls
             CheckOrientation(info, initialOrientationCheck);
 
             canvas.Clear();
-            
+
+            Int64 minTicks = date.Ticks - halfWidth * pixeltime;
+            Int64 maxTicks = date.Ticks + halfWidth * pixeltime;
+
             //TIMELINE
             canvas.DrawLine(0, timelineMiddleY, info.Width, timelineMiddleY, timelinePaint);
             //UNITS AND SUBUNITS
-            DrawUnitsAndSubUnits(canvas);
+            DrawUnitsAndSubUnits(canvas, minTicks, maxTicks);
             //HIGHLIGHTER
             canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, highlightPaint);
 
 			//EVENTS
 			for (int i = 0; i < 8; i++) laneBusyUntil[i] = null;
-			if (this.Timeline1 != null) DrawTimelineEvents(canvas);
+			if (this.Timeline1 != null) DrawTimelineEvents(canvas, minTicks, maxTicks);
         }
 
 		#region "UNITS AND SUBUNITS DRAWING"
-		private void DrawUnitsAndSubUnits(SKCanvas canvas)
+		private void DrawUnitsAndSubUnits(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
         {
-            float unitPos;
-            float subUnitPos;
-
-            TimelineDateTime minDate;
-            try
-            {
-                minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                minDate = TimelineDateTime.MinValue;
-            }
-
-            TimelineDateTime maxDate;
-            try
-            {
-                maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                maxDate = TimelineDateTime.MaxValue;
-            }
-            
-
             date.CopyTo(ref unitDate, ZoomUnit);
-
-			while (unitDate.Ticks > minDate.Ticks) unitDate.Add(ZoomUnit, -1);
-
-			while (unitDate.Ticks < maxDate.Ticks)
+            try
             {
-				unitPos = (unitDate.Ticks - minDate.Ticks) / pixeltime;
+                while (unitDate.Ticks > minTicks) unitDate.Add(ZoomUnit, -1);
+            }
+            catch (OverflowException)
+            {
+                DrawSubUnits(canvas, minTicks, BCACDateTime.MinTicks, unitDate.Ticks, ZoomUnit - 1);
+            }
 
-                //UNIT MARK
-                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);
-                //UNIT TEXT
-				canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);
+            float unitPos;
+            while (unitDate.Ticks < maxTicks)
+            {
+				unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
 
-                unitDate.CopyTo(ref subUnitDate, ZoomUnit - 1);
+                Int64 fromTicks = unitDate.Ticks;
                 try
                 {
                     unitDate.Add(ZoomUnit);
                 }
-                catch (OverflowException)
+                catch(OverflowException)
                 {
-                    unitDate = (TimelineDateTime)TimelineDateTime.MaxValue;
+                    //WHEN WE ARE AT MAX
+                    DrawSubUnits(canvas, minTicks, fromTicks, BCACDateTime.MaxTicks, ZoomUnit - 1);
+                    break;
                 }
-				
-                
-				while (subUnitDate.Ticks < unitDate.Ticks && subUnitDate.Ticks < maxDate.Ticks)
-                {
-					subUnitPos = (subUnitDate.Ticks - minDate.Ticks) / pixeltime;
-                    
-                    //SUBUNIT MARK
-                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);
-                    
-					//SUBUNIT TEXT
-					if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);
-
-                    try
-                    {
-                        subUnitDate.Add(ZoomUnit-1);
-                    }
-                    catch (OverflowException)
-                    {
-                        subUnitDate = (TimelineDateTime)TimelineDateTime.MaxValue;
-                    }
-                    //subUnitDate.Add(ZoomUnit - 1);
-                }
+                //NORMAL SUBUNIT DRAW
+                DrawSubUnits(canvas, minTicks, fromTicks, unitDate.Ticks, ZoomUnit - 1);
             }
         }
 
-        private string GetUnitText(TimelineDateTime tlcdate)
+        private void DrawSubUnits(SKCanvas canvas, Int64 minTicks, Int64 fromTicks, Int64 toTicks, TimelineUnits unit)
+        {
+            float subUnitPos;
+            TimelineDateTime subUnitDate = TimelineDateTime.FromTicks(fromTicks);
+
+            while (subUnitDate.Ticks < toTicks)
+            {
+                subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
+                canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);                                //SUBUNIT MARK
+                if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);      //SUBUNIT TEXT
+
+                try { subUnitDate.Add(unit); } catch (OverflowException) { break; }
+            }
+        }
+
+        private string GetUnitText(TimelineDateTime tldate)
         {
             switch (this.ZoomUnit)
             {
                 case TimelineUnits.Minute:
                     return "";
                 case TimelineUnits.Hour:
-					return tlcdate.Hour.ToString() + ":00";
+					return tldate.Hour.ToString() + ":00";
                 case TimelineUnits.Day:
-					return tlcdate.Day.ToString() + "." + shortMonthNames[tlcdate.Month - 1];
+					return tldate.Day.ToString() + "." + shortMonthNames[tldate.Month - 1];
                 case TimelineUnits.Month:
-					return shortMonthNames[tlcdate.Month - 1];
+					return shortMonthNames[tldate.Month - 1];
                 case TimelineUnits.Year:
-					return tlcdate.Year.ToString();
+					return tldate.YearStr;
                 case TimelineUnits.Decade:
-                    return tlcdate.Decade.ToString() + "0";
+                    return tldate.DecadeStr;
                 case TimelineUnits.Century:
-                    return tlcdate.Century.ToString() + "00";
+                    return tldate.CenturyStr;
                 default:
                     return "";
             }
@@ -518,49 +498,27 @@ namespace Timeline.Controls
                 case TimelineUnits.Year:
 					return shortMonthNames[tlcdate.Month - 1];
                 case TimelineUnits.Decade:
-					return tlcdate.Year.ToString();
+					return tlcdate.YearStr;
                 case TimelineUnits.Century:
-                    return tlcdate.Decade.ToString() + "0";
+                    return tlcdate.DecadeStr;
                 default:
                     return "";
             }      
 		}
 		#endregion
 
-		private void DrawTimelineEvents(SKCanvas canvas)
+		private void DrawTimelineEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
 		{
-            //TimelineDateTime minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
-            //TimelineDateTime maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
-            TimelineDateTime minDate;
-            try
-            {
-                minDate = TimelineDateTime.FromTicks(date.Ticks - halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                minDate = TimelineDateTime.MinValue;
-            }
-
-            TimelineDateTime maxDate;
-            try
-            {
-                maxDate = TimelineDateTime.FromTicks(date.Ticks + halfWidth * pixeltime);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                maxDate = TimelineDateTime.MaxValue;
-            }
-
             foreach (MTimelineEvent e in this.Timeline1.Events)
 			{
-				if((e.EndDate.Ticks>minDate.Ticks)&&(e.StartDate.Ticks<maxDate.Ticks))
+				if((e.EndDate.Ticks>minTicks)&&(e.StartDate.Ticks<maxTicks))
 				{
-					DrawTimelineEvent(e, canvas, minDate);
+					DrawTimelineEvent(e, canvas, minTicks);
 				}
 			}
 		}
 
-		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, TimelineDateTime minDate)
+		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, Int64 minTicks)
 		{
 			float startX;
 			float endX;
@@ -570,8 +528,8 @@ namespace Timeline.Controls
 
 			int lane = GetFreeLane(e.StartDate);
 			SetLaneBusy(lane, e.EndDate);
-			startX = (e.StartDate.Ticks - minDate.Ticks) / pixeltime;
-			endX = (e.EndDate.Ticks - minDate.Ticks) / pixeltime - 1;
+			startX = (e.StartDate.Ticks - minTicks) / pixeltime;
+			endX = (e.EndDate.Ticks - minTicks) / pixeltime - 1;
 			eventWidth = endX - startX;
 			eventTop = eventsTopY + lane * laneHeight;
 			eventBottom = eventTop + laneHeight - 1;
