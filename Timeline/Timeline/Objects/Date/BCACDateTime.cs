@@ -52,7 +52,8 @@ namespace Timeline.Objects.Date
         {
             get
             {
-                if (bcacDate == null) return 0;
+                if (bcacDate == null)
+                    return 0;
                 if (bcac == BCAC.AC)
                     return bcacDate.Year;
                 else

@@ -284,6 +284,7 @@ namespace Timeline.Controls
         float subUnitMarkY2;
         float unitTextY;
         float subUnitTextY;
+        int fullwidth;
         int halfWidth;
 
 		int eventLanes;
@@ -301,7 +302,7 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new TimelineDateTime(10);
+			date = new TimelineDateTime(2018);
 			unitDate = new TimelineDateTime();
 			//subUnitDate = new TimelineDateTime();
 			DateStr = date.DateStr(ZoomUnit);
@@ -396,8 +397,18 @@ namespace Timeline.Controls
 
             //TIMELINE
             canvas.DrawLine(0, timelineMiddleY, info.Width, timelineMiddleY, timelinePaint);
+
             //UNITS AND SUBUNITS
-            DrawUnitsAndSubUnits(canvas, minTicks, maxTicks);
+            if(minTicks<0 && maxTicks>0)
+            {
+                DrawUnitsAndSubUnitsBCAC(canvas, minTicks, maxTicks);   //WHEN YEAR -1/1 IS VISIBLE
+            }
+            else
+            {
+                if (minTicks > 0) DrawUnitsAndSubUnitsAC(canvas, minTicks, maxTicks);   //PURE AC
+                if (maxTicks < 0) DrawUnitsAndSubUnitsBC(canvas, minTicks, maxTicks);   //PURE BC
+            }
+
             //HIGHLIGHTER
             canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, highlightPaint);
 
@@ -406,32 +417,55 @@ namespace Timeline.Controls
 			if (this.Timeline1 != null) DrawTimelineEvents(canvas, minTicks, maxTicks);
         }
 
-		#region "UNITS AND SUBUNITS DRAWING"
-		private void DrawUnitsAndSubUnits(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        #region "UNITS AND SUBUNITS DRAWING"
+        private void DrawUnitsAndSubUnitsBCAC(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
         {
-            date.CopyTo(ref unitDate, ZoomUnit);
-            try
-            {
-                while (unitDate.Ticks > minTicks) unitDate.Add(ZoomUnit, -1);
-            }
-            catch (OverflowException)
-            {
-                DrawSubUnits(canvas, minTicks, BCACDateTime.MinTicks, unitDate.Ticks, ZoomUnit - 1);
-            }
-
             float unitPos;
-            while (unitDate.Ticks < maxTicks)
+
+            unitDate.SetDate(1, 1, 1, 0, 0);
+            do  //DRAW AC PART
             {
-				unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
                 canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
 
                 Int64 fromTicks = unitDate.Ticks;
-                try
-                {
-                    unitDate.Add(ZoomUnit);
-                }
-                catch(OverflowException)
+                unitDate.Add(ZoomUnit);
+
+                //NORMAL SUBUNIT DRAW
+                DrawSubUnits(canvas, minTicks, fromTicks, unitDate.Ticks, ZoomUnit - 1);
+            } while (unitPos < fullwidth);
+
+            unitDate.SetDate(1, 1, 1, 0, 0);
+            do  //DRAW BC PART
+            {
+                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+
+                Int64 fromTicks = unitDate.Ticks;
+                unitDate.Add(ZoomUnit, -1);
+
+                //NORMAL SUBUNIT DRAW
+                DrawSubUnits(canvas, minTicks, fromTicks, unitDate.Ticks, ZoomUnit - 1, true);
+            } while (unitPos > 0);
+        }
+
+        private void DrawUnitsAndSubUnitsAC(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        {
+            date.CopyTo(ref unitDate, ZoomUnit);
+            while (unitDate.Ticks > minTicks) unitDate.Add(ZoomUnit, -1);
+
+            float unitPos;
+            do
+            {
+                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+
+                Int64 fromTicks = unitDate.Ticks;
+                try { unitDate.Add(ZoomUnit); }
+                catch (OverflowException)
                 {
                     //WHEN WE ARE AT MAX
                     DrawSubUnits(canvas, minTicks, fromTicks, BCACDateTime.MaxTicks, ZoomUnit - 1);
@@ -439,22 +473,62 @@ namespace Timeline.Controls
                 }
                 //NORMAL SUBUNIT DRAW
                 DrawSubUnits(canvas, minTicks, fromTicks, unitDate.Ticks, ZoomUnit - 1);
-            }
+            } while (unitPos < fullwidth);
         }
 
-        private void DrawSubUnits(SKCanvas canvas, Int64 minTicks, Int64 fromTicks, Int64 toTicks, TimelineUnits unit)
+        private void DrawUnitsAndSubUnitsBC(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        {
+            date.CopyTo(ref unitDate, ZoomUnit);
+            while (unitDate.Ticks < maxTicks) unitDate.Add(ZoomUnit, 1);
+
+            float unitPos;
+            do
+            {
+                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+
+                Int64 fromTicks = unitDate.Ticks;
+                try { unitDate.Add(ZoomUnit, -1); }
+                catch (OverflowException)
+                {
+                    //WHEN WE ARE AT MIN
+                    DrawSubUnits(canvas, minTicks, fromTicks, BCACDateTime.MinTicks, ZoomUnit - 1, true);
+                    break;
+                }
+                //NORMAL SUBUNIT DRAW
+                DrawSubUnits(canvas, minTicks, fromTicks, unitDate.Ticks, ZoomUnit - 1, true);
+            } while (unitPos > 0);
+        }
+
+        private void DrawSubUnits(SKCanvas canvas, Int64 minTicks, Int64 fromTicks, Int64 toTicks, TimelineUnits unit, bool backwards=false)
         {
             float subUnitPos;
             TimelineDateTime subUnitDate = TimelineDateTime.FromTicks(fromTicks);
 
-            while (subUnitDate.Ticks < toTicks)
+            if(backwards)
             {
-                subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
-                canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);                                //SUBUNIT MARK
-                if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);      //SUBUNIT TEXT
+                while (subUnitDate.Ticks > toTicks)
+                {
+                    subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
+                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);                                //SUBUNIT MARK
+                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);      //SUBUNIT TEXT
 
-                try { subUnitDate.Add(unit); } catch (OverflowException) { break; }
+                    try { subUnitDate.Add(unit, -1); } catch (OverflowException) { break; }
+                }
             }
+            else
+            {
+                while (subUnitDate.Ticks < toTicks)
+                {
+                    subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
+                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);                                //SUBUNIT MARK
+                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);      //SUBUNIT TEXT
+
+                    try { subUnitDate.Add(unit); } catch (OverflowException) { break; }
+                }
+            }
+
         }
 
         private string GetUnitText(TimelineDateTime tldate)
@@ -615,6 +689,7 @@ namespace Timeline.Controls
 				subUnitMarkY2 = subUnitMarkY1 - (timelineHeight * 0.15f);
 				unitTextY = timelineBottomY - (timelineHeight * 0.5f);
 				subUnitTextY = timelineBottomY - (timelineHeight * 0.2f);
+                fullwidth = info.Width;
                 halfWidth = info.Width / 2;
 
 				timelinePaint.Color = this.TimelineColor.ToSKColor();
