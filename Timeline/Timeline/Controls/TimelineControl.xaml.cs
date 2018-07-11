@@ -1,5 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
+using Xamarin.Essentials;
 
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
@@ -7,6 +8,10 @@ using SkiaSharp.Views.Forms;
 using Timeline.Models;
 using Timeline.Objects.Date;
 using Timeline.Objects.TouchTracking;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Input;
 
 namespace Timeline.Controls
 {
@@ -93,58 +98,70 @@ namespace Timeline.Controls
             typeof(TimelineControl),
             TimelineUnits.Year, BindingMode.OneWay,
             propertyChanged: OnZoomUnitChanged);
-
-		public static readonly BindableProperty DateProperty = BindableProperty.Create(
-            nameof(Date),
-            typeof(DateTime),
-            typeof(TimelineControl),
-            DateTime.UtcNow, BindingMode.TwoWay,
-            propertyChanged: OnDateChanged);
-		
+	
         public static readonly BindableProperty DateStrProperty = BindableProperty.Create(
             nameof(DateStr),
             typeof(string),
             typeof(TimelineControl),
             "", BindingMode.OneWay);
 
-		private static void OnTimeline1Changed(BindableObject bindable, object oldValue, object newValue)
+        public static readonly BindableProperty EventsStrProperty = BindableProperty.Create(
+            nameof(EventsStr),
+            typeof(string),
+            typeof(TimelineControl),
+            "", BindingMode.OneWay);
+
+        //public static readonly BindableProperty CommandProperty = BindableProperty.Create<TimelineControl, ICommand>(x => x.Command, null);
+        public static readonly BindableProperty LongTapCommandProperty = BindableProperty.Create(nameof(LongTapCommand), typeof(ICommand), typeof(TimelineControl), null);
+
+        public ICommand LongTapCommand
         {
+            get { return (ICommand)GetValue(LongTapCommandProperty); }
+            set { SetValue(LongTapCommandProperty, value); }
+        }
+
+        private static void OnTimeline1Changed(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (((TimelineControl)bindable).Timeline1 != null && ((TimelineControl)bindable).Timeline1.Events.Count > 0)
+                ((TimelineControl)bindable).date = new TimelineDateTime(((TimelineControl)bindable).Timeline1.Events[0].StartDate.Year);
+            else
+                ((TimelineControl)bindable).date = new TimelineDateTime(DateTime.UtcNow);
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnTimelineColorChanged(BindableObject bindable, object oldValue, object newValue)
         {
-			((TimelineControl)bindable).initialOrientationCheck = true;
+			((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnUnitMarkColorChanged(BindableObject bindable, object oldValue, object newValue)
         {
-			((TimelineControl)bindable).initialOrientationCheck = true;
+			((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnUnitTextColorChanged(BindableObject bindable, object oldValue, object newValue)
         {
-			((TimelineControl)bindable).initialOrientationCheck = true;
+			((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnSubUnitMarkColorChanged(BindableObject bindable, object oldValue, object newValue)
         {
-			((TimelineControl)bindable).initialOrientationCheck = true;
+			((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnSubUnitTextColorChanged(BindableObject bindable, object oldValue, object newValue)
         {
-			((TimelineControl)bindable).initialOrientationCheck = true;
+			((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
 		private static void OnHighlightColorChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((TimelineControl)bindable).initialOrientationCheck = true;
+            ((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
@@ -156,13 +173,6 @@ namespace Timeline.Controls
         private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnDateChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            ((TimelineDateTime)newValue).CopyTo(ref ((TimelineControl)bindable).date);
-			//((TimelineControl)bindable).date.BaseDate = (DateTime)newValue;
-			((TimelineControl)bindable).InvalidateLayout();
         }
         
 		public MTimeline Timeline1
@@ -218,12 +228,6 @@ namespace Timeline.Controls
             get { return (TimelineUnits)GetValue(ZoomUnitProperty); }
             set { SetValue(ZoomUnitProperty, value); }
         }
-        
-		public DateTime Date
-        {
-            get { return (DateTime)GetValue(DateProperty); }
-            set { SetValue(DateProperty, value); }
-        }
 
         public string DateStr
         {
@@ -231,16 +235,19 @@ namespace Timeline.Controls
             set { SetValue(DateStrProperty, value); }
         }
 
+        public string EventsStr
+        {
+            get { return (string)GetValue(EventsStrProperty); }
+            set { SetValue(EventsStrProperty, value); }
+        }
         #endregion
 
         string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
         TouchGestureRecognizer gestureRecognizer;
-        TimelineOrientation orientation;
 
         TimelineDateTime date;
         TimelineDateTime unitDate;
-        //TimelineDateTime subUnitDate;
 
         SKPaint timelinePaint;
         SKPaint unitMarkPaint;
@@ -274,7 +281,6 @@ namespace Timeline.Controls
 		const int SEC_PER_MONTH = 2592000;
 		const int SEC_PER_YEAR = 31104000;
 
-        //FOR LANDSCAPE MODE
         float timelineHeight;
         float timelineBottomY;
         float timelineMiddleY;
@@ -285,16 +291,14 @@ namespace Timeline.Controls
         float unitTextY;
         float subUnitTextY;
         int fullwidth;
+        int fullheight;
         int halfWidth;
 
-		int eventLanes;
-		float eventsHeight;
 		float eventsTopY;
-		float laneHeight;
-		bool[] laneBusy;
-		TimelineDateTime[] laneBusyUntil;
+		int laneHeight;
+        int lanesOffsetY;
 
-        bool initialOrientationCheck;
+        bool forceInitialize;
 
 		public TimelineControl()
 		{
@@ -302,15 +306,21 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-			date = new TimelineDateTime(2018);
+            if (Timeline1 != null && Timeline1.Events.Count > 0)
+                date = new TimelineDateTime(Timeline1.Events[0].StartDate.Year);
+            else
+                date = new TimelineDateTime(DateTime.UtcNow);
+
 			unitDate = new TimelineDateTime();
-			//subUnitDate = new TimelineDateTime();
-			DateStr = date.DateStr(ZoomUnit);
+            DateStr = date.DateStr(ZoomUnit);
+            EventsStr = "";
 
 			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
 			showSubUnitText = false;
+            lanesOffsetY = 0;
 
-			initialOrientationCheck = true;
+            DeviceDisplay.ScreenMetricsChanaged += DeviceDisplay_ScreenMetricsChanged;
+            forceInitialize = true;
 
 			timelinePaint = new SKPaint();
 			unitMarkPaint = new SKPaint();
@@ -330,9 +340,14 @@ namespace Timeline.Controls
 			eventBorderPaint.Style = SKPaintStyle.Stroke;
 
 			eventTextPaint = new SKPaint();
-			eventTextPaint.Color = Color.Black.ToSKColor();
-			eventTextPaint.TextSize = 16;
+			eventTextPaint.Color = Color.White.ToSKColor();
+			eventTextPaint.TextSize = 32;
 		}
+
+        private void DeviceDisplay_ScreenMetricsChanged(ScreenMetricsChanagedEventArgs e)
+        {
+            forceInitialize = true;
+        }
 
         void GestureRecognizer_OnGestureRecognized(object sender, TouchGestureEventArgs args)
         {
@@ -344,13 +359,20 @@ namespace Timeline.Controls
 
                 case TouchGestureType.LongTap:
                     //Console.WriteLine("LONGTAP");
+                    
+                    if (LongTapCommand != null && LongTapCommand.CanExecute(null)) LongTapCommand.Execute(new Point(args.Data.X, args.Data.Y));
                     break;
 
                 case TouchGestureType.Pan:
                     //Console.WriteLine("PAN");
+                    //X AXIS -- MOVE TIMELINE
                     try
                     {
-                        date.AddTicks(-2 * (long)args.Data.X * pixeltime);
+                        if (Math.Abs(args.Data.Y) < Math.Abs(args.Data.X))
+                        {
+                            date.AddTicks(-2 * (long)args.Data.X * pixeltime);
+                            DateStr = date.DateStr(ZoomUnit - 1);
+                        }
                     }
 					catch(OverflowException)
                     {
@@ -359,7 +381,14 @@ namespace Timeline.Controls
                         else
                             date = TimelineDateTime.MinValue;
                     }
-                    DateStr = date.DateStr(ZoomUnit-1);
+
+                    //Y AXIS -- MOVE EVENT LANES
+                    if (Math.Abs(args.Data.X) < Math.Abs(args.Data.Y))
+                    {
+                        lanesOffsetY += (int)args.Data.Y * 2;
+                        if (lanesOffsetY > 0) lanesOffsetY = 0;
+                    }
+
                     canvasView.InvalidateSurface();
                     break;
                     
@@ -369,7 +398,6 @@ namespace Timeline.Controls
                     if (Zoom < 4) Zoom = 4;
 					if (Zoom > 2073600) Zoom = 2073600;
                     pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
-                    //Console.WriteLine("Zoom: " + Zoom.ToString() + "  pixeltime: " + pixeltime.ToString());
                     AdjustZoomUnit();
                     DateStr = date.DateStr(ZoomUnit - 1);
                     canvasView.InvalidateSurface();
@@ -388,7 +416,7 @@ namespace Timeline.Controls
             SKCanvas canvas = surface.Canvas;
 
             //the user might have rotated the phone
-            CheckOrientation(info, initialOrientationCheck);
+            if(forceInitialize) InitializeParameters(info);
 
             canvas.Clear();
 
@@ -401,7 +429,7 @@ namespace Timeline.Controls
             //UNITS AND SUBUNITS
             if(minTicks<0 && maxTicks>0)
             {
-                DrawUnitsAndSubUnitsBCAC(canvas, minTicks, maxTicks);   //WHEN YEAR -1/1 IS VISIBLE
+                DrawUnitsAndSubUnitsBCAC(canvas, minTicks, maxTicks);   //WHEN BCAC CHANGE IS VISIBLE
             }
             else
             {
@@ -412,8 +440,10 @@ namespace Timeline.Controls
             //HIGHLIGHTER
             canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, highlightPaint);
 
-			//EVENTS
-			for (int i = 0; i < 8; i++) laneBusyUntil[i] = null;
+            //EVENTS
+            SKRect clipRect = new SKRect(0, timelineBottomY, info.Width, info.Height);
+            canvas.ClipRect(clipRect);
+
 			if (this.Timeline1 != null) DrawTimelineEvents(canvas, minTicks, maxTicks);
         }
 
@@ -583,47 +613,48 @@ namespace Timeline.Controls
 
 		private void DrawTimelineEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
 		{
+            int topLane = -lanesOffsetY / laneHeight;
+            EventsStr = "";
             foreach (MTimelineEvent e in this.Timeline1.Events)
 			{
+                if (e.LaneNumber < topLane) continue;
+
 				if((e.EndDate.Ticks>minTicks)&&(e.StartDate.Ticks<maxTicks))
 				{
-					DrawTimelineEvent(e, canvas, minTicks);
+                    bool isCurrent = e.StartDate.Ticks < date.Ticks && e.EndDate.Ticks > date.Ticks;
+                    if(isCurrent) AddToEventsStr(e);
+					DrawTimelineEvent(e, canvas, minTicks, isCurrent);
 				}
 			}
 		}
 
-		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, Int64 minTicks)
+		private void DrawTimelineEvent(MTimelineEvent e, SKCanvas canvas, Int64 minTicks, bool highlighted)
 		{
 			float startX;
 			float endX;
-			float eventWidth;
 			float eventTop;
-			float eventBottom;
 
-			int lane = GetFreeLane(e.StartDate);
-			SetLaneBusy(lane, e.EndDate);
 			startX = (e.StartDate.Ticks - minTicks) / pixeltime;
 			endX = (e.EndDate.Ticks - minTicks) / pixeltime - 1;
-			eventWidth = endX - startX;
-			eventTop = eventsTopY + lane * laneHeight;
-			eventBottom = eventTop + laneHeight - 1;
-			canvas.DrawRect(startX, eventTop, endX - startX, eventBottom - eventTop, eventPaint);
-			canvas.DrawRect(startX, eventTop, endX - startX, eventBottom - eventTop, eventBorderPaint);
-		}
+			eventTop = eventsTopY + e.LaneNumber * laneHeight + lanesOffsetY;
 
-		private void SetLaneBusy(int lane, TimelineDateTime tld)
-		{
-			if (laneBusyUntil[lane] == null) laneBusyUntil[lane] = new TimelineDateTime(DateTime.UtcNow);
-			tld.CopyTo(ref laneBusyUntil[lane]);
-		}
+            if (eventTop > fullheight) return; //OUT OF SCREEN
 
-		private int GetFreeLane(TimelineDateTime tld)
-		{
-			for (int i = 0; i < 8;i++)
-				if((laneBusyUntil[i]==null)||(laneBusyUntil[i]<tld)) return i;
-			
-			return -1;
-		}
+            //draw event box
+			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, eventPaint);
+            if (highlighted)
+                eventBorderPaint.Color = Color.Yellow.ToSKColor();
+            else
+                eventBorderPaint.Color = Color.Black.ToSKColor();
+			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, eventBorderPaint);
+
+            //draw title
+            canvas.Save();
+            SKRect clipEvent = new SKRect(startX, eventTop, endX, eventTop + laneHeight - 1);
+            canvas.ClipRect(clipEvent);
+            DrawTextInRect(canvas, e.Title, clipEvent, eventTextPaint);
+            canvas.Restore();
+        }
 
 		private void AdjustZoomUnit()
         {
@@ -670,64 +701,58 @@ namespace Timeline.Controls
         }
 
         //Detect orientation
-        private void CheckOrientation(SKImageInfo info, bool forceSet = false)
+        private void InitializeParameters(SKImageInfo info)
         {
-            TimelineOrientation oldorientation = orientation;
+			timelineHeight = info.Height * 0.10f;
+			if (timelineHeight < 100) timelineHeight = 100;
+            timelineBottomY = timelineHeight;
+            timelineMiddleY = timelineHeight / 2;
+            unitMarkY1 = timelineBottomY;
+			unitMarkY2 = unitMarkY1 - (timelineHeight * 0.45f);
+            subUnitMarkY1 = timelineBottomY;
+			subUnitMarkY2 = subUnitMarkY1 - (timelineHeight * 0.15f);
+			unitTextY = timelineBottomY - (timelineHeight * 0.5f);
+			subUnitTextY = timelineBottomY - (timelineHeight * 0.2f);
+            fullwidth = info.Width;
+            fullheight = info.Height;
+            halfWidth = info.Width / 2;
 
-            orientation = TimelineOrientation.Portrait;
-            if (this.Bounds.Width > this.Bounds.Height) orientation = TimelineOrientation.Landscape;
+			timelinePaint.Color = this.TimelineColor.ToSKColor();
+            timelinePaint.StrokeWidth = timelineHeight;
+            unitMarkPaint.Color = this.UnitMarkColor.ToSKColor();
+            unitMarkPaint.StrokeWidth = 4;
+            unitTextPaint.Color = this.UnitTextColor.ToSKColor();
+			unitTextPaint.TextSize = unitTextY - 10;
+            subUnitMarkPaint.Color = this.SubUnitMarkColor.ToSKColor();
+            subUnitMarkPaint.StrokeWidth = 2;
+			subUnitTextPaint.Color = this.SubUnitTextColor.ToSKColor();
+            subUnitTextPaint.TextSize = unitTextPaint.TextSize - 8;
+			highlightPaint.Color = this.HighlightColor.ToSKColor();
+			highlightPaint.StrokeWidth = 3;
 
-            if ((oldorientation != orientation) || forceSet)
-            {
-				timelineHeight = info.Height * 0.10f;
-				if (timelineHeight < 100) timelineHeight = 100;
-                timelineBottomY = timelineHeight;
-                timelineMiddleY = timelineHeight / 2;
-                unitMarkY1 = timelineBottomY;
-				unitMarkY2 = unitMarkY1 - (timelineHeight * 0.45f);
-                subUnitMarkY1 = timelineBottomY;
-				subUnitMarkY2 = subUnitMarkY1 - (timelineHeight * 0.15f);
-				unitTextY = timelineBottomY - (timelineHeight * 0.5f);
-				subUnitTextY = timelineBottomY - (timelineHeight * 0.2f);
-                fullwidth = info.Width;
-                halfWidth = info.Width / 2;
-
-				timelinePaint.Color = this.TimelineColor.ToSKColor();
-                timelinePaint.StrokeWidth = timelineHeight;
-                unitMarkPaint.Color = this.UnitMarkColor.ToSKColor();
-                unitMarkPaint.StrokeWidth = 4;
-                unitTextPaint.Color = this.UnitTextColor.ToSKColor();
-				unitTextPaint.TextSize = unitTextY - 10;
-                subUnitMarkPaint.Color = this.SubUnitMarkColor.ToSKColor();
-                subUnitMarkPaint.StrokeWidth = 2;
-				subUnitTextPaint.Color = this.SubUnitTextColor.ToSKColor();
-                subUnitTextPaint.TextSize = unitTextPaint.TextSize - 8;
-				highlightPaint.Color = this.HighlightColor.ToSKColor();
-				highlightPaint.StrokeWidth = 3;
-
-                unitXWidth = unitTextPaint.MeasureText("X");
-                subunitXWidth = subUnitTextPaint.MeasureText("X");
+            unitXWidth = unitTextPaint.MeasureText("X");
+            subunitXWidth = subUnitTextPaint.MeasureText("X");
                 
-				zoomLimitHourToDay = (int)(SEC_PER_HOUR / 100);
-                zoomLimitDayToMonth = (int)(SEC_PER_DAY / 150);
-				zoomLimitMonthToYear = (int)(SEC_PER_MONTH / 200);
-				zoomLimitYearToDecade = (int)(SEC_PER_YEAR / 150);
+			zoomLimitHourToDay = (int)(SEC_PER_HOUR / 100);
+            zoomLimitDayToMonth = (int)(SEC_PER_DAY / 150);
+			zoomLimitMonthToYear = (int)(SEC_PER_MONTH / 200);
+			zoomLimitYearToDecade = (int)(SEC_PER_YEAR / 150);
 
-				subunitLimitMinute = (int)(SEC_PER_MINUTE / subunitXWidth * 3);
-				subunitLimitHour = (int)(SEC_PER_HOUR / subunitXWidth / 2);
-				subunitLimitDay = (int)(SEC_PER_DAY / subunitXWidth / 2);
-				subunitLimitMonth = (int)(SEC_PER_MONTH / subunitXWidth / 3);
-				subunitLimitYear = (int)(SEC_PER_YEAR / subunitXWidth / 4);
+			subunitLimitMinute = (int)(SEC_PER_MINUTE / subunitXWidth * 3);
+			subunitLimitHour = (int)(SEC_PER_HOUR / subunitXWidth / 2);
+			subunitLimitDay = (int)(SEC_PER_DAY / subunitXWidth / 2);
+			subunitLimitMonth = (int)(SEC_PER_MONTH / subunitXWidth / 3);
+			subunitLimitYear = (int)(SEC_PER_YEAR / subunitXWidth / 4);
 
-				eventLanes = 8;
-                eventsTopY = timelineBottomY + 10;
-				eventsHeight = info.Height - eventsTopY;
-				laneHeight = eventsHeight / eventLanes;
-				laneBusy = new bool[eventLanes];
-				laneBusyUntil = new TimelineDateTime[eventLanes];
-                
-                initialOrientationCheck = false;
-            }
+            eventsTopY = timelineBottomY + 5;
+            laneHeight = 200;
+
+            forceInitialize = false;
+        }
+
+        private void AddToEventsStr(MTimelineEvent e)
+        {
+            EventsStr += e.StartDate.DateStr(e.StartDate.Precision) + " -- " + e.Title + "\n";
         }
 
         //Any touch action we simply forward to the gesture recognizer
@@ -735,6 +760,69 @@ namespace Timeline.Controls
         {
             gestureRecognizer.ProcessTouchEvent(args.Id, args.Type, args.Location.ToSKPoint());
         }
-        
+
+        #region "DRAW TEXT IN RECT"
+        //https://forums.xamarin.com/discussion/105582/drawtext-multiline
+        public class Line
+        {
+            public string Value { get; set; }
+
+            public float Width { get; set; }
+        }
+
+        private void DrawTextInRect(SKCanvas canvas, string text, SKRect area, SKPaint paint)
+        {
+            float lineHeight = paint.TextSize * 1.2f;
+            var lines = SplitLines(text, paint, area.Width);
+            var height = lines.Length * lineHeight;
+
+            var y = area.MidY - height / 2;
+
+            foreach (var line in lines)
+            {
+                y += lineHeight;
+                var x = area.MidX - line.Width / 2;
+                canvas.DrawText(line.Value, x, y, paint);
+            }
+        }
+
+        private Line[] SplitLines(string text, SKPaint paint, float maxWidth)
+        {
+            var spaceWidth = paint.MeasureText(" ");
+            var lines = text.Split('\n');
+
+            return lines.SelectMany((line) =>
+            {
+                var result = new List<Line>();
+
+                var words = line.Split(new[] { " " }, StringSplitOptions.None);
+
+                var lineResult = new StringBuilder();
+                float width = 0;
+                foreach (var word in words)
+                {
+                    var wordWidth = paint.MeasureText(word);
+                    var wordWithSpaceWidth = wordWidth + spaceWidth;
+                    var wordWithSpace = word + " ";
+
+                    if (width + wordWidth > maxWidth)
+                    {
+                        result.Add(new Line() { Value = lineResult.ToString(), Width = width });
+                        lineResult = new StringBuilder(wordWithSpace);
+                        width = wordWithSpaceWidth;
+                    }
+                    else
+                    {
+                        lineResult.Append(wordWithSpace);
+                        width += wordWithSpaceWidth;
+                    }
+                }
+
+                result.Add(new Line() { Value = lineResult.ToString(), Width = width });
+
+                return result.ToArray();
+            }).ToArray();
+        }
+        #endregion
     }
 }

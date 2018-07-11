@@ -1,23 +1,39 @@
 ﻿using System;
+using Xamarin.Forms;
 
 using Timeline.Models;
 using Timeline.Objects.Date;
+using Timeline.Objects.Timeline;
 
 namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
-		public MTimeline Timeline { get; set; }
+        private MTimeline _timeline;
+
+        public Command CmdLongTap { get; set; }
+		public MTimeline Timeline { get { return _timeline; } set { _timeline = value; } }
 
 		public VMTimeline(Services.Base.ServiceContainer services) : base(services)
         {
+            CmdLongTap = new Command(LongTapExecute);
 			Timeline = new MTimeline();
-            //TimelineDateTime tld = new TimelineDateTime(2018, 1);
-			for (int i = 1; i < 11; i++)
-			{
-				Timeline.Events.Add(new MTimelineEvent("event1", new TimelineDateTime(2018, i), 2));
 
-			}
+            for (int y = 2018; y < 2025; y++)
+            {
+                for (int i = 1; i < 11; i++)
+                {
+                    Timeline.Events.Add(new MTimelineEvent("event1 with long title", new TimelineDateTime(y, i), 2));
+                }
+            }
+
+            EventManager.SortEventsToLanes(ref _timeline, 10);
+        }
+
+        private void LongTapExecute(object obj)
+        {
+            Acr.UserDialogs.UserDialogs.Instance.Alert("longtap");
+            throw new NotImplementedException();
         }
     }
 }

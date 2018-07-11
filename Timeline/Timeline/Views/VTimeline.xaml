@@ -8,14 +8,16 @@
              BindingContext="{Binding TimelineViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
-        <Grid Margin="0,20,0,0">
+        <Grid Margin="0,0,0,0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="2*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
 
-            <controls:TimelineControl Grid.Row="0" x:Name="tlc" Timeline1="{Binding Timeline}"/>
-            <Label Grid.Row="1" BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
+            <Label BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
+            <controls:TimelineControl Grid.Row="1" x:Name="tlc" Timeline1="{Binding Timeline}" LongTapCommand="{Binding CmdLongTap}"/>
+            <Label Grid.Row="2" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>
