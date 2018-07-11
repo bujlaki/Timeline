@@ -32,6 +32,22 @@ namespace Timeline.Controls
         Landscape
     }
 
+    public class LongTapEventArg
+    {
+        public float X;
+        public float Y;
+        public int Lane;
+        public Int64 Ticks;
+
+        public LongTapEventArg(float _x, float _y, int _lane, Int64 _ticks)
+        {
+            X = _x;
+            Y = _y;
+            Lane = _lane;
+            Ticks = _ticks;
+        }
+    }
+
     public partial class TimelineControl : ContentView
     {
         
@@ -359,8 +375,10 @@ namespace Timeline.Controls
 
                 case TouchGestureType.LongTap:
                     //Console.WriteLine("LONGTAP");
-                    
-                    if (LongTapCommand != null && LongTapCommand.CanExecute(null)) LongTapCommand.Execute(new Point(args.Data.X, args.Data.Y));
+                    if (args.InitialRawLocation.Y < timelineBottomY) break;
+                    int clickedLane = ((int)args.InitialRawLocation.Y - (int)timelineBottomY - lanesOffsetY) / laneHeight;
+                    LongTapEventArg arg = new LongTapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, 0);
+                    if (LongTapCommand != null && LongTapCommand.CanExecute(null)) LongTapCommand.Execute(arg);
                     break;
 
                 case TouchGestureType.Pan:
@@ -419,6 +437,9 @@ namespace Timeline.Controls
             if(forceInitialize) InitializeParameters(info);
 
             canvas.Clear();
+            SKPaint cp = new SKPaint();
+            cp.Color = Color.AliceBlue.ToSKColor();
+            canvas.DrawRect(info.Rect, cp);
 
             Int64 minTicks = date.Ticks - halfWidth * pixeltime;
             Int64 maxTicks = date.Ticks + halfWidth * pixeltime;
@@ -758,7 +779,7 @@ namespace Timeline.Controls
         //Any touch action we simply forward to the gesture recognizer
         protected void OnTouchEffectAction(object sender, TouchActionEventArgs args)
         {
-            gestureRecognizer.ProcessTouchEvent(args.Id, args.Type, args.Location.ToSKPoint());
+            gestureRecognizer.ProcessTouchEvent(args.Id, args.Type, args.Location.ToSKPoint(), args.RawLocation.ToSKPoint());
         }
 
         #region "DRAW TEXT IN RECT"

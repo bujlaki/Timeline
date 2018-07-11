@@ -208,9 +208,9 @@ namespace Timeline.Droid.Objects.TouchTracking
             double x = pointerLocation.X - twoIntArray[0];
             double y = pointerLocation.Y - twoIntArray[1];
             Point point = new Point(fromPixels(x), fromPixels(y));
-
+            Point rawpoint = new Point(x, y);
             // Call the method
-            onTouchAction(touchEffect.formsElement, new TouchActionEventArgs(id, actionType, point, isInContact));
+            onTouchAction(touchEffect.formsElement, new TouchActionEventArgs(id, actionType, point, rawpoint, isInContact));
         }
     }
 

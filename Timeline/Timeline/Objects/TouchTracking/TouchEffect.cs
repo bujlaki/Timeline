@@ -15,11 +15,12 @@ namespace Timeline.Objects.TouchTracking
 
     public class TouchActionEventArgs : EventArgs
     {
-        public TouchActionEventArgs(long id, TouchActionType type, Point location, bool isInContact)
+        public TouchActionEventArgs(long id, TouchActionType type, Point location, Point rawlocation, bool isInContact)
         {
             Id = id;
             Type = type;
             Location = location;
+            RawLocation = rawlocation;
             IsInContact = isInContact;
         }
 
@@ -28,6 +29,8 @@ namespace Timeline.Objects.TouchTracking
         public TouchActionType Type { private set; get; }
 
         public Point Location { private set; get; }
+
+        public Point RawLocation { private set; get; }
 
         public bool IsInContact { private set; get; }
     }

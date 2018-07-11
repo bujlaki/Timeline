@@ -11,7 +11,7 @@ namespace Timeline.Objects.TouchTracking
     public class Timings
     {
         public static int shortTapMilliseconds = 200;
-        public static int longTapMilliseconds = 1000;
+        public static int longTapMilliseconds = 850;
     }
 
     public enum TouchGestureType
@@ -25,11 +25,12 @@ namespace Timeline.Objects.TouchTracking
 
     public class TouchGestureEventArgs : EventArgs
     {
-        public TouchGestureEventArgs(long id, TouchGestureType type, SKPoint data)
+        public TouchGestureEventArgs(long id, TouchGestureType type, SKPoint data, SKPoint initialRawLocation)
         {
             Id = id;
             Type = type;
             Data = data;
+            InitialRawLocation = initialRawLocation;
         }
 
         public long Id { private set; get; }
@@ -37,6 +38,8 @@ namespace Timeline.Objects.TouchTracking
         public TouchGestureType Type { private set; get; }
 
         public SKPoint Data { private set; get; }
+
+        public SKPoint InitialRawLocation { private set; get; }
     }
 
     public delegate void TouchGestureEventHandler(object sender, TouchGestureEventArgs args);
@@ -47,7 +50,7 @@ namespace Timeline.Objects.TouchTracking
 
         public event TouchGestureEventHandler OnGestureRecognized;
 
-        public void ProcessTouchEvent(long id, TouchActionType type, SKPoint location)
+        public void ProcessTouchEvent(long id, TouchActionType type, SKPoint location, SKPoint rawlocation)
         {
             TouchInfo info;
 
@@ -60,13 +63,14 @@ namespace Timeline.Objects.TouchTracking
                         touches.Add(id, new TouchInfo
                         {
                             InitialTime = DateTime.UtcNow,
+                            InitialRawPoint = rawlocation,
                             InitialPoint = location,
                             PreviousPoint = location,
                             NewPoint = location
                         });
 
                         //check for LONGTAP
-                        CheckLongTapAsync(Timings.longTapMilliseconds, id);
+                        Task.Run(async () => await CheckLongTapAsync(Timings.longTapMilliseconds, id));
                     }
                     break;
 
@@ -80,7 +84,7 @@ namespace Timeline.Objects.TouchTracking
                     {
                         //this is PAN
                         SKPoint diff = info.NewPoint - info.PreviousPoint;
-                        OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Pan, diff));
+                        OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Pan, diff, info.InitialRawPoint));
                     } else if(touches.Count==2){
                         //this is PINCH
                         TouchInfo info1 = touches.ElementAt(0).Value;
@@ -88,7 +92,7 @@ namespace Timeline.Objects.TouchTracking
                         SKPoint preDiff = new SKPoint(Math.Abs(info2.PreviousPoint.X - info1.PreviousPoint.X),Math.Abs(info2.PreviousPoint.Y-info1.PreviousPoint.Y));
                         SKPoint postDiff = new SKPoint(Math.Abs(info2.NewPoint.X - info1.NewPoint.X), Math.Abs(info2.NewPoint.Y - info1.NewPoint.Y));
                         SKPoint pinchData = postDiff - preDiff;
-                        OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Pinch, pinchData));
+                        OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Pinch, pinchData, info1.InitialRawPoint));
                     }
                     info.PreviousPoint = info.NewPoint;
                     break;
@@ -107,14 +111,14 @@ namespace Timeline.Objects.TouchTracking
                             TimeSpan timeDiff = DateTime.UtcNow - info.InitialTime;
                             if (timeDiff < TimeSpan.FromMilliseconds(Timings.shortTapMilliseconds))
                             {
-                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Tap, info.InitialPoint));
+                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Tap, info.InitialPoint, SKPoint.Empty));
                             }
                         } else {
                             //check for SWIPE
                             SKPoint lastDiff = info.NewPoint - info.PreviousPoint;
                             if(Math.Abs(lastDiff.X)>5 || Math.Abs(lastDiff.Y)>5)
                             {
-                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Swipe, lastDiff));
+                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Swipe, lastDiff, SKPoint.Empty));
                             }
                         }
                     }
@@ -138,7 +142,7 @@ namespace Timeline.Objects.TouchTracking
             float diffX = Math.Abs(info.PreviousPoint.X - info.InitialPoint.X);
             float diffY = Math.Abs(info.PreviousPoint.Y - info.InitialPoint.Y);
             if (diffX < 5 && diffY < 5)
-                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.LongTap, info.InitialPoint));
+                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.LongTap, info.InitialPoint, info.InitialRawPoint));
         }
 
 

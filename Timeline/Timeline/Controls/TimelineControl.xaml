@@ -6,10 +6,14 @@
              x:Class="Timeline.Controls.TimelineControl">
     <ContentView.Content>
         <Grid>
-            <skia:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface"/>
-            <Grid.Effects>
+            <skia:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface">
+                <skia:SKCanvasView.Effects>
+                    <tt:TouchEffect Capture="True" TouchAction="OnTouchEffectAction" />
+                </skia:SKCanvasView.Effects>
+            </skia:SKCanvasView>
+            <!--<Grid.Effects>
                 <tt:TouchEffect Capture="True" TouchAction="OnTouchEffectAction" />
-            </Grid.Effects>
+            </Grid.Effects>-->
         </Grid>
     </ContentView.Content>
 </ContentView>

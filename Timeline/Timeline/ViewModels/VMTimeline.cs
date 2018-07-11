@@ -32,8 +32,9 @@ namespace Timeline.ViewModels
 
         private void LongTapExecute(object obj)
         {
-            Acr.UserDialogs.UserDialogs.Instance.Alert("longtap");
-            throw new NotImplementedException();
+            Controls.LongTapEventArg arg = (Controls.LongTapEventArg)obj;
+            
+            Acr.UserDialogs.UserDialogs.Instance.Alert("longtap " + arg.X.ToString() + " : " + arg.Y.ToString() + " : " + arg.Lane.ToString());
         }
     }
 }
