@@ -15,6 +15,8 @@ namespace Timeline
 {
 	public partial class App : Application
 	{
+        public static readonly Timeline.Services.Base.ServiceContainer services = new Timeline.Services.Base.ServiceContainer();
+
 		public App ()
 		{
 			InitializeComponent();
@@ -31,23 +33,28 @@ namespace Timeline
 
             VMLocator locator = (VMLocator)Current.Resources["vmLocator"];
 
+            //INITIALIZE SERVICES
+            services.Set(new Services.NavigationService(locator));
+            services.Set(new Services.DBService());
+            services.Set(new Services.AuthenticationService());
+
             if (!DesignMode.IsDesignModeEnabled)
             {
-                Task.Run(async ()=> await locator.Services.Authentication.GetCachedCredentials()).Wait();
+                Task.Run(async ()=> await services.Authentication.GetCachedCredentials()).Wait();
 
-                if (locator.Services.Authentication.CurrentUser.LoggedIn)
+                if (services.Authentication.CurrentUser.LoggedIn)
                 {
-                    MainPage = new NavigationPage(locator.Services.Navigation.UserPagesView());
-                    locator.UserPagesViewModel.User = locator.Services.Authentication.CurrentUser;
+                    MainPage = new NavigationPage(services.Navigation.UserPagesView());
+                    locator.UserPagesViewModel.User = services.Authentication.CurrentUser;
                 }
                 else
                 {
-                    MainPage = new NavigationPage(locator.Services.Navigation.LoginPage());
+                    MainPage = new NavigationPage(services.Navigation.LoginPage());
                 }
             }
             else
             {
-                MainPage = new NavigationPage(locator.Services.Navigation.LoginPage());
+                MainPage = new NavigationPage(services.Navigation.LoginPage());
             }
         }
 

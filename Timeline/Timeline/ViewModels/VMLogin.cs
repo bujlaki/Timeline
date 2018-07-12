@@ -29,7 +29,7 @@ namespace Timeline.ViewModels
             set { password = value; RaisePropertyChanged("Password"); }
         }
 
-        public VMLogin(Services.Base.ServiceContainer services) : base(services)
+        public VMLogin() : base()
         {
             CmdTest = new Command(CmdTestExecute);
             CmdBazLogin = new Command(CmdBazLoginExecute);
@@ -41,7 +41,7 @@ namespace Timeline.ViewModels
 
         void CmdTestExecute(object obj)
         {
-            _services.Navigation.GoToTestPage();
+            App.services.Navigation.GoToTestPage();
         }
 
         async void CmdBazLoginExecute(object obj)
@@ -51,10 +51,10 @@ namespace Timeline.ViewModels
                 if (!Lock()) return;
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    await _services.Authentication.LoginCognito("baz", "password");
+                    await App.services.Authentication.LoginCognito("baz", "password");
                 }
 
-                _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
+                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
                 Unlock();
             }
             catch (Exception ex)
@@ -69,7 +69,7 @@ namespace Timeline.ViewModels
             try
             {
                 if (!Lock()) return;
-                _services.Authentication.AuthenticateGoogle(this);      
+                App.services.Authentication.AuthenticateGoogle(this);      
                 Unlock();
             }
             catch (Exception ex)
@@ -86,10 +86,10 @@ namespace Timeline.ViewModels
                 if (!Lock()) return;
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    await _services.Authentication.LoginCognito(username, password);
+                    await App.services.Authentication.LoginCognito(username, password);
                 }
 
-                _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
+                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
                 Unlock();
             }
             catch (Exception ex)
@@ -109,13 +109,13 @@ namespace Timeline.ViewModels
         void CmdSignupExecute(object obj)
         {
             if (!Lock()) return;
-            _services.Navigation.GoToSignupPage();
+            App.services.Navigation.GoToSignupPage();
             Unlock();
         }
 
         public void OnAuthCompleted()
         {
-            _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
+            App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
         }
 
         public void OnAuthFailed(string message, Exception exception)

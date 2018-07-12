@@ -12,16 +12,14 @@ namespace Timeline.ViewModels.Base
         private bool busy = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected ServiceContainer _services;
 
         public bool Busy {
             get { return busy; }
             set { busy = value; RaisePropertyChanged("Busy"); }
         }
 
-        public VMBase(ServiceContainer services)
+        public VMBase()
         {
-            _services = services;
             Busy = false;
         }
 

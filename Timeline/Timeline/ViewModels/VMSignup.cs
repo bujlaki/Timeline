@@ -45,7 +45,7 @@ namespace Timeline.ViewModels
             set { email = value; RaisePropertyChanged("Email"); }
         }
 
-        public VMSignup(Services.Base.ServiceContainer services) : base(services)
+        public VMSignup() : base()
         {            
             CmdSignup = new Command(CmdSignupExecute);
         }
@@ -56,7 +56,7 @@ namespace Timeline.ViewModels
             {
                 using (UserDialogs.Instance.Loading("Please wait..."))
                 {
-                    await _services.Authentication.SignupCognito(username, password, email);
+                    await App.services.Authentication.SignupCognito(username, password, email);
                 }
 
                 PromptConfig pc = new PromptConfig
@@ -68,16 +68,16 @@ namespace Timeline.ViewModels
 
                 using (UserDialogs.Instance.Loading("Confirming verification code..."))
                 {
-                    await _services.Authentication.VerifyUserCognito(username, pr.Text);
+                    await App.services.Authentication.VerifyUserCognito(username, pr.Text);
                 }
 
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    await _services.Authentication.LoginCognito(username, password);
+                    await App.services.Authentication.LoginCognito(username, password);
                 }
 
                 //SUCCESS
-                _services.Navigation.GoToUserPagesPage(_services.Authentication.CurrentUser, true);
+                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
             }
             catch (Exception ex)
             {

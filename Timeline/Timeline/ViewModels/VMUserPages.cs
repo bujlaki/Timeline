@@ -59,7 +59,7 @@ namespace Timeline.ViewModels
             }
         }
 
-        public VMUserPages(Services.Base.ServiceContainer services) : base(services)
+        public VMUserPages() : base()
         {
             MenuItems = new ObservableCollection<UserPagesMenuItem>(new[]
             {
@@ -74,27 +74,27 @@ namespace Timeline.ViewModels
 
         public void CmdMenuExecute(object obj)
         {
-            Views.VUserPages mainPage = (_services.Navigation.UserPagesView() as Views.VUserPages);
+            Views.VUserPages mainPage = (App.services.Navigation.UserPagesView() as Views.VUserPages);
             mainPage.IsPresented = true;
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)
         {
-            Views.VUserPages mainPage = (_services.Navigation.UserPagesView() as Views.VUserPages);
+            Views.VUserPages mainPage = (App.services.Navigation.UserPagesView() as Views.VUserPages);
             switch (id)
             {
                 case UserPagesMenuItem.MenuItemID.Timelines:
-                    mainPage.Detail = new NavigationPage(_services.Navigation.TimelineListView());
+                    mainPage.Detail = new NavigationPage(App.services.Navigation.TimelineListView());
                     break;
                 case UserPagesMenuItem.MenuItemID.Options:
-                    mainPage.Detail = new NavigationPage(_services.Navigation.OptionsView());
+                    mainPage.Detail = new NavigationPage(App.services.Navigation.OptionsView());
                     break;
                 case UserPagesMenuItem.MenuItemID.SignOut:
-                    _services.Authentication.SignOut();
-                    _services.Navigation.GoToLoginPage();
+                    App.services.Authentication.SignOut();
+                    App.services.Navigation.GoToLoginPage();
                     break;
                 case UserPagesMenuItem.MenuItemID.Test:
-                    _services.Navigation.GoToTestPage();
+                    App.services.Navigation.GoToTestPage();
                     break;
             }
             mainPage.IsPresented = false;

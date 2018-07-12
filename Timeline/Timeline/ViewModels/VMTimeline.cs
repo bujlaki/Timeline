@@ -14,7 +14,7 @@ namespace Timeline.ViewModels
         public Command CmdLongTap { get; set; }
 		public MTimeline Timeline { get { return _timeline; } set { _timeline = value; } }
 
-		public VMTimeline(Services.Base.ServiceContainer services) : base(services)
+		public VMTimeline() : base()
         {
             CmdLongTap = new Command(LongTapExecute);
 			Timeline = new MTimeline();
