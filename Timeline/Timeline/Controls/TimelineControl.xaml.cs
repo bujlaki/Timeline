@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Input;
+
 using Xamarin.Forms;
 using Xamarin.Essentials;
 
@@ -6,101 +11,22 @@ using SkiaSharp;
 using SkiaSharp.Views.Forms;
 
 using Timeline.Models;
-using Timeline.Objects.Date;
+using Timeline.Objects.Timeline;
 using Timeline.Objects.TouchTracking;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Input;
 
 namespace Timeline.Controls
 {
-    public enum TimelineUnits
-    {
-        Minute,
-        Hour,
-        Day,
-        Month,
-        Year,
-        Decade,
-        Century
-    }
-
-    public enum TimelineOrientation
-    {
-        Portrait,
-        Landscape
-    }
-
-    public class LongTapEventArg
-    {
-        public float X;
-        public float Y;
-        public int Lane;
-        public Int64 Ticks;
-
-        public LongTapEventArg(float _x, float _y, int _lane, Int64 _ticks)
-        {
-            X = _x;
-            Y = _y;
-            Lane = _lane;
-            Ticks = _ticks;
-        }
-    }
-
     public partial class TimelineControl : ContentView
     {
         
         #region "Bindable properties"
-		public static readonly BindableProperty Timeline1Property = BindableProperty.Create(
-            nameof(Zoom),
+		public static readonly BindableProperty TimelineProperty = BindableProperty.Create(
+            nameof(Timeline),
             typeof(MTimeline),
             typeof(TimelineControl),
             null, BindingMode.OneWay,
-            propertyChanged: OnTimeline1Changed);
-		
-		public static readonly BindableProperty TimelineColorProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(Color),
-            typeof(TimelineControl),
-            Color.SkyBlue, BindingMode.OneWay,
-			propertyChanged: OnTimelineColorChanged);
-        
-		public static readonly BindableProperty UnitMarkColorProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(Color),
-            typeof(TimelineControl),
-            Color.Black, BindingMode.OneWay,
-            propertyChanged: OnUnitMarkColorChanged);
-
-		public static readonly BindableProperty UnitTextColorProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(Color),
-            typeof(TimelineControl),
-            Color.Black, BindingMode.OneWay,
-            propertyChanged: OnUnitTextColorChanged);
-
-		public static readonly BindableProperty SubUnitMarkColorProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(Color),
-            typeof(TimelineControl),
-            Color.DimGray, BindingMode.OneWay,
-            propertyChanged: OnSubUnitMarkColorChanged);
-
-		public static readonly BindableProperty SubUnitTextColorProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(Color),
-            typeof(TimelineControl),
-            Color.DimGray, BindingMode.OneWay,
-            propertyChanged: OnSubUnitTextColorChanged);
-	
-		public static readonly BindableProperty HighlightColorProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(Color),
-            typeof(TimelineControl),
-            Color.Yellow, BindingMode.OneWay,
-            propertyChanged: OnHighlightColorChanged);
-		
+            propertyChanged: OnTimelineChanged);
+			
         public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
             nameof(Zoom),
             typeof(double),
@@ -127,7 +53,6 @@ namespace Timeline.Controls
             typeof(TimelineControl),
             "", BindingMode.OneWay);
 
-        //public static readonly BindableProperty CommandProperty = BindableProperty.Create<TimelineControl, ICommand>(x => x.Command, null);
         public static readonly BindableProperty LongTapCommandProperty = BindableProperty.Create(nameof(LongTapCommand), typeof(ICommand), typeof(TimelineControl), null);
 
         public ICommand LongTapCommand
@@ -136,48 +61,12 @@ namespace Timeline.Controls
             set { SetValue(LongTapCommandProperty, value); }
         }
 
-        private static void OnTimeline1Changed(BindableObject bindable, object oldValue, object newValue)
+        private static void OnTimelineChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (((TimelineControl)bindable).Timeline1 != null && ((TimelineControl)bindable).Timeline1.Events.Count > 0)
-                ((TimelineControl)bindable).date = new TimelineDateTime(((TimelineControl)bindable).Timeline1.Events[0].StartDate.Year);
+            if (((TimelineControl)bindable).Timeline != null && ((TimelineControl)bindable).Timeline.Events.Count > 0)
+                ((TimelineControl)bindable).date = new TimelineDateTime(((TimelineControl)bindable).Timeline.Events[0].StartDate.Year);
             else
                 ((TimelineControl)bindable).date = new TimelineDateTime(DateTime.UtcNow);
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnTimelineColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-			((TimelineControl)bindable).forceInitialize = true;
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnUnitMarkColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-			((TimelineControl)bindable).forceInitialize = true;
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnUnitTextColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-			((TimelineControl)bindable).forceInitialize = true;
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnSubUnitMarkColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-			((TimelineControl)bindable).forceInitialize = true;
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnSubUnitTextColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-			((TimelineControl)bindable).forceInitialize = true;
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-		private static void OnHighlightColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            ((TimelineControl)bindable).forceInitialize = true;
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
@@ -191,46 +80,10 @@ namespace Timeline.Controls
             ((TimelineControl)bindable).InvalidateLayout();
         }
         
-		public MTimeline Timeline1
+		public MTimeline Timeline
         {
-			get { return (MTimeline)GetValue(Timeline1Property); }
-			set { SetValue(Timeline1Property, value); }
-        }
-
-		public Color TimelineColor
-        {
-            get { return (Color)GetValue(TimelineColorProperty); }
-			set { SetValue(TimelineColorProperty, value); }
-        }
-
-		public Color UnitMarkColor
-        {
-			get { return (Color)GetValue(UnitMarkColorProperty); }
-			set { SetValue(UnitMarkColorProperty, value); }
-        }
-
-		public Color UnitTextColor
-        {
-			get { return (Color)GetValue(UnitTextColorProperty); }
-			set { SetValue(UnitTextColorProperty, value); }
-        }
-        
-		public Color SubUnitMarkColor
-        {
-			get { return (Color)GetValue(SubUnitMarkColorProperty); }
-			set { SetValue(SubUnitMarkColorProperty, value); }
-        }
-
-		public Color SubUnitTextColor
-        {
-			get { return (Color)GetValue(SubUnitTextColorProperty); }
-			set { SetValue(SubUnitTextColorProperty, value); }
-        }
-
-		public Color HighlightColor
-        {
-			get { return (Color)GetValue(HighlightColorProperty); }
-			set { SetValue(HighlightColorProperty, value); }
+			get { return (MTimeline)GetValue(TimelineProperty); }
+			set { SetValue(TimelineProperty, value); }
         }
 
         public double Zoom
@@ -262,18 +115,10 @@ namespace Timeline.Controls
 
         TouchGestureRecognizer gestureRecognizer;
 
+        TimelineTheme theme;
+
         TimelineDateTime date;
         TimelineDateTime unitDate;
-
-        SKPaint timelinePaint;
-        SKPaint unitMarkPaint;
-        SKPaint unitTextPaint;
-        SKPaint subUnitMarkPaint;
-        SKPaint subUnitTextPaint;
-		SKPaint highlightPaint;
-		SKPaint eventPaint;
-		SKPaint eventBorderPaint;
-		SKPaint eventTextPaint;
 
         Int64 pixeltime;
         float unitXWidth;
@@ -299,7 +144,6 @@ namespace Timeline.Controls
 
         float timelineHeight;
         float timelineBottomY;
-        float timelineMiddleY;
         float unitMarkY1;
         float unitMarkY2;
         float subUnitMarkY1;
@@ -311,6 +155,7 @@ namespace Timeline.Controls
         int halfWidth;
 
 		float eventsTopY;
+        float eventsBottomY;
 		int laneHeight;
         int lanesOffsetY;
 
@@ -319,11 +164,14 @@ namespace Timeline.Controls
 		public TimelineControl()
 		{
 			InitializeComponent();
+
+            theme = new TimelineTheme("");
+
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-            if (Timeline1 != null && Timeline1.Events.Count > 0)
-                date = new TimelineDateTime(Timeline1.Events[0].StartDate.Year);
+            if (Timeline != null && Timeline.Events.Count > 0)
+                date = new TimelineDateTime(Timeline.Events[0].StartDate.Year);
             else
                 date = new TimelineDateTime(DateTime.UtcNow);
 
@@ -337,27 +185,6 @@ namespace Timeline.Controls
 
             DeviceDisplay.ScreenMetricsChanaged += DeviceDisplay_ScreenMetricsChanged;
             forceInitialize = true;
-
-			timelinePaint = new SKPaint();
-			unitMarkPaint = new SKPaint();
-			unitTextPaint = new SKPaint();
-			subUnitMarkPaint = new SKPaint();
-			subUnitTextPaint = new SKPaint();
-			highlightPaint = new SKPaint();
-
-			eventPaint = new SKPaint();
-			eventPaint.StrokeWidth = 2;
-			eventPaint.Color = Color.DarkGray.ToSKColor();
-			eventPaint.Style = SKPaintStyle.Fill;
-
-			eventBorderPaint = new SKPaint();
-			eventBorderPaint.Color = Color.Black.ToSKColor();
-			eventBorderPaint.StrokeWidth = 4;
-			eventBorderPaint.Style = SKPaintStyle.Stroke;
-
-			eventTextPaint = new SKPaint();
-			eventTextPaint.Color = Color.White.ToSKColor();
-			eventTextPaint.TextSize = 32;
 		}
 
         private void DeviceDisplay_ScreenMetricsChanged(ScreenMetricsChanagedEventArgs e)
@@ -404,7 +231,11 @@ namespace Timeline.Controls
                     if (Math.Abs(args.Data.X) < Math.Abs(args.Data.Y))
                     {
                         lanesOffsetY += (int)args.Data.Y * 2;
+
                         if (lanesOffsetY > 0) lanesOffsetY = 0;
+
+                        if (eventsBottomY > fullheight && eventsTopY + fullheight - lanesOffsetY > eventsBottomY)
+                            lanesOffsetY = (int)eventsTopY + fullheight - (int)eventsBottomY;
                     }
 
                     canvasView.InvalidateSurface();
@@ -437,15 +268,12 @@ namespace Timeline.Controls
             if(forceInitialize) InitializeParameters(info);
 
             canvas.Clear();
-            SKPaint cp = new SKPaint();
-            cp.Color = Color.AliceBlue.ToSKColor();
-            canvas.DrawRect(info.Rect, cp);
 
             Int64 minTicks = date.Ticks - halfWidth * pixeltime;
             Int64 maxTicks = date.Ticks + halfWidth * pixeltime;
 
             //TIMELINE
-            canvas.DrawLine(0, timelineMiddleY, info.Width, timelineMiddleY, timelinePaint);
+            canvas.DrawRect(0, 0, info.Width, timelineHeight, theme.TimelinePaint);
 
             //UNITS AND SUBUNITS
             if(minTicks<0 && maxTicks>0)
@@ -459,13 +287,13 @@ namespace Timeline.Controls
             }
 
             //HIGHLIGHTER
-            canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, highlightPaint);
+            canvas.DrawLine(halfWidth, 0, halfWidth, timelineBottomY, theme.HighlightPaint);
 
             //EVENTS
             SKRect clipRect = new SKRect(0, timelineBottomY, info.Width, info.Height);
             canvas.ClipRect(clipRect);
 
-			if (this.Timeline1 != null) DrawTimelineEvents(canvas, minTicks, maxTicks);
+			if (this.Timeline != null) DrawTimelineEvents(canvas, minTicks, maxTicks);
         }
 
         #region "UNITS AND SUBUNITS DRAWING"
@@ -477,8 +305,8 @@ namespace Timeline.Controls
             do  //DRAW AC PART
             {
                 unitPos = (unitDate.Ticks - minTicks) / pixeltime;
-                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
-                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
                 Int64 fromTicks = unitDate.Ticks;
                 unitDate.Add(ZoomUnit);
@@ -491,8 +319,8 @@ namespace Timeline.Controls
             do  //DRAW BC PART
             {
                 unitPos = (unitDate.Ticks - minTicks) / pixeltime;
-                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
-                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
                 Int64 fromTicks = unitDate.Ticks;
                 unitDate.Add(ZoomUnit, -1);
@@ -511,8 +339,8 @@ namespace Timeline.Controls
             do
             {
                 unitPos = (unitDate.Ticks - minTicks) / pixeltime;
-                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
-                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
                 Int64 fromTicks = unitDate.Ticks;
                 try { unitDate.Add(ZoomUnit); }
@@ -536,8 +364,8 @@ namespace Timeline.Controls
             do
             {
                 unitPos = (unitDate.Ticks - minTicks) / pixeltime;
-                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, unitMarkPaint);   //UNIT MARK
-                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, unitTextPaint);  //UNIT TEXT
+                canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
+                canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
                 Int64 fromTicks = unitDate.Ticks;
                 try { unitDate.Add(ZoomUnit, -1); }
@@ -562,8 +390,8 @@ namespace Timeline.Controls
                 while (subUnitDate.Ticks > toTicks)
                 {
                     subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
-                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);                                //SUBUNIT MARK
-                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);      //SUBUNIT TEXT
+                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, theme.SubUnitMarkPaint);                                //SUBUNIT MARK
+                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, theme.SubUnitTextPaint);      //SUBUNIT TEXT
 
                     try { subUnitDate.Add(unit, -1); } catch (OverflowException) { break; }
                 }
@@ -573,8 +401,8 @@ namespace Timeline.Controls
                 while (subUnitDate.Ticks < toTicks)
                 {
                     subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
-                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, subUnitMarkPaint);                                //SUBUNIT MARK
-                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, subUnitTextPaint);      //SUBUNIT TEXT
+                    canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, theme.SubUnitMarkPaint);                                //SUBUNIT MARK
+                    if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, theme.SubUnitTextPaint);      //SUBUNIT TEXT
 
                     try { subUnitDate.Add(unit); } catch (OverflowException) { break; }
                 }
@@ -636,7 +464,7 @@ namespace Timeline.Controls
 		{
             int topLane = -lanesOffsetY / laneHeight;
             EventsStr = "";
-            foreach (MTimelineEvent e in this.Timeline1.Events)
+            foreach (MTimelineEvent e in this.Timeline.Events)
 			{
                 if (e.LaneNumber < topLane) continue;
 
@@ -662,18 +490,18 @@ namespace Timeline.Controls
             if (eventTop > fullheight) return; //OUT OF SCREEN
 
             //draw event box
-			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, eventPaint);
+			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, theme.EventPaint);
             if (highlighted)
-                eventBorderPaint.Color = Color.Yellow.ToSKColor();
+                theme.EventBorderPaint.Color = Color.Yellow.ToSKColor();
             else
-                eventBorderPaint.Color = Color.Black.ToSKColor();
-			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, eventBorderPaint);
+                theme.EventBorderPaint.Color = Color.Black.ToSKColor();
+			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, theme.EventBorderPaint);
 
             //draw title
             canvas.Save();
             SKRect clipEvent = new SKRect(startX, eventTop, endX, eventTop + laneHeight - 1);
             canvas.ClipRect(clipEvent);
-            DrawTextInRect(canvas, e.Title, clipEvent, eventTextPaint);
+            DrawTextInRect(canvas, e.Title, clipEvent, theme.EventTextPaint);
             canvas.Restore();
         }
 
@@ -727,7 +555,6 @@ namespace Timeline.Controls
 			timelineHeight = info.Height * 0.10f;
 			if (timelineHeight < 100) timelineHeight = 100;
             timelineBottomY = timelineHeight;
-            timelineMiddleY = timelineHeight / 2;
             unitMarkY1 = timelineBottomY;
 			unitMarkY2 = unitMarkY1 - (timelineHeight * 0.45f);
             subUnitMarkY1 = timelineBottomY;
@@ -738,21 +565,15 @@ namespace Timeline.Controls
             fullheight = info.Height;
             halfWidth = info.Width / 2;
 
-			timelinePaint.Color = this.TimelineColor.ToSKColor();
-            timelinePaint.StrokeWidth = timelineHeight;
-            unitMarkPaint.Color = this.UnitMarkColor.ToSKColor();
-            unitMarkPaint.StrokeWidth = 4;
-            unitTextPaint.Color = this.UnitTextColor.ToSKColor();
-			unitTextPaint.TextSize = unitTextY - 10;
-            subUnitMarkPaint.Color = this.SubUnitMarkColor.ToSKColor();
-            subUnitMarkPaint.StrokeWidth = 2;
-			subUnitTextPaint.Color = this.SubUnitTextColor.ToSKColor();
-            subUnitTextPaint.TextSize = unitTextPaint.TextSize - 8;
-			highlightPaint.Color = this.HighlightColor.ToSKColor();
-			highlightPaint.StrokeWidth = 3;
+            theme.TimelinePaint.StrokeWidth = timelineHeight;
+            theme.UnitMarkPaint.StrokeWidth = 4;
+			theme.UnitTextPaint.TextSize = unitTextY - 10;
+            theme.SubUnitMarkPaint.StrokeWidth = 2;
+            theme.SubUnitTextPaint.TextSize = theme.UnitTextPaint.TextSize - 8;
+			theme.HighlightPaint.StrokeWidth = 3;
 
-            unitXWidth = unitTextPaint.MeasureText("X");
-            subunitXWidth = subUnitTextPaint.MeasureText("X");
+            unitXWidth = theme.UnitTextPaint.MeasureText("X");
+            subunitXWidth = theme.SubUnitTextPaint.MeasureText("X");
                 
 			zoomLimitHourToDay = (int)(SEC_PER_HOUR / 100);
             zoomLimitDayToMonth = (int)(SEC_PER_DAY / 150);
@@ -765,8 +586,10 @@ namespace Timeline.Controls
 			subunitLimitMonth = (int)(SEC_PER_MONTH / subunitXWidth / 3);
 			subunitLimitYear = (int)(SEC_PER_YEAR / subunitXWidth / 4);
 
-            eventsTopY = timelineBottomY + 5;
             laneHeight = 200;
+            eventsTopY = timelineBottomY + 5;
+            eventsBottomY = info.Height;
+            if (Timeline != null) eventsBottomY = eventsTopY + laneHeight * Timeline.MaxLane;
 
             forceInitialize = false;
         }

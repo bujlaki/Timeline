@@ -2,7 +2,6 @@
 using Xamarin.Forms;
 
 using Timeline.Models;
-using Timeline.Objects.Date;
 using Timeline.Objects.Timeline;
 
 namespace Timeline.ViewModels
@@ -32,7 +31,7 @@ namespace Timeline.ViewModels
 
         private void LongTapExecute(object obj)
         {
-            Controls.LongTapEventArg arg = (Controls.LongTapEventArg)obj;
+            LongTapEventArg arg = (LongTapEventArg)obj;
             
             Acr.UserDialogs.UserDialogs.Instance.Alert("longtap " + arg.X.ToString() + " : " + arg.Y.ToString() + " : " + arg.Lane.ToString());
         }

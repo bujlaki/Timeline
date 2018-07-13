@@ -2,7 +2,7 @@
 
 using Timeline.Controls;
 
-namespace Timeline.Objects.Date
+namespace Timeline.Objects.Timeline
 {
     public class TimelineDateTime : BCACDateTime
     {

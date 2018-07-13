@@ -6,6 +6,7 @@ using System.Text;
 using Xamarin.Forms;
 
 using Timeline.Models;
+using Timeline.Objects.Timeline;
 
 namespace Timeline.ViewModels
 {
@@ -33,10 +34,12 @@ namespace Timeline.ViewModels
     {
         private UserPagesMenuItem _selectedItem;
         private MUser _user;
+        private TimelineTheme theme;
 
         public ObservableCollection<MTimeline> Timelines;
 
         public Command CmdMenu { get; set; }
+        public Command CmdNewTimeline { get; set; }
         public MUser User {
             get { return _user; }
             set { _user = value; RaisePropertyChanged("User"); }
@@ -70,12 +73,18 @@ namespace Timeline.ViewModels
             });
 
             CmdMenu = new Command(CmdMenuExecute);
+            CmdNewTimeline = new Command(CmdNewTimelineExecute);
         }
 
         public void CmdMenuExecute(object obj)
         {
             Views.VUserPages mainPage = (App.services.Navigation.UserPagesView() as Views.VUserPages);
             mainPage.IsPresented = true;
+        }
+
+        public void CmdNewTimelineExecute(object obj)
+        {
+            App.services.Navigation.GoToNewTimelineView();
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)

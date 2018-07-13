@@ -1,7 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
 
-using Timeline.Objects.Date;
+using Timeline.Objects.Timeline;
 
 namespace Timeline.Models
 {

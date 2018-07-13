@@ -6,11 +6,22 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
-        <StackLayout Orientation="Vertical">
-            <Label Text="TIMELINELIST"
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
+            
+            <Label Grid.Row="0" 
+                   Text="TIMELINE LIST"
+                   HeightRequest="100"
+                   FontSize="32"
                    VerticalOptions="Start" 
                    HorizontalOptions="CenterAndExpand" />
-            <ListView ItemsSource="{Binding Timelines}">
+            
+            <ListView Grid.Row="1" 
+                      ItemsSource="{Binding Timelines}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -19,6 +30,18 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </StackLayout>
+
+            <Button Grid.Row="2" 
+                    Text="Create Timeline"
+                    TextColor="#234B64"
+                    BackgroundColor="#bfd9f3"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Command="{Binding CmdNewTimeline}"
+                    BorderRadius="10"
+                    BorderWidth="2"
+                    BorderColor="#eeebd3"/>
+        </Grid>
+
     </ContentView>
 </ContentPage>

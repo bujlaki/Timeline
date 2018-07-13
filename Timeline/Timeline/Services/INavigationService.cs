@@ -18,6 +18,7 @@ namespace Timeline.Services
         void GoToUserPagesPage(MUser _user, bool clearStack = false);
         void GoToTestPage();
 		void GoToTimelineView(Models.MTimeline timeline);
-		void GoBack();
+        void GoToNewTimelineView();
+        void GoBack();
     }
 }

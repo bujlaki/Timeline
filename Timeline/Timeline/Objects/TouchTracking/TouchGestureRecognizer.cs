@@ -60,17 +60,19 @@ namespace Timeline.Objects.TouchTracking
                     //we only handle 2 fingers
                     if (touches.Count < 2)
                     {
-                        touches.Add(id, new TouchInfo
+                        TouchInfo ti = new TouchInfo
                         {
                             InitialTime = DateTime.UtcNow,
                             InitialRawPoint = rawlocation,
                             InitialPoint = location,
                             PreviousPoint = location,
                             NewPoint = location
-                        });
+                        };
+
+                        touches.Add(id, ti);
 
                         //check for LONGTAP
-                        Task.Run(async () => await CheckLongTapAsync(Timings.longTapMilliseconds, id));
+                        Task.Run(async () => await CheckLongTapAsync(Timings.longTapMilliseconds, id, ti.TouchId));
                     }
                     break;
 
@@ -131,18 +133,19 @@ namespace Timeline.Objects.TouchTracking
             }
         }
         
-        public async Task CheckLongTapAsync(int delay, long id)
+        public async Task CheckLongTapAsync(int delay, long touchid, long touchinfoid)
         {
             await Task.Delay(delay);
 
             if (touches.Count!=1) return;
-            TouchInfo info = touches[id];
+            TouchInfo info = touches[touchid];
             if (info == null) return;
+            if (info.TouchId != touchinfoid) return;
 
             float diffX = Math.Abs(info.PreviousPoint.X - info.InitialPoint.X);
             float diffY = Math.Abs(info.PreviousPoint.Y - info.InitialPoint.Y);
             if (diffX < 5 && diffY < 5)
-                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.LongTap, info.InitialPoint, info.InitialRawPoint));
+                OnGestureRecognized(this, new TouchGestureEventArgs(touchid, TouchGestureType.LongTap, info.InitialPoint, info.InitialRawPoint));
         }
 
 

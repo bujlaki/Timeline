@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Timeline.Objects.Date
+namespace Timeline.Objects.Timeline
 {
     public class BCACDateTime
     {

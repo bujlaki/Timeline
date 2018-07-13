@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using Timeline.Models;
-using Timeline.Objects.Date;
 
 namespace Timeline.Objects.Timeline
 {
@@ -16,10 +15,13 @@ namespace Timeline.Objects.Timeline
             laneBusyUntil = new TimelineDateTime[laneCount];
             for (int i = 0; i < laneCount; i++) laneBusyUntil[i] = null;
 
+            timeline.MaxLane = 0;
             foreach (MTimelineEvent e in timeline.Events)
             {
                 e.LaneNumber = GetFreeLane(e.StartDate);
                 SetLaneBusy(e.LaneNumber, e.EndDate);
+
+                if (e.LaneNumber > timeline.MaxLane) timeline.MaxLane = e.LaneNumber;
             }
         }
 
