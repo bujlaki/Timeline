@@ -58,8 +58,6 @@ namespace Timeline.Services
                 await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"]);
                 CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
                 CurrentUser.CognitoIdentityId = cognitoAuth.UserInfo.IdentityId;
-
-                CurrentUser.LoggedIn = true;
             }
             catch (Exception ex)
             {
@@ -81,7 +79,6 @@ namespace Timeline.Services
                 CurrentUser.PhotoUrl = cognitoAuth.UserInfo.Picture;
                 CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
                 CurrentUser.Type = MUser.MUserType.Cognito;
-                CurrentUser.LoggedIn = true;
             }
             catch (Exception ex)
             {
@@ -148,12 +145,11 @@ namespace Timeline.Services
                 CurrentUser.Email = googleAuth.UserInfo.Email;
                 CurrentUser.PhotoUrl = googleAuth.UserInfo.Picture;
                 CurrentUser.Type = MUser.MUserType.Google;
-
+                
                 await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"]);
                 CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
                 CurrentUser.CognitoIdentityId = cognitoAuth.UserInfo.IdentityId;
 
-                CurrentUser.LoggedIn = true;
                 authDelegate.OnAuthCompleted();
             }
             catch(Exception ex)

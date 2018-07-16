@@ -23,12 +23,12 @@ namespace Timeline.Objects.Auth.Cognito
 
         //private CognitoAWSCredentials credentials;
 
-        public CognitoUserInfo UserInfo { get; private set; }
+        public LoginData loginData { get; private set; }
 
         public CognitoAuthenticator()
         {
             //credentials = new CognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
-            UserInfo = new CognitoUserInfo();
+            loginData = new LoginData();
         }
 
         //public CognitoAWSCredentials GetCachedCognitoIdentity()
@@ -62,8 +62,8 @@ namespace Timeline.Objects.Auth.Cognito
                 getCredentialReq.Logins.Add("accounts.google.com", token);
 
                 GetCredentialsForIdentityResponse getCredentialsResponse = await cli.GetCredentialsForIdentityAsync(getCredentialReq);
-                UserInfo.Credentials = getCredentialsResponse.Credentials;
-                UserInfo.IdentityId = getCredentialsResponse.IdentityId;
+                loginData.AWSCredentials = getCredentialsResponse.Credentials;
+                loginData.IdentityId = getCredentialsResponse.IdentityId;
             }
             catch(Exception ex)
             {
@@ -76,9 +76,9 @@ namespace Timeline.Objects.Auth.Cognito
         {
             try
             {
-                UserInfo.Clear();
-                UserInfo.UserName = username;
-                UserInfo.Email = email;
+                loginData.Clear();
+                loginData.UserName = username;
+                loginData.Email = email;
 
                 AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
 
@@ -93,7 +93,7 @@ namespace Timeline.Objects.Auth.Cognito
                 signUpRequest.UserAttributes.Add(attributeType1);
 
                 SignUpResponse signUpResponse = await provider.SignUpAsync(signUpRequest);
-                UserInfo.Verified = signUpResponse.UserConfirmed;
+                loginData.SignupVerified = signUpResponse.UserConfirmed;
             }
             catch (Exception ex)
             {
@@ -113,7 +113,7 @@ namespace Timeline.Objects.Auth.Cognito
                 confirmSignUpRequest.ClientId = CLIENTAPP_ID;
 
                 await provider.ConfirmSignUpAsync(confirmSignUpRequest);
-                UserInfo.Verified = true;
+                loginData.SignupVerified = true;
             }
             catch(Exception ex)
             {
@@ -148,6 +148,8 @@ namespace Timeline.Objects.Auth.Cognito
         {
             try
             {
+                loginData.Clear();
+
                 AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
                 CognitoUserPool userPool = new CognitoUserPool(this.USERPOOL_ID, this.CLIENTAPP_ID, provider);
                 CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
@@ -158,23 +160,27 @@ namespace Timeline.Objects.Auth.Cognito
                 AuthFlowResponse authFlowResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
                 if (authFlowResponse.AuthenticationResult == null) throw new Exception("Cognito authentication error");
 
+                loginData.Account = new LoginData.LoginAccount {
+                    access_token = authFlowResponse.AuthenticationResult.AccessToken,
+                    expires_in = authFlowResponse.AuthenticationResult.ExpiresIn,
+                    token_type = authFlowResponse.AuthenticationResult.TokenType,
+                    id_token = authFlowResponse.AuthenticationResult.IdToken,
+                    refresh_token = authFlowResponse.AuthenticationResult.RefreshToken
+                };
+
                 GetUserResponse userDetails = await user.GetUserDetailsAsync();
+                loginData.UserId = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "sub").Value;
+                loginData.UserName = user.Username;
+                loginData.Email = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "email").Value;
+                loginData.Picture = "userphoto";
 
                 string idtoken = authFlowResponse.AuthenticationResult.IdToken;
 
-                //CognitoAWSCredentials creds = user.GetCognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
                 CognitoAWSCredentials creds = new CognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
                 creds.Clear();
-                //creds.CurrentLoginProviders.SetValue(idtoken, 0);
-                //creds.CurrentLoginProviders.SetValue(idtoken, 1);
                 creds.AddLogin("cognito-idp." + RegionEndpoint.EUCentral1.SystemName + ".amazonaws.com/" + this.USERPOOL_ID, idtoken);
 
-                UserInfo.Clear();
-                UserInfo.Credentials = creds;
-                UserInfo.UserId = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "sub").Value;
-                UserInfo.UserName = user.Username;
-                UserInfo.Email = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "email").Value;
-                UserInfo.Picture = "userphoto";
+                loginData.AWSCredentials = creds;
             }
             catch (Exception ex)
             {
