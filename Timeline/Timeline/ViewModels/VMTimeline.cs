@@ -8,15 +8,15 @@ namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
-        private MTimeline _timeline;
+        private MTimelineInfo _timeline;
 
         public Command CmdLongTap { get; set; }
-		public MTimeline Timeline { get { return _timeline; } set { _timeline = value; } }
+		public MTimelineInfo Timeline { get { return _timeline; } set { _timeline = value; } }
 
 		public VMTimeline() : base()
         {
             CmdLongTap = new Command(LongTapExecute);
-			Timeline = new MTimeline();
+			Timeline = new MTimelineInfo();
 
             for (int y = 2018; y < 2025; y++)
             {

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 
 using Acr.UserDialogs;
+
 using Timeline.Models;
-using Timeline.Models.DynamoDBModels;
 
 
 namespace Timeline.ViewModels.TestViewModels
@@ -35,16 +35,16 @@ namespace Timeline.ViewModels.TestViewModels
 		{
 			Console.WriteLine("Starting TESTS for 'MTimelineDate'");
 
-            MDBUser dbuser;
-            App.services.Database.Connect(App.services.Authentication.CurrentUser.AWSCredentials);
-            dbuser = Task.Run(async () => await App.services.Database.GetUser("1")).Result;
+            MUser user;
+            App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
+            user = Task.Run(async () => await App.services.Database.GetUser("1")).Result;
 
-            UserDialogs.Instance.Alert(dbuser.UserName);
+            UserDialogs.Instance.Alert(user.UserName);
 
-            dbuser.Timelines.Add(new MDBTimelineInfo("my timeline1","just a test"));
+            user.Timelines.Add(new MTimelineInfo("my timeline1","just a test"));
 
 
-            Task.Run(async () => await App.services.Database.UpdateUser(dbuser));
+            Task.Run(async () => await App.services.Database.UpdateUser(user));
 
             UserDialogs.Instance.Alert("done");
 		}

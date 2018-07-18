@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 
-using Timeline.Models.DynamoDBModels;
+using Timeline.Models;
 
 namespace Timeline.Objects.Database
 {
@@ -20,12 +20,12 @@ namespace Timeline.Objects.Database
         }
 
         #region "MDBUser"
-        public async Task CreateUser(MDBUser user)
+        public async Task CreateUser(MUser user)
         {
             try
             {
                 Table table = Table.LoadTable(client, "TimelineUsers");
-                await table.PutItemAsync(user.AsDynamoDocument());
+                await table.PutItemAsync(DynamoDBAdapter.User2DynamoDoc(user));
             }
             catch (Exception ex)
             {
@@ -34,13 +34,13 @@ namespace Timeline.Objects.Database
             }
         }
 
-        public async Task<MDBUser> GetUserById(string id)
+        public async Task<MUser> GetUserById(string id)
         {
             try
             {
                 Table table = Table.LoadTable(client, "TimelineUsers");
                 Document doc = await table.GetItemAsync(id);
-                return new MDBUser(doc);
+                return DynamoDBAdapter.DynamoDoc2User(doc);
             }
             catch (Exception ex)
             {
@@ -49,12 +49,12 @@ namespace Timeline.Objects.Database
             }
         }
 
-        public async Task UpdateUser(MDBUser user)
+        public async Task UpdateUser(MUser user)
         {
             try
             {
                 Table table = Table.LoadTable(client, "TimelineUsers");
-                await table.UpdateItemAsync(user.AsDynamoDocument());
+                await table.UpdateItemAsync(DynamoDBAdapter.User2DynamoDoc(user));
             }
             catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace Timeline.Objects.Database
             }
         }
 
-        public async Task DeleteUser(MDBUser user)
+        public async Task DeleteUser(MUser user)
         {
             try
             {
@@ -79,13 +79,13 @@ namespace Timeline.Objects.Database
         #endregion
 
         #region "MDBTimelineEvent"
-        public async Task StoreEvents(List<MDBTimelineEvent> timelineEvents)
+        public async Task StoreEvents(List<MTimelineEvent> timelineEvents)
         {
             try
             {
                 Table table = Table.LoadTable(client, "TimelineEvents");
                 DocumentBatchWrite batchWrite = table.CreateBatchWrite();
-                foreach (MDBTimelineEvent tlevent in timelineEvents) batchWrite.AddDocumentToPut(tlevent.AsDynamoDocument());
+                foreach (MTimelineEvent tlevent in timelineEvents) batchWrite.AddDocumentToPut( DynamoDBAdapter.TimelineEvent2DynamoDoc(tlevent) );
 
                 await batchWrite.ExecuteAsync();
             }
@@ -96,11 +96,11 @@ namespace Timeline.Objects.Database
             }
         }
 
-        public async Task<List<MDBTimelineEvent>> GetEvents(string timelineId)
+        public async Task<List<MTimelineEvent>> GetEvents(string timelineId)
         {
             try
             {
-                List<MDBTimelineEvent> results = new List<MDBTimelineEvent>();
+                List<MTimelineEvent> results = new List<MTimelineEvent>();
 
                 Table table = Table.LoadTable(client, "TimelineEvents");
                 QueryFilter filter = new QueryFilter("timelineid", QueryOperator.Equal, timelineId);
@@ -109,7 +109,7 @@ namespace Timeline.Objects.Database
                 do
                 {
                     var docSet = await search.GetNextSetAsync();
-                    foreach (Document doc in docSet) results.Add(new MDBTimelineEvent(doc));
+                    foreach (Document doc in docSet) results.Add( DynamoDBAdapter.DynamoDoc2TimelineEvent(doc) );
 
                 } while (!search.IsDone);
 

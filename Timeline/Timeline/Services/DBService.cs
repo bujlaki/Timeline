@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Models.DynamoDBModels;
+
+using Timeline.Models;
 using Timeline.Objects.Database;
 
 namespace Timeline.Services
@@ -29,27 +30,27 @@ namespace Timeline.Services
             }   
         }
 
-        public async Task CreateUser(MDBUser user)
+        public async Task CreateUser(MUser user)
         {
             await ddb.CreateUser(user);
         }
 
-        public async Task UpdateUser(MDBUser user)
+        public async Task UpdateUser(MUser user)
         {
             await ddb.UpdateUser(user);
         }
 
-        public async Task<MDBUser> GetUser(string userId)
+        public async Task<MUser> GetUser(string userId)
         {
             return await ddb.GetUserById(userId);
         }
 
-        public async Task StoreEvents(List<MDBTimelineEvent> timelineEvents)
+        public async Task StoreEvents(List<MTimelineEvent> timelineEvents)
         {
             await ddb.StoreEvents(timelineEvents);
         }
 
-        public async Task<List<MDBTimelineEvent>> GetEvents(string timelineId)
+        public async Task<List<MTimelineEvent>> GetEvents(string timelineId)
         {
             return await ddb.GetEvents(timelineId);
         }

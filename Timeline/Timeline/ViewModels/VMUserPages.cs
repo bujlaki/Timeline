@@ -36,7 +36,7 @@ namespace Timeline.ViewModels
         private MUser _user;
         private TimelineTheme theme;
 
-        public ObservableCollection<MTimeline> Timelines;
+        public ObservableCollection<MTimelineInfo> Timelines;
 
         public Command CmdMenu { get; set; }
         public Command CmdNewTimeline { get; set; }

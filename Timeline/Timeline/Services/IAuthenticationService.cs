@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Timeline.Models;
+using Timeline.Objects.Auth;
 using Timeline.Objects.Auth.Google;
 
 namespace Timeline.Services
@@ -10,6 +11,7 @@ namespace Timeline.Services
     public interface IAuthenticationService
     {
         MUser CurrentUser { get; }
+        LoginData Login { get; }
         Task GetCachedCredentials();
         void AuthenticateGoogle(IAuthenticationDelegate _delegate);
         Task LoginCognito(string username, string password);

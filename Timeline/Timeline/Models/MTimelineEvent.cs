@@ -7,12 +7,25 @@ namespace Timeline.Models
 {
     public class MTimelineEvent
     {
+        public string TimelineId { get; set; }
         public string Title { get; set; }
-        public Uri Link { get; set; }
+        public string Description { get; set; }
+        public string ImageBase64 { get; set; }
+        public string URL { get; set; }
+        public string Data { get; set; }
+        public Int64 StartDateTicks { get { return StartDate.Ticks; } }
+        public Int64 EndDateTicks { get { return EndDate.Ticks; } }
+        public byte Precision { get; set; }
+
+        //internal
         public Image Image { get; set; }
-		public TimelineDateTime StartDate { get; set; }
-		public TimelineDateTime EndDate { get; set; }
+        public TimelineDateTime StartDate { get; set; }
+        public TimelineDateTime EndDate { get; set; }
         public int LaneNumber { get; set; }
+
+        public MTimelineEvent()
+        {
+        }
 
 		public MTimelineEvent(string _title, TimelineDateTime _startdate, int _length=1)
         {

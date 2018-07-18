@@ -21,15 +21,7 @@ namespace Timeline.Objects.Auth.Cognito
         private string CUSTOM_DOMAIN = "timeline";
         private string REGION = RegionEndpoint.EUCentral1.DisplayName;
 
-        //private CognitoAWSCredentials credentials;
-
-        public LoginData loginData { get; private set; }
-
-        public CognitoAuthenticator()
-        {
-            //credentials = new CognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
-            loginData = new LoginData();
-        }
+        public CognitoAuthenticator() { }
 
         //public CognitoAWSCredentials GetCachedCognitoIdentity()
         //{
@@ -41,7 +33,7 @@ namespace Timeline.Objects.Auth.Cognito
         //    return null;
         //}
 
-        public async Task GetAWSCredentialsWithGoogleToken(string token)
+        public async Task GetAWSCredentialsWithGoogleToken(string token, Ref<LoginData> loginData)
         {
             try
             {
@@ -62,8 +54,8 @@ namespace Timeline.Objects.Auth.Cognito
                 getCredentialReq.Logins.Add("accounts.google.com", token);
 
                 GetCredentialsForIdentityResponse getCredentialsResponse = await cli.GetCredentialsForIdentityAsync(getCredentialReq);
-                loginData.AWSCredentials = getCredentialsResponse.Credentials;
-                loginData.IdentityId = getCredentialsResponse.IdentityId;
+                loginData.Value.AWSCredentials = getCredentialsResponse.Credentials;
+                loginData.Value.IdentityId = getCredentialsResponse.IdentityId;
             }
             catch(Exception ex)
             {
@@ -72,14 +64,10 @@ namespace Timeline.Objects.Auth.Cognito
             }
         }
 
-        public async Task SignupUser(string username, string password, string email)
+        public async Task SignupUser(string username, string password, string email, Ref<LoginData> loginData)
         {
             try
             {
-                loginData.Clear();
-                loginData.UserName = username;
-                loginData.Email = email;
-
                 AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
 
                 SignUpRequest signUpRequest = new SignUpRequest();
@@ -93,7 +81,7 @@ namespace Timeline.Objects.Auth.Cognito
                 signUpRequest.UserAttributes.Add(attributeType1);
 
                 SignUpResponse signUpResponse = await provider.SignUpAsync(signUpRequest);
-                loginData.SignupVerified = signUpResponse.UserConfirmed;
+                loginData.Value.SignupVerified = signUpResponse.UserConfirmed;
             }
             catch (Exception ex)
             {
@@ -102,7 +90,7 @@ namespace Timeline.Objects.Auth.Cognito
             }
         }
 
-        public async Task VerifyAccessCode(string username, string code)
+        public async Task VerifyAccessCode(string username, string code, Ref<LoginData> loginData)
         {
             try
             {
@@ -113,7 +101,7 @@ namespace Timeline.Objects.Auth.Cognito
                 confirmSignUpRequest.ClientId = CLIENTAPP_ID;
 
                 await provider.ConfirmSignUpAsync(confirmSignUpRequest);
-                loginData.SignupVerified = true;
+                loginData.Value.SignupVerified = true;
             }
             catch(Exception ex)
             {
@@ -144,12 +132,10 @@ namespace Timeline.Objects.Auth.Cognito
         //    return user;
         //}
 
-        public async Task ValidateUser(string username, string password)
+        public async Task ValidateUser(string username, string password, Ref<LoginData> loginData)
         {
             try
             {
-                loginData.Clear();
-
                 AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
                 CognitoUserPool userPool = new CognitoUserPool(this.USERPOOL_ID, this.CLIENTAPP_ID, provider);
                 CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
@@ -160,7 +146,7 @@ namespace Timeline.Objects.Auth.Cognito
                 AuthFlowResponse authFlowResponse = await user.StartWithSrpAuthAsync(authRequest).ConfigureAwait(false);
                 if (authFlowResponse.AuthenticationResult == null) throw new Exception("Cognito authentication error");
 
-                loginData.Account = new LoginData.LoginAccount {
+                loginData.Value.Account = new LoginData.LoginAccount {
                     access_token = authFlowResponse.AuthenticationResult.AccessToken,
                     expires_in = authFlowResponse.AuthenticationResult.ExpiresIn,
                     token_type = authFlowResponse.AuthenticationResult.TokenType,
@@ -169,18 +155,20 @@ namespace Timeline.Objects.Auth.Cognito
                 };
 
                 GetUserResponse userDetails = await user.GetUserDetailsAsync();
-                loginData.UserId = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "sub").Value;
-                loginData.UserName = user.Username;
-                loginData.Email = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "email").Value;
-                loginData.Picture = "userphoto";
+                loginData.Value.UserId = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "sub").Value;
+                loginData.Value.UserName = user.Username;
+                loginData.Value.Email = userDetails.UserAttributes.Find(x => x.Name.ToLower() == "email").Value;
+                loginData.Value.Picture = "userphoto";
 
-                string idtoken = authFlowResponse.AuthenticationResult.IdToken;
+                //string idtoken = authFlowResponse.AuthenticationResult.IdToken;
 
                 CognitoAWSCredentials creds = new CognitoAWSCredentials(this.IDENTITYPOOL_ID, RegionEndpoint.EUCentral1);
                 creds.Clear();
-                creds.AddLogin("cognito-idp." + RegionEndpoint.EUCentral1.SystemName + ".amazonaws.com/" + this.USERPOOL_ID, idtoken);
+                creds.AddLogin(
+                    "cognito-idp." + RegionEndpoint.EUCentral1.SystemName + ".amazonaws.com/" + this.USERPOOL_ID, 
+                    authFlowResponse.AuthenticationResult.IdToken);
 
-                loginData.AWSCredentials = creds;
+                loginData.Value.AWSCredentials = creds;
             }
             catch (Exception ex)
             {

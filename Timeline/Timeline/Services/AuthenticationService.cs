@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
-using Amazon.Extensions.CognitoAuthentication;
+using Xamarin.Auth;
 
 using Timeline.Models;
+using Timeline.Objects;
+using Timeline.Objects.Auth;
 using Timeline.Objects.Auth.Cognito;
 using Timeline.Objects.Auth.Google;
-using Amazon.CognitoIdentityProvider.Model;
-using Acr.UserDialogs;
-using Amazon.CognitoIdentityProvider;
-using Amazon.CognitoIdentity;
-using Amazon.CognitoIdentity.Model;
-using Xamarin.Auth;
-using Newtonsoft.Json.Linq;
-
 
 namespace Timeline.Services
 {
@@ -30,11 +23,12 @@ namespace Timeline.Services
         private IAuthenticationDelegate authDelegate;
 
         public MUser CurrentUser { get; private set; }
+        public LoginData Login { get; private set; }
 
         public AuthenticationService()
         {
             CurrentUser = new MUser();
-
+            Login = new LoginData();
             platformGoogleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
             googleAuth = new GoogleAuthenticator(platformGoogleAuth.PlatformClientID, "email profile", "hu.iqtech.timeline:/oauth2redirect", this);
             cognitoAuth = new CognitoAuthenticator();
@@ -44,20 +38,16 @@ namespace Timeline.Services
         {
             try
             {
+                Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
+
                 IEnumerable<Account> accounts = AccountStore.Create().FindAccountsForService("Google");
                 Account account = accounts.FirstOrDefault();
                 if (account == null) return;
 
-                await googleAuth.GetGoogleUserInfo(account);
-                CurrentUser.UserId = googleAuth.UserInfo.UserId;
-                CurrentUser.UserName = googleAuth.UserInfo.UserName;
-                CurrentUser.Email = googleAuth.UserInfo.Email;
-                CurrentUser.PhotoUrl = googleAuth.UserInfo.Picture;
-                CurrentUser.Type = MUser.MUserType.Google;
-
-                await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"]);
-                CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
-                CurrentUser.CognitoIdentityId = cognitoAuth.UserInfo.IdentityId;
+                await googleAuth.GetGoogleUserInfo(account, loginDataRef);
+                await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"], loginDataRef);
+                Login.Type = LoginType.Google;
+                PopulateUser();              
             }
             catch (Exception ex)
             {
@@ -72,13 +62,11 @@ namespace Timeline.Services
         {
             try
             {
-                await cognitoAuth.ValidateUser(username, password);
-                CurrentUser.UserId = cognitoAuth.UserInfo.UserId;
-                CurrentUser.UserName = cognitoAuth.UserInfo.UserName;
-                CurrentUser.Email = cognitoAuth.UserInfo.Email;
-                CurrentUser.PhotoUrl = cognitoAuth.UserInfo.Picture;
-                CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
-                CurrentUser.Type = MUser.MUserType.Cognito;
+                Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
+
+                await cognitoAuth.ValidateUser(username, password, loginDataRef);
+                Login.Type = LoginType.Cognito;
+                PopulateUser();
             }
             catch (Exception ex)
             {
@@ -91,8 +79,9 @@ namespace Timeline.Services
         {
             try
             {
+                Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
                 CurrentUser.Clear();
-                await cognitoAuth.SignupUser(username, password, email);
+                await cognitoAuth.SignupUser(username, password, email, loginDataRef);
             }
             catch (Exception ex)
             {
@@ -105,7 +94,8 @@ namespace Timeline.Services
         {
             try
             {
-                await cognitoAuth.VerifyAccessCode(username, verificationCode);
+                Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
+                await cognitoAuth.VerifyAccessCode(username, verificationCode, loginDataRef);
             }
             catch (Exception ex)
             {
@@ -123,6 +113,7 @@ namespace Timeline.Services
         public void SignOut()
         {
             CurrentUser.Clear();
+            Login.Clear();
             ClearCachedCredentials();
             googleAuth.ReInit();
         }
@@ -130,6 +121,7 @@ namespace Timeline.Services
         public void OnGoogleAuthCanceled()
         {
             CurrentUser.Clear();
+            Login.Clear();
             authDelegate.OnAuthFailed("Authentication has been cancelled", null);
         }
 
@@ -137,18 +129,14 @@ namespace Timeline.Services
         {
             try
             {
+                Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
+
                 platformGoogleAuth.ClearStaticAuth();
 
-                await googleAuth.GetGoogleUserInfo(account);
-                CurrentUser.UserId = googleAuth.UserInfo.UserId;
-                CurrentUser.UserName = googleAuth.UserInfo.UserName;
-                CurrentUser.Email = googleAuth.UserInfo.Email;
-                CurrentUser.PhotoUrl = googleAuth.UserInfo.Picture;
-                CurrentUser.Type = MUser.MUserType.Google;
-                
-                await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"]);
-                CurrentUser.AWSCredentials = cognitoAuth.UserInfo.Credentials;
-                CurrentUser.CognitoIdentityId = cognitoAuth.UserInfo.IdentityId;
+                await googleAuth.GetGoogleUserInfo(account, loginDataRef);               
+                await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"], loginDataRef);
+                Login.Type = LoginType.Google;
+                PopulateUser();
 
                 authDelegate.OnAuthCompleted();
             }
@@ -163,6 +151,7 @@ namespace Timeline.Services
         public void OnGoogleAuthFailed(string message, Exception exception)
         {
             CurrentUser.Clear();
+            Login.Clear();
             authDelegate.OnAuthFailed(message, exception);
         }
 
@@ -174,6 +163,14 @@ namespace Timeline.Services
             if (account == null) return;
 
             accountStore.Delete(account, "Google");
+        }
+
+        private void PopulateUser()
+        {
+            CurrentUser.UserId = Login.UserId;
+            CurrentUser.UserName = Login.UserName;
+            CurrentUser.Email = Login.Email;
+            CurrentUser.PhotoUrl = Login.Picture;
         }
     }
 }

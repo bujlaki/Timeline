@@ -22,7 +22,7 @@ namespace Timeline.Controls
         #region "Bindable properties"
 		public static readonly BindableProperty TimelineProperty = BindableProperty.Create(
             nameof(Timeline),
-            typeof(MTimeline),
+            typeof(MTimelineInfo),
             typeof(TimelineControl),
             null, BindingMode.OneWay,
             propertyChanged: OnTimelineChanged);
@@ -80,9 +80,9 @@ namespace Timeline.Controls
             ((TimelineControl)bindable).InvalidateLayout();
         }
         
-		public MTimeline Timeline
+		public MTimelineInfo Timeline
         {
-			get { return (MTimeline)GetValue(TimelineProperty); }
+			get { return (MTimelineInfo)GetValue(TimelineProperty); }
 			set { SetValue(TimelineProperty, value); }
         }
 

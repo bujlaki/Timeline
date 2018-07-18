@@ -10,7 +10,7 @@ namespace Timeline.Objects.Timeline
     {
         private static TimelineDateTime[] laneBusyUntil;
 
-        public static void SortEventsToLanes(ref MTimeline timeline, int laneCount)
+        public static void SortEventsToLanes(ref MTimelineInfo timeline, int laneCount)
         {
             laneBusyUntil = new TimelineDateTime[laneCount];
             for (int i = 0; i < laneCount; i++) laneBusyUntil[i] = null;

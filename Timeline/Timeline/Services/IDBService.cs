@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Models.DynamoDBModels;
+
+using Timeline.Models;
 
 namespace Timeline.Services
 {
@@ -10,11 +11,11 @@ namespace Timeline.Services
     {
         void Connect(AWSCredentials credential);
 
-        Task CreateUser(MDBUser user);
-        Task UpdateUser(MDBUser user);
-        Task<MDBUser> GetUser(string userId);
+        Task CreateUser(MUser user);
+        Task UpdateUser(MUser user);
+        Task<MUser> GetUser(string userId);
 
-        Task StoreEvents(List<MDBTimelineEvent> timelineEvents);
-        Task<List<MDBTimelineEvent>> GetEvents(string timelineId);
+        Task StoreEvents(List<MTimelineEvent> timelineEvents);
+        Task<List<MTimelineEvent>> GetEvents(string timelineId);
     }
 }

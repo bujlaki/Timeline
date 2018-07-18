@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Timeline.Models;
+
 using Xamarin.Auth;
+using Newtonsoft.Json.Linq;
+
+using Timeline.Objects;
+
 
 namespace Timeline.Objects.Auth.Google
 {
@@ -19,7 +22,6 @@ namespace Timeline.Objects.Auth.Google
         private OAuth2Authenticator auth;
         private IGoogleAuthenticationDelegate authDelegate;
 
-        public GoogleUserInfo UserInfo { get; private set; }
 
         public GoogleAuthenticator(string clientId, string scope, string redirectUrl, IGoogleAuthenticationDelegate authenticationDelegate)
         {
@@ -27,7 +29,6 @@ namespace Timeline.Objects.Auth.Google
             current_clientId = clientId;
             current_scope = scope;
             current_RedirectUrl = redirectUrl;
-            UserInfo = new GoogleUserInfo();
 
             auth = new OAuth2Authenticator(clientId, string.Empty, scope,
                                             new Uri(AuthorizeUrl),
@@ -117,18 +118,17 @@ namespace Timeline.Objects.Auth.Google
             var response = await request.GetResponseAsync();
         }
 
-        public async Task GetGoogleUserInfo(Account account)
+        public async Task GetGoogleUserInfo(Account account, Ref<LoginData> loginData)
         {
             //get GOOGLE userinfo
             var req = new OAuth2Request("GET", new Uri("https://www.googleapis.com/oauth2/v2/userinfo"), null, account);
             var resp = await req.GetResponseAsync();
             var obj = JObject.Parse(resp.GetResponseText());
 
-            UserInfo.Clear();
-            UserInfo.UserId = obj["id"].ToString().Replace("\"", "");
-            UserInfo.UserName = obj["given_name"].ToString().Replace("\"", "");
-            UserInfo.Email = obj["email"].ToString().Replace("\"", "");
-            UserInfo.Picture = obj["picture"].ToString().Replace("\"", "");
+            loginData.Value.UserId = obj["id"].ToString().Replace("\"", "");
+            loginData.Value.UserName = obj["given_name"].ToString().Replace("\"", "");
+            loginData.Value.Email = obj["email"].ToString().Replace("\"", "");
+            loginData.Value.Picture = obj["picture"].ToString().Replace("\"", "");
         }
     }
 }

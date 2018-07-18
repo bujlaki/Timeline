@@ -10,28 +10,16 @@ namespace Timeline.Models
 {
     public class MUser
     {
-        public enum MUserType
-        {
-            None,
-            Cognito,
-            Google
-        }
 
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
-
-        public LoginData Login { get; set; }
-
-        public MUserType Type { get; set; }
-
-        public string CognitoIdentityId { get; set; }
-        public Account GoogleAccount { get; set; }
-        public AWSCredentials AWSCredentials { get; set; }        
+        public List<MTimelineInfo> Timelines { get; set; }
 
         public MUser()
         {
+            Timelines = new List<MTimelineInfo>();
             Clear();
         }
 
@@ -41,10 +29,7 @@ namespace Timeline.Models
             UserName = "";
             Email = "";
             PhotoUrl = "";
-            CognitoIdentityId = "";
-            Type = MUserType.None;
-            GoogleAccount = null;
-            AWSCredentials = null;
         }
+            
     }
 }

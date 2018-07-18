@@ -115,7 +115,7 @@ namespace Timeline.Services
             }
         }
 
-        public void GoToTimelineView(Models.MTimeline timeline)
+        public void GoToTimelineView(Models.MTimelineInfo timeline)
         {
             //_vMLocator.DetailMovieViewModel.Film = itemMovie;
 			_navigation.PushAsync(timelineView.Value);

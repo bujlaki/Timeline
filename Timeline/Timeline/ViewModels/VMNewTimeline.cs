@@ -10,12 +10,12 @@ namespace Timeline.ViewModels
     public class VMNewTimeline : Base.VMBase
     {
         public Command CmdCreate { get; set; }
-        public MTimeline Timeline { get; set; }
+        public MTimelineInfo Timeline { get; set; }
 
         public VMNewTimeline() : base()
         {
             CmdCreate = new Command(CmdCreateExecute);
-            Timeline = new MTimeline();
+            Timeline = new MTimelineInfo();
         }
 
         private void CmdCreateExecute(object obj)

@@ -42,7 +42,7 @@ namespace Timeline
             {
                 Task.Run(async ()=> await services.Authentication.GetCachedCredentials()).Wait();
 
-                if (services.Authentication.CurrentUser.Type != Models.MUser.MUserType.None) //if logged in
+                if (services.Authentication.Login.Type != Objects.Auth.LoginType.None) //if logged in
                 {
                     MainPage = new NavigationPage(services.Navigation.UserPagesView());
                     locator.UserPagesViewModel.User = services.Authentication.CurrentUser;
