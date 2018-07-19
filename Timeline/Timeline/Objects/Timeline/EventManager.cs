@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 using Timeline.Models;
@@ -10,19 +11,21 @@ namespace Timeline.Objects.Timeline
     {
         private static TimelineDateTime[] laneBusyUntil;
 
-        public static void SortEventsToLanes(ref MTimelineInfo timeline, int laneCount)
+        public static int SortEventsToLanes(ObservableCollection<MTimelineEvent> events, int laneCount)
         {
+            int maxlane = 0;
             laneBusyUntil = new TimelineDateTime[laneCount];
             for (int i = 0; i < laneCount; i++) laneBusyUntil[i] = null;
 
-            timeline.MaxLane = 0;
-            foreach (MTimelineEvent e in timeline.Events)
+            foreach (MTimelineEvent e in events)
             {
                 e.LaneNumber = GetFreeLane(e.StartDate);
                 SetLaneBusy(e.LaneNumber, e.EndDate);
 
-                if (e.LaneNumber > timeline.MaxLane) timeline.MaxLane = e.LaneNumber;
+                if (e.LaneNumber > maxlane) maxlane = e.LaneNumber;
             }
+
+            return maxlane;
         }
 
         private static void SetLaneBusy(int lane, TimelineDateTime tld)

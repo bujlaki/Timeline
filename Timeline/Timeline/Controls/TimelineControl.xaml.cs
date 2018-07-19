@@ -13,6 +13,7 @@ using SkiaSharp.Views.Forms;
 using Timeline.Models;
 using Timeline.Objects.Timeline;
 using Timeline.Objects.TouchTracking;
+using System.Collections.ObjectModel;
 
 namespace Timeline.Controls
 {
@@ -20,13 +21,20 @@ namespace Timeline.Controls
     {
         
         #region "Bindable properties"
-		public static readonly BindableProperty TimelineProperty = BindableProperty.Create(
+		public static readonly BindableProperty EventsSourceProperty = BindableProperty.Create(
             nameof(Timeline),
-            typeof(MTimelineInfo),
+            typeof(Collection<MTimelineEvent>),
             typeof(TimelineControl),
-            null, BindingMode.OneWay,
-            propertyChanged: OnTimelineChanged);
-			
+            new Collection<MTimelineEvent>(), BindingMode.TwoWay,
+            propertyChanged: OnEventsSourceChanged);
+
+        public static readonly BindableProperty LaneCountProperty = BindableProperty.Create(
+            nameof(Timeline),
+            typeof(int),
+            typeof(TimelineControl),
+            0, BindingMode.TwoWay,
+            propertyChanged: OnLaneCountChanged);
+
         public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
             nameof(Zoom),
             typeof(double),
@@ -61,12 +69,20 @@ namespace Timeline.Controls
             set { SetValue(LongTapCommandProperty, value); }
         }
 
-        private static void OnTimelineChanged(BindableObject bindable, object oldValue, object newValue)
+        private static void OnEventsSourceChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (((TimelineControl)bindable).Timeline != null && ((TimelineControl)bindable).Timeline.Events.Count > 0)
-                ((TimelineControl)bindable).date = new TimelineDateTime(((TimelineControl)bindable).Timeline.Events[0].StartDate.Year);
+            if (((TimelineControl)bindable).EventsSource.Count > 0)
+                ((TimelineControl)bindable).date = new TimelineDateTime(((TimelineControl)bindable).EventsSource[0].StartDate.Year);
             else
                 ((TimelineControl)bindable).date = new TimelineDateTime(DateTime.UtcNow);
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
+
+        private static void OnLaneCountChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (((TimelineControl)bindable).LaneCount > 0)
+                ((TimelineControl)bindable).eventsBottomY = ((TimelineControl)bindable).eventsTopY + ((TimelineControl)bindable).laneHeight * ((TimelineControl)bindable).LaneCount;
+
             ((TimelineControl)bindable).InvalidateLayout();
         }
 
@@ -80,30 +96,31 @@ namespace Timeline.Controls
             ((TimelineControl)bindable).InvalidateLayout();
         }
         
-		public MTimelineInfo Timeline
+		public Collection<MTimelineEvent> EventsSource
         {
-			get { return (MTimelineInfo)GetValue(TimelineProperty); }
-			set { SetValue(TimelineProperty, value); }
+			get { return (Collection<MTimelineEvent>)GetValue(EventsSourceProperty); }
+			set { SetValue(EventsSourceProperty, value); }
         }
-
+        public int LaneCount
+        {
+            get { return (int)GetValue(LaneCountProperty); }
+            set { SetValue(LaneCountProperty, value); }
+        }
         public double Zoom
         {
             get { return (double)GetValue(ZoomProperty); }
             set { SetValue(ZoomProperty, value); }
         }
-
         public TimelineUnits ZoomUnit
         {
             get { return (TimelineUnits)GetValue(ZoomUnitProperty); }
             set { SetValue(ZoomUnitProperty, value); }
         }
-
         public string DateStr
         {
             get { return (string)GetValue(DateStrProperty); }
             set { SetValue(DateStrProperty, value); }
         }
-
         public string EventsStr
         {
             get { return (string)GetValue(EventsStrProperty); }
@@ -170,8 +187,8 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-            if (Timeline != null && Timeline.Events.Count > 0)
-                date = new TimelineDateTime(Timeline.Events[0].StartDate.Year);
+            if (EventsSource.Count > 0)
+                date = new TimelineDateTime(EventsSource[0].StartDate.Year);
             else
                 date = new TimelineDateTime(DateTime.UtcNow);
 
@@ -293,7 +310,7 @@ namespace Timeline.Controls
             SKRect clipRect = new SKRect(0, timelineBottomY, info.Width, info.Height);
             canvas.ClipRect(clipRect);
 
-			if (this.Timeline != null) DrawTimelineEvents(canvas, minTicks, maxTicks);
+			if (EventsSource.Count > 0) DrawTimelineEvents(canvas, minTicks, maxTicks);
         }
 
         #region "UNITS AND SUBUNITS DRAWING"
@@ -464,7 +481,7 @@ namespace Timeline.Controls
 		{
             int topLane = -lanesOffsetY / laneHeight;
             EventsStr = "";
-            foreach (MTimelineEvent e in this.Timeline.Events)
+            foreach (MTimelineEvent e in this.EventsSource)
 			{
                 if (e.LaneNumber < topLane) continue;
 
@@ -589,7 +606,7 @@ namespace Timeline.Controls
             laneHeight = 200;
             eventsTopY = timelineBottomY + 5;
             eventsBottomY = info.Height;
-            if (Timeline != null) eventsBottomY = eventsTopY + laneHeight * Timeline.MaxLane;
+            if (LaneCount > 0) eventsBottomY = eventsTopY + laneHeight * LaneCount;
 
             forceInitialize = false;
         }
