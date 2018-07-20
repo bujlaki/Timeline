@@ -74,6 +74,14 @@ namespace Timeline.ViewModels
 
             CmdMenu = new Command(CmdMenuExecute);
             CmdNewTimeline = new Command(CmdNewTimelineExecute);
+
+            //subscribe to events
+            MessagingCenter.Subscribe<VMNewTimeline, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
+        }
+
+        private void TimelineInfo_created(VMNewTimeline arg1, MTimelineInfo arg2)
+        {
+            User.Timelines.Add(arg2);
         }
 
         public void CmdMenuExecute(object obj)
