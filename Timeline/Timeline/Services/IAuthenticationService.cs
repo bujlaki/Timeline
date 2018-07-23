@@ -10,7 +10,6 @@ namespace Timeline.Services
 {
     public interface IAuthenticationService
     {
-        MUser CurrentUser { get; }
         LoginData Login { get; }
         Task GetCachedCredentials();
         void AuthenticateGoogle(IAuthenticationDelegate _delegate);

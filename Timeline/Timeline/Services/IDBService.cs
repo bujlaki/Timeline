@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Timeline.Models;
+using Timeline.Objects.Auth;
 
 namespace Timeline.Services
 {
@@ -11,7 +12,7 @@ namespace Timeline.Services
     {
         void Connect(AWSCredentials credential);
 
-        Task CreateUser(MUser user);
+        Task CreateUser(LoginData login);
         Task UpdateUser(MUser user);
         Task<MUser> GetUser(string userId);
 

@@ -99,12 +99,13 @@ namespace Timeline.Services
             _navigation.PushModalAsync(signupView.Value);
         }
 
-        public void GoToUserPagesPage(MUser _user, bool clearStack = false)
+        public void GoToUserPagesPage(string userid, bool clearStack = false)
         {
             //set the user
-            _vmLocator.UserPagesViewModel.User = _user;
-
-            if(clearStack)
+            _vmLocator.UserPagesViewModel.User = Task.Run(async () => await App.services.Database.GetUser(userid)).Result;
+            
+            
+            if (clearStack)
             {
                 Application.Current.MainPage = new NavigationPage(userpagesView.Value);
                 _navigation.PopToRootAsync();

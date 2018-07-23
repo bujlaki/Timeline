@@ -19,18 +19,26 @@
                    FontSize="32"
                    VerticalOptions="Start" 
                    HorizontalOptions="CenterAndExpand" />
-            
-            <ListView Grid.Row="1" 
-                      ItemsSource="{Binding User.Timelines}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <Label Text="{Binding Name}"/>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
 
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <ListView Grid.Column="1" 
+                          ItemsSource="{Binding User.Timelines}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Label Text="{Binding Name}"/>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            
             <Button Grid.Row="2" 
                     Text="Create Timeline"
                     TextColor="#234B64"

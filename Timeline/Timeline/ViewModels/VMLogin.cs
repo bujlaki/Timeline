@@ -55,7 +55,7 @@ namespace Timeline.ViewModels
                 }
 
                 App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
-                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
+                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
                 Unlock();
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace Timeline.ViewModels
                 }
 
                 App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
-                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
+                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
                 Unlock();
             }
             catch (Exception ex)
@@ -118,7 +118,7 @@ namespace Timeline.ViewModels
         public void OnAuthCompleted()
         {
             App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
-            App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
+            App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
         }
 
         public void OnAuthFailed(string message, Exception exception)

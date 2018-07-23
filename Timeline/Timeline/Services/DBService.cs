@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Timeline.Models;
+using Timeline.Objects.Auth;
 using Timeline.Objects.Database;
 
 namespace Timeline.Services
@@ -30,9 +31,9 @@ namespace Timeline.Services
             }   
         }
 
-        public async Task CreateUser(MUser user)
+        public async Task CreateUser(LoginData login)
         {
-            await ddb.CreateUser(user);
+            await ddb.CreateUser(login);
         }
 
         public async Task UpdateUser(MUser user)

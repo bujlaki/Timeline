@@ -15,7 +15,7 @@ namespace Timeline.Services
         Page OptionsView();
         void GoToLoginPage();
         void GoToSignupPage();
-        void GoToUserPagesPage(MUser _user, bool clearStack = false);
+        void GoToUserPagesPage(string userid, bool clearStack = false);
         void GoToTestPage();
 		void GoToTimelineView(Models.MTimelineInfo timeline);
         void GoToNewTimelineView();

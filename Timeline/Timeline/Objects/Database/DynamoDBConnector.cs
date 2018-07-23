@@ -7,6 +7,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 
 using Timeline.Models;
+using Timeline.Objects.Auth;
 
 namespace Timeline.Objects.Database
 {
@@ -20,11 +21,16 @@ namespace Timeline.Objects.Database
         }
 
         #region "MDBUser"
-        public async Task CreateUser(MUser user)
+        public async Task CreateUser(LoginData login)
         {
             try
             {
                 Table table = Table.LoadTable(client, "TimelineUsers");
+                MUser user = new MUser();
+                user.UserId = login.UserId;
+                user.UserName = login.UserName;
+                user.Email = login.Email;
+                user.PhotoUrl = login.Picture;
                 await table.PutItemAsync(DynamoDBAdapter.User2DynamoDoc(user));
             }
             catch (Exception ex)

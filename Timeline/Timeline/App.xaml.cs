@@ -45,7 +45,7 @@ namespace Timeline
                 if (services.Authentication.Login.Type != Objects.Auth.LoginType.None) //if logged in
                 {
                     MainPage = new NavigationPage(services.Navigation.UserPagesView());
-                    locator.UserPagesViewModel.User = services.Authentication.CurrentUser;
+                    locator.UserPagesViewModel.User = Task.Run(async () => await App.services.Database.GetUser(App.services.Authentication.Login.UserId)).Result;
                 }
                 else
                 {

@@ -22,12 +22,10 @@ namespace Timeline.Services
         private IPlatformSpecificGoogleAuth platformGoogleAuth;
         private IAuthenticationDelegate authDelegate;
 
-        public MUser CurrentUser { get; private set; }
         public LoginData Login { get; private set; }
 
         public AuthenticationService()
         {
-            CurrentUser = new MUser();
             Login = new LoginData();
             platformGoogleAuth = DependencyService.Get<IPlatformSpecificGoogleAuth>();
             googleAuth = new GoogleAuthenticator(platformGoogleAuth.PlatformClientID, "email profile", "hu.iqtech.timeline:/oauth2redirect", this);
@@ -46,13 +44,11 @@ namespace Timeline.Services
 
                 await googleAuth.GetGoogleUserInfo(account, loginDataRef);
                 await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"], loginDataRef);
-                Login.Type = LoginType.Google;
-                PopulateUser();              
+                Login.Type = LoginType.Google;          
             }
             catch (Exception ex)
             {
                 Console.WriteLine("GetCachedCredentials ERROR: " + ex.Message);
-                CurrentUser.Clear();
 
                 throw ex;
             }
@@ -66,7 +62,6 @@ namespace Timeline.Services
 
                 await cognitoAuth.ValidateUser(username, password, loginDataRef);
                 Login.Type = LoginType.Cognito;
-                PopulateUser();
             }
             catch (Exception ex)
             {
@@ -80,7 +75,6 @@ namespace Timeline.Services
             try
             {
                 Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
-                CurrentUser.Clear();
                 await cognitoAuth.SignupUser(username, password, email, loginDataRef);
             }
             catch (Exception ex)
@@ -112,7 +106,6 @@ namespace Timeline.Services
 
         public void SignOut()
         {
-            CurrentUser.Clear();
             Login.Clear();
             ClearCachedCredentials();
             googleAuth.ReInit();
@@ -120,7 +113,6 @@ namespace Timeline.Services
 
         public void OnGoogleAuthCanceled()
         {
-            CurrentUser.Clear();
             Login.Clear();
             authDelegate.OnAuthFailed("Authentication has been cancelled", null);
         }
@@ -136,21 +128,18 @@ namespace Timeline.Services
                 await googleAuth.GetGoogleUserInfo(account, loginDataRef);               
                 await cognitoAuth.GetAWSCredentialsWithGoogleToken(account.Properties["id_token"], loginDataRef);
                 Login.Type = LoginType.Google;
-                PopulateUser();
 
                 authDelegate.OnAuthCompleted();
             }
             catch(Exception ex)
             {
                 Console.WriteLine("OnGoogleAuthCompleted ERROR: " + ex.Message);
-                CurrentUser.Clear();
                 authDelegate.OnAuthFailed(ex.Message, ex);
             }
         }
 
         public void OnGoogleAuthFailed(string message, Exception exception)
         {
-            CurrentUser.Clear();
             Login.Clear();
             authDelegate.OnAuthFailed(message, exception);
         }
@@ -165,12 +154,5 @@ namespace Timeline.Services
             accountStore.Delete(account, "Google");
         }
 
-        private void PopulateUser()
-        {
-            CurrentUser.UserId = Login.UserId;
-            CurrentUser.UserName = Login.UserName;
-            CurrentUser.Email = Login.Email;
-            CurrentUser.PhotoUrl = Login.Picture;
-        }
     }
 }
