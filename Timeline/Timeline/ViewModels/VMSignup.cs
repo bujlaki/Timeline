@@ -77,6 +77,8 @@ namespace Timeline.ViewModels
                 }
 
                 //SUCCESS
+                App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
+                await App.services.Database.CreateUser(App.services.Authentication.CurrentUser);
                 App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
             }
             catch (Exception ex)

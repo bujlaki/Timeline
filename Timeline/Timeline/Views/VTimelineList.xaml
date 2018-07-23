@@ -21,7 +21,7 @@
                    HorizontalOptions="CenterAndExpand" />
             
             <ListView Grid.Row="1" 
-                      ItemsSource="{Binding Timelines}">
+                      ItemsSource="{Binding User.Timelines}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

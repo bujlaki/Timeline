@@ -2,6 +2,7 @@
 using Amazon.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using Timeline.Objects.Auth;
 using Xamarin.Auth;
@@ -15,11 +16,11 @@ namespace Timeline.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
-        public List<MTimelineInfo> Timelines { get; set; }
+        public ObservableCollection<MTimelineInfo> Timelines { get; set; }
 
         public MUser()
         {
-            Timelines = new List<MTimelineInfo>();
+            Timelines = new ObservableCollection<MTimelineInfo>();
             Clear();
         }
 

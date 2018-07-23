@@ -82,6 +82,7 @@ namespace Timeline.ViewModels
         private void TimelineInfo_created(VMNewTimeline arg1, MTimelineInfo arg2)
         {
             User.Timelines.Add(arg2);
+            App.services.Database.UpdateUser(User);
         }
 
         public void CmdMenuExecute(object obj)
