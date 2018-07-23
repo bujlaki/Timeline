@@ -26,6 +26,8 @@ namespace Timeline.ViewModels
                 UserDialogs.Instance.Alert("Please set a name for the timeline", "Name not set");
                 return;
             }
+            if (String.IsNullOrEmpty(TimelineInfo.Description)) TimelineInfo.Description = "";
+
             MessagingCenter.Send<VMNewTimeline, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo);
             App.services.Navigation.GoBack();
         }

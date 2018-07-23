@@ -13,6 +13,8 @@ namespace Timeline.Models
         public MTimelineInfo()
         {
             TimelineId = Guid.NewGuid().ToString();
+            Name = "";
+            Description = "";
         }
 
         public MTimelineInfo(string id)

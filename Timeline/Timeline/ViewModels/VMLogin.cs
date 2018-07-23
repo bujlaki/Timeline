@@ -54,6 +54,7 @@ namespace Timeline.ViewModels
                     await App.services.Authentication.LoginCognito("baz", "password");
                 }
 
+                App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
                 App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
                 Unlock();
             }
@@ -89,6 +90,7 @@ namespace Timeline.ViewModels
                     await App.services.Authentication.LoginCognito(username, password);
                 }
 
+                App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
                 App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
                 Unlock();
             }
@@ -115,6 +117,7 @@ namespace Timeline.ViewModels
 
         public void OnAuthCompleted()
         {
+            App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
             App.services.Navigation.GoToUserPagesPage(App.services.Authentication.CurrentUser, true);
         }
 

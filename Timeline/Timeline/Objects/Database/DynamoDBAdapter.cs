@@ -12,12 +12,12 @@ namespace Timeline.Objects.Database
         public static Document User2DynamoDoc(MUser user)
         {
             var doc = new Document();
-            doc["userid"] = user.UserId;
-            doc["username"] = user.UserName;
-            doc["email"] = user.Email;
+            doc.Add("userid", user.UserId);
+            doc.Add("username", user.UserName);
+            doc.Add("email", user.Email);
             Document timelines = new Document();
             foreach (MTimelineInfo tli in user.Timelines) timelines.Add(tli.TimelineId, TimelineInfo2DynamoDoc(tli));
-            doc["timelines"] = timelines;
+            doc.Add("timelines", timelines);
             return doc;
         }
 
@@ -85,6 +85,12 @@ namespace Timeline.Objects.Database
         {
             byte[] imageBytes = Convert.FromBase64String(base64picture);
             return new Xamarin.Forms.Image { Source = Xamarin.Forms.ImageSource.FromStream(() => new System.IO.MemoryStream(imageBytes)) };
+        }
+
+        private static DynamoDBEntry GetDDBEntry(object value)
+        {
+            if (value == null) return new DynamoDBNull();
+            return (DynamoDBEntry)value;
         }
     }
 }
