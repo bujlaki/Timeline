@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Xamarin.Forms;
+using Xamarin.Essentials;
 
 using Timeline.ViewModels.Base;
 using Timeline.Views;
@@ -89,7 +90,7 @@ namespace Timeline.Services
 
         public void GoToTestPage()
 		{
-			_navigation.PushAsync(testView.Value);	
+			_navigation.PushModalAsync(testView.Value);	
 		}
 
         public void GoToLoginPage()

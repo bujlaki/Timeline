@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
+using Xamarin.Essentials;
 using Acr.UserDialogs;
 
 using Timeline.Models;
@@ -29,10 +30,8 @@ namespace Timeline.ViewModels
         private void LongTapExecute(object obj)
         {
             LongTapEventArg arg = (LongTapEventArg)obj;
-            
-            //UserDialogs.Instance.Alert("longtap " + arg.X.ToString() + " : " + arg.Y.ToString() + " : " + arg.Lane.ToString());
 
-            App.services.Navigation.GoToTimelineEventView();
+            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView());
         }
 
         public void LoadEvents(string timelineId)

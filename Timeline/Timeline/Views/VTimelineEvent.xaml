@@ -8,65 +8,55 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="1">
+        <RelativeLayout>
+            <RelativeLayout>
+                
+            </RelativeLayout>
+            
+            <Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width,Factor=0.9,Constant=0}"
+                  VerticalOptions="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*"/>
-                    <RowDefinition Height="4*"/>
-                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!--<Image Source="title"/>-->
+                <Image Source="title"/>
 
-                <Frame Grid.Row="1"
-                       BackgroundColor="#307496"
-                       CornerRadius="20" 
-                       Margin="-10">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="4*"/>
-                        </Grid.RowDefinitions>
+                <controls:XEntry Grid.Row="1" 
+                             VerticalOptions="Start"
+                             Text="{Binding Event.Title, Mode=OneWayToSource}" 
+                             TextColor="#eeebd3" 
+                             FontSize="16"
+                             Placeholder="title"
+                             PlaceholderColor="#bfd9f3"/>
 
-                        <controls:XEntry Grid.Row="0" 
-                                         VerticalOptions="FillAndExpand"
-                                         Text="{Binding Event.Title, Mode=OneWayToSource}" 
-                                         TextColor="#eeebd3" 
-                                         FontSize="18"
-                                         Placeholder="title"
-                                         PlaceholderColor="#bfd9f3"/>
+                <Label Grid.Row="2" Text="Description"/>
+                <Editor Grid.Row="3"
+                            Text="{Binding Event.Description, Mode=OneWayToSource}"
+                            TextColor="#234b64"
+                            BackgroundColor="#eeebd3"
+                            FontSize="14"/>
 
-                        <Label Grid.Row="1" Text="Description"/>
-
-                        <Editor Grid.Row="2"
-                                Text="{Binding Event.Description, Mode=OneWayToSource}"
-                                TextColor="#234b64"
-                                BackgroundColor="#eeebd3"
-                                FontSize="14"/>
-                    </Grid>
-                </Frame>
-
-                <Button Grid.Row="2" 
-                        Text="Create" 
-                        TextColor="#234B64"
-                        BackgroundColor="#bfd9f3"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
-                        Command="{Binding CmdCreate}"
-                        CommandParameter="1"
-                        BorderRadius="10"
-                        BorderWidth="2"
-                        BorderColor="#eeebd3"/>
+                <Button Grid.Row="6" 
+                    Text="Create" 
+                    TextColor="#234B64"
+                    BackgroundColor="#bfd9f3"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Command="{Binding CmdCreate}"
+                    CommandParameter="1"
+                    BorderRadius="10"
+                    BorderWidth="2"
+                    BorderColor="#eeebd3"/>
 
             </Grid>
-        </Grid>
+        </RelativeLayout>
+
 
     </ContentPage.Content>
 </ContentPage>
