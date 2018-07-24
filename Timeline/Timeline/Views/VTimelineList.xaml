@@ -20,24 +20,26 @@
                    VerticalOptions="Start" 
                    HorizontalOptions="CenterAndExpand" />
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="6*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <ListView Grid.Column="1" 
-                          ItemsSource="{Binding User.Timelines}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ViewCell>
-                                <Label Text="{Binding Name}"/>
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
+            <ListView Grid.Row="1" 
+                      ItemsSource="{Binding User.Timelines}"
+                      Margin="30,0,30,0"
+                      RowHeight="100"
+                      SelectedItem="{Binding SelectedTimeline, Mode=TwoWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid Margin="5,5,5,5" BackgroundColor="#bfd9f3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Label Text="{Binding Name}" Margin="10,0,10,5" TextColor="#f4bd4f" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding Description}" Grid.Row="1" Margin="10,5,10,10" TextColor="#234b64" FontSize="12"/>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
             
             <Button Grid.Row="2" 
                     Text="Create Timeline"

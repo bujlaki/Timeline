@@ -8,12 +8,12 @@ using Acr.UserDialogs;
 
 namespace Timeline.ViewModels
 {
-    public class VMNewTimeline : Base.VMBase
+    public class VMTimelineInfo : Base.VMBase
     {
         public Command CmdCreate { get; set; }
         public MTimelineInfo TimelineInfo { get; set; }
 
-        public VMNewTimeline() : base()
+        public VMTimelineInfo() : base()
         {
             CmdCreate = new Command(CmdCreateExecute);
             TimelineInfo = new MTimelineInfo();
@@ -28,7 +28,7 @@ namespace Timeline.ViewModels
             }
             if (String.IsNullOrEmpty(TimelineInfo.Description)) TimelineInfo.Description = "";
 
-            MessagingCenter.Send<VMNewTimeline, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo);
+            MessagingCenter.Send<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo);
             App.services.Navigation.GoBack();
         }
     }

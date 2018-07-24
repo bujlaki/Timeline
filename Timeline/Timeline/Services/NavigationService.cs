@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+
 using Xamarin.Forms;
+
 using Timeline.ViewModels.Base;
 using Timeline.Views;
 using Timeline.Views.TestPages;
@@ -26,7 +28,8 @@ namespace Timeline.Services
         private Lazy<VTimelineList> timelinelistView;
         private Lazy<VOptions> optionsView;
         private Lazy<VTimeline> timelineView;
-        private Lazy<VNewTimeline> newtimelineView;
+        private Lazy<VTimelineInfo> timelineInfoView;
+        private Lazy<VTimelineEvent> timelineEventView;
 
         public NavigationService(VMLocator loc)
         {
@@ -42,7 +45,8 @@ namespace Timeline.Services
             timelinelistView = new Lazy<VTimelineList>(() => new VTimelineList());
             optionsView = new Lazy<VOptions>(() => new VOptions());
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
-            newtimelineView = new Lazy<VNewTimeline>(() => new VNewTimeline());
+            timelineInfoView = new Lazy<VTimelineInfo>(() => new VTimelineInfo());
+            timelineEventView = new Lazy<VTimelineEvent>(() => new VTimelineEvent());
         }
 
 		public Page LoginPage()
@@ -116,15 +120,20 @@ namespace Timeline.Services
             }
         }
 
-        public void GoToTimelineView(Models.MTimelineInfo timeline)
+        public void GoToTimelineView(MTimelineInfo timeline)
         {
-            //_vMLocator.DetailMovieViewModel.Film = itemMovie;
-			_navigation.PushAsync(timelineView.Value);
+            _vmLocator.TimelineViewModel.LoadEvents(timeline.TimelineId);
+			_navigation.PushModalAsync(timelineView.Value);
         }
 
-        public void GoToNewTimelineView()
+        public void GoToTimelineInfoView()
         {
-            _navigation.PushModalAsync(newtimelineView.Value);
+            _navigation.PushModalAsync(timelineInfoView.Value);
+        }
+
+        public void GoToTimelineEventView()
+        {
+            _navigation.PushModalAsync(timelineEventView.Value);
         }
 
         public void GoBack() => _navigation.PopModalAsync();

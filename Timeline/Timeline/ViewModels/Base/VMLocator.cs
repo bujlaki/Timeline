@@ -12,7 +12,8 @@ namespace Timeline.ViewModels.Base
         private Lazy<VMSignup> signupViewModel;
         private Lazy<VMUserPages> userpagesViewModel;
 		private Lazy<VMTimeline> timelineViewModel;
-        private Lazy<VMNewTimeline> newtimelineViewModel;
+        private Lazy<VMTimelineInfo> timelineInfoViewModel;
+        private Lazy<VMTimelineEvent> timelineEventViewModel;
         
         public VMLocator()
         {
@@ -22,7 +23,8 @@ namespace Timeline.ViewModels.Base
             signupViewModel = new Lazy<VMSignup>(() => new VMSignup());
             userpagesViewModel = new Lazy<VMUserPages>(() => new VMUserPages());
             timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline());
-            newtimelineViewModel = new Lazy<VMNewTimeline>(() => new VMNewTimeline());
+            timelineInfoViewModel = new Lazy<VMTimelineInfo>(() => new VMTimelineInfo());
+            timelineEventViewModel = new Lazy<VMTimelineEvent>(() => new VMTimelineEvent());
         }
         
 		public TestViewModels.VMTestPage TestViewModel {
@@ -45,8 +47,12 @@ namespace Timeline.ViewModels.Base
 			get { return timelineViewModel.Value; }
         }
 
-        public VMNewTimeline NewTimelineViewModel {
-            get { return newtimelineViewModel.Value; }
+        public VMTimelineInfo TimelineInfoViewModel {
+            get { return timelineInfoViewModel.Value; }
+        }
+
+        public VMTimelineEvent TimelineEventViewModel {
+            get { return timelineEventViewModel.Value; }
         }
     }
 }

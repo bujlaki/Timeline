@@ -10,7 +10,7 @@
                   SeparatorVisibility="None"
                   HasUnevenRows="true"
                   ItemsSource="{Binding MenuItems}"
-                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                  SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}">
             <ListView.Header>
                 <Grid BackgroundColor="#bfd9f3">
                     <Grid.ColumnDefinitions>

@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Timeline.Controls"
+             x:Class="Timeline.Views.VTimelineInfo"
+             Title="NEWTIMELINE"
+             BindingContext="{Binding TimelineInfoViewModel, Source={StaticResource vmLocator}}"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#234b64">
+    <ContentPage.Content>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+
+                <Image Source="title"/>
+
+                <Frame Grid.Row="1"
+                       BackgroundColor="#307496"
+                       CornerRadius="20" 
+                       Margin="-10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="4*"/>
+                        </Grid.RowDefinitions>
+
+                        <controls:XEntry Grid.Row="0" 
+                                         VerticalOptions="FillAndExpand"
+                                         Text="{Binding TimelineInfo.Name, Mode=OneWayToSource}" 
+                                         TextColor="#eeebd3" 
+                                         FontSize="18"
+                                         Placeholder="name"
+                                         PlaceholderColor="#bfd9f3"/>
+
+                        <Label Grid.Row="1" Text="Description"/>
+
+                        <Editor Grid.Row="2"
+                                Text="{Binding TimelineInfo.Description, Mode=OneWayToSource}"
+                                TextColor="#234b64"
+                                BackgroundColor="#eeebd3"
+                                FontSize="14"/>
+                    </Grid>
+                </Frame>
+
+                <Button Grid.Row="2" 
+                        Text="Create" 
+                        TextColor="#234B64"
+                        BackgroundColor="#bfd9f3"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Command="{Binding CmdCreate}"
+                        CommandParameter="1"
+                        BorderRadius="10"
+                        BorderWidth="2"
+                        BorderColor="#eeebd3"/>
+
+            </Grid>
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

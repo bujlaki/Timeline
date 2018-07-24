@@ -222,7 +222,10 @@ namespace Timeline.Controls
                     if (args.InitialRawLocation.Y < timelineBottomY) break;
                     int clickedLane = ((int)args.InitialRawLocation.Y - (int)timelineBottomY - lanesOffsetY) / laneHeight;
                     LongTapEventArg arg = new LongTapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, 0);
-                    if (LongTapCommand != null && LongTapCommand.CanExecute(null)) LongTapCommand.Execute(arg);
+                    if (LongTapCommand != null && LongTapCommand.CanExecute(null))
+                    {
+                        LongTapCommand.Execute(arg);
+                    }
                     break;
 
                 case TouchGestureType.Pan:

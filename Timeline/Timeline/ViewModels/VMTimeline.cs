@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+
 using Xamarin.Forms;
+using Acr.UserDialogs;
 
 using Timeline.Models;
 using Timeline.Objects.Timeline;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+
 
 namespace Timeline.ViewModels
 {
@@ -18,24 +22,25 @@ namespace Timeline.ViewModels
 		public VMTimeline() : base()
         {
             CmdLongTap = new Command(LongTapExecute);
+
             Events = new ObservableCollection<MTimelineEvent>();
-
-            for (int y = 2018; y < 2025; y++)
-            {
-                for (int i = 1; i < 11; i++)
-                {
-                    Events.Add(new MTimelineEvent("event1 with long title", new TimelineDateTime(y, i), 2));
-                }
-            }
-
-            LaneCount = EventManager.SortEventsToLanes(Events, 10);
         }
 
         private void LongTapExecute(object obj)
         {
             LongTapEventArg arg = (LongTapEventArg)obj;
             
-            Acr.UserDialogs.UserDialogs.Instance.Alert("longtap " + arg.X.ToString() + " : " + arg.Y.ToString() + " : " + arg.Lane.ToString());
+            //UserDialogs.Instance.Alert("longtap " + arg.X.ToString() + " : " + arg.Y.ToString() + " : " + arg.Lane.ToString());
+
+            App.services.Navigation.GoToTimelineEventView();
+        }
+
+        public void LoadEvents(string timelineId)
+        {
+            Task.Run(async () => {
+                Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(timelineId));
+                LaneCount = EventManager.SortEventsToLanes(Events, 10);
+            });
         }
     }
 }

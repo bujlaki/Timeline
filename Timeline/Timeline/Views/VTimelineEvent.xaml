@@ -2,9 +2,9 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:Timeline.Controls"
-             x:Class="Timeline.Views.VNewTimeline"
-             Title="NEWTIMELINE"
-             BindingContext="{Binding NewTimelineViewModel, Source={StaticResource vmLocator}}"
+             x:Class="Timeline.Views.VTimelineEvent"
+             Title="TIMELINE_EVENT"
+             BindingContext="{Binding TimelineEventViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content>
@@ -22,7 +22,7 @@
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
-                <Image Source="title"/>
+                <!--<Image Source="title"/>-->
 
                 <Frame Grid.Row="1"
                        BackgroundColor="#307496"
@@ -37,16 +37,16 @@
 
                         <controls:XEntry Grid.Row="0" 
                                          VerticalOptions="FillAndExpand"
-                                         Text="{Binding TimelineInfo.Name, Mode=OneWayToSource}" 
+                                         Text="{Binding Event.Title, Mode=OneWayToSource}" 
                                          TextColor="#eeebd3" 
                                          FontSize="18"
-                                         Placeholder="name"
+                                         Placeholder="title"
                                          PlaceholderColor="#bfd9f3"/>
 
                         <Label Grid.Row="1" Text="Description"/>
 
                         <Editor Grid.Row="2"
-                                Text="{Binding TimelineInfo.Description, Mode=OneWayToSource}"
+                                Text="{Binding Event.Description, Mode=OneWayToSource}"
                                 TextColor="#234b64"
                                 BackgroundColor="#eeebd3"
                                 FontSize="14"/>

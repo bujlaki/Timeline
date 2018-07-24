@@ -10,9 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Timeline.Views
 {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class VNewTimeline : ContentPage
+	public partial class VTimelineEvent : ContentPage
 	{
-		public VNewTimeline ()
+		public VTimelineEvent ()
 		{
 			InitializeComponent ();
 		}

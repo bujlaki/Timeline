@@ -32,33 +32,42 @@ namespace Timeline.ViewModels
 
     public class VMUserPages : Base.VMBase
     {
-        private UserPagesMenuItem _selectedItem;
+        private UserPagesMenuItem _selectedMenuItem;
+        private MTimelineInfo _selectedTimeline;
         private MUser _user;
         private TimelineTheme theme;
 
         public ObservableCollection<MTimelineInfo> Timelines;
+        public MTimelineInfo SelectedTimeline {
+            get { return _selectedTimeline; }
+            set
+            {
+                _selectedTimeline = value;
+                RaisePropertyChanged("SelectedTimeline");
+                if (_selectedTimeline == null) return;
+                CmdTimelineSelected.Execute(_selectedTimeline);
+                SelectedTimeline = null;
+            }
+        }
 
         public Command CmdMenu { get; set; }
         public Command CmdNewTimeline { get; set; }
+        public Command CmdTimelineSelected { get; set; }
         public MUser User {
             get { return _user; }
             set { _user = value; RaisePropertyChanged("User"); }
         }        
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
-        public UserPagesMenuItem SelectedItem
+        public UserPagesMenuItem SelectedMenuItem
         {
-            get
-            {
-                return _selectedItem;
-            }
+            get { return _selectedMenuItem; }
             set
             {
-                _selectedItem = value;
+                _selectedMenuItem = value;
                 RaisePropertyChanged("SelectedItem");
-                if (_selectedItem == null)
-                    return;
-                HandleMenuItem(_selectedItem.Id);
-                SelectedItem = null;
+                if (_selectedMenuItem == null) return;
+                HandleMenuItem(_selectedMenuItem.Id);
+                SelectedMenuItem = null;
             }
         }
 
@@ -74,12 +83,13 @@ namespace Timeline.ViewModels
 
             CmdMenu = new Command(CmdMenuExecute);
             CmdNewTimeline = new Command(CmdNewTimelineExecute);
+            CmdTimelineSelected = new Command(CmdTimelineSelectedExecute);
 
             //subscribe to events
-            MessagingCenter.Subscribe<VMNewTimeline, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
+            MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
         }
 
-        private void TimelineInfo_created(VMNewTimeline arg1, MTimelineInfo arg2)
+        private void TimelineInfo_created(VMTimelineInfo arg1, MTimelineInfo arg2)
         {
             User.Timelines.Add(arg2);
             App.services.Database.UpdateUser(User);
@@ -93,7 +103,12 @@ namespace Timeline.ViewModels
 
         public void CmdNewTimelineExecute(object obj)
         {
-            App.services.Navigation.GoToNewTimelineView();
+            App.services.Navigation.GoToTimelineInfoView();
+        }
+
+        public void CmdTimelineSelectedExecute(object obj)
+        {
+            App.services.Navigation.GoToTimelineView((MTimelineInfo)obj);
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)

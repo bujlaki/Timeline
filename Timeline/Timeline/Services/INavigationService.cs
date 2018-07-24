@@ -18,7 +18,8 @@ namespace Timeline.Services
         void GoToUserPagesPage(string userid, bool clearStack = false);
         void GoToTestPage();
 		void GoToTimelineView(Models.MTimelineInfo timeline);
-        void GoToNewTimelineView();
+        void GoToTimelineInfoView();
+        void GoToTimelineEventView();
         void GoBack();
     }
 }
