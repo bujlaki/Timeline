@@ -8,11 +8,45 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content>
-        <RelativeLayout>
-            <RelativeLayout>
+        <AbsoluteLayout BackgroundColor="DarkGreen">
+
+            <Frame AbsoluteLayout.LayoutFlags="All" 
+                   AbsoluteLayout.LayoutBounds="0,0,1,1" 
+                   BackgroundColor="#88eeebd3">
+                <Grid HeightRequest="300" BackgroundColor="#eeebd3" VerticalOptions="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Text="SET DATE" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"/>
+                    <Grid Grid.Row="1" WidthRequest="200" HorizontalOptions="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Entry Placeholder="year"/>
+                        <Label Grid.Column="1" Text="Before Christ" VerticalOptions="Center"/>
+                        <Switch Grid.Column="2" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="10,10,10,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Picker Title="Month" />
+                        <Picker Grid.Column="1" Title="Day" />
+                        <Picker Grid.Column="2" Title="Hour" />
+                        <Picker Grid.Column="3" Title="Minute" />
+                    </Grid>
+                </Grid>
                 
-            </RelativeLayout>
-            
+            </Frame>
+
             <Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width,Factor=0.9,Constant=0}"
                   VerticalOptions="Center">
                 <Grid.RowDefinitions>
@@ -55,7 +89,7 @@
                     BorderColor="#eeebd3"/>
 
             </Grid>
-        </RelativeLayout>
+        </AbsoluteLayout>
 
 
     </ContentPage.Content>
