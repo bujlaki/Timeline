@@ -11,9 +11,6 @@
                     <tt:TouchEffect Capture="True" TouchAction="OnTouchEffectAction" />
                 </skia:SKCanvasView.Effects>
             </skia:SKCanvasView>
-            <!--<Grid.Effects>
-                <tt:TouchEffect Capture="True" TouchAction="OnTouchEffectAction" />
-            </Grid.Effects>-->
         </Grid>
     </ContentView.Content>
 </ContentView>

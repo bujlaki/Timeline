@@ -11,6 +11,8 @@
         <StackLayout Orientation="Vertical">
             <Button Text="RUN TESTS" Command="{Binding CmdRunTests}"/>
             <Button Text="OPEN TIMELINE TEST" Command="{Binding CmdOpenTimeline}"/>
+            <controls:ValuePicker x:Name="valuepicker" HeightRequest="150"/>
+            <Label Text="{Binding NumericValue, Source={Reference valuepicker}}" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

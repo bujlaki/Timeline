@@ -38,7 +38,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Picker Title="Month" />
+                        <controls:ValuePicker />
                         <Picker Grid.Column="1" Title="Day" />
                         <Picker Grid.Column="2" Title="Hour" />
                         <Picker Grid.Column="3" Title="Minute" />
