@@ -16,7 +16,7 @@ namespace Timeline.Controls
     public enum ValuePickerType
     {
         Numeric,
-        StringList
+        ItemList
     }
 
 	[XamlCompilation(XamlCompilationOptions.Compile)]
@@ -115,7 +115,7 @@ namespace Timeline.Controls
         private static void OnNumericValueChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ValuePicker vp = (ValuePicker)bindable;
-            vp.doInitialize = true;
+            if (!vp.inAction) vp.currentOffset = (vp.NumericValue - vp.MinValue) * vp.stepY;
             Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => vp.canvasView.InvalidateSurface());
         }
         public int NumericValue
@@ -124,6 +124,24 @@ namespace Timeline.Controls
             set { SetValue(NumericValueProperty, value); }
         }
 
+        public static readonly BindableProperty ItemValueProperty = BindableProperty.Create(
+            nameof(ItemValue),
+            typeof(object),
+            typeof(ValuePicker),
+            null, BindingMode.TwoWay,
+            propertyChanged: OnItemValueChanged);
+
+        private static void OnItemValueChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ValuePicker vp = (ValuePicker)bindable;
+            if (!vp.inAction) vp.NumericValue = vp.Items.ToList().IndexOf(newValue);
+            Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => vp.canvasView.InvalidateSurface());
+        }
+        public object ItemValue
+        {
+            get { return (object)GetValue(ItemValueProperty); }
+            set { SetValue(ItemValueProperty, value); }
+        }
         #endregion
 
         private SKPaint primaryPaint;
@@ -179,7 +197,7 @@ namespace Timeline.Controls
             else if (currentOffset <minValueOffset) { currentOffset = minValueOffset; StopSwipeAnimation(); }
             else
             {
-                NumericValue = (int)((currentOffset + halfStepY) / stepY);
+                SetValue();
                 swipeSpeed = swipeSpeed * 0.9f;
                 if (Math.Abs(swipeSpeed) < stepY / 10) { StopSwipeAnimation(); StartAdjustAnimation(100); }
                 Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
@@ -225,8 +243,8 @@ namespace Timeline.Controls
             path.MoveTo(0, halfHeight);
             path.LineTo(fullWidth, halfHeight);
 
-            int minVisibleValue = (int)((currentOffset - halfHeight) / stepY);
-            int maxVisibleValue = (int)((currentOffset + halfHeight) / stepY) + 1;
+            int minVisibleValue = MinValue + (int)((currentOffset - halfHeight) / stepY);
+            int maxVisibleValue = MinValue + (int)((currentOffset + halfHeight) / stepY) + 1;
 
             int unit;
             for(unit=minVisibleValue; unit<=maxVisibleValue; unit++)
@@ -238,7 +256,7 @@ namespace Timeline.Controls
                 {
                     canvas.DrawTextOnPath(unit.ToString(), path, 0, unitOffset - currentOffset + primaryPaint.FontMetrics.CapHeight / 2, primaryPaint);
                 }
-                else if(PickerType==ValuePickerType.StringList)
+                else if(PickerType==ValuePickerType.ItemList)
                 {
                     if(Items!=null)
                         canvas.DrawTextOnPath(Items.ElementAt(unit).ToString(), path, 0, unitOffset - currentOffset + primaryPaint.FontMetrics.CapHeight / 2, primaryPaint);
@@ -261,7 +279,7 @@ namespace Timeline.Controls
                     currentOffset = panStartOffset - (float)e.TotalY * 2;
                     if (currentOffset < minValueOffset) currentOffset = minValueOffset;
                     if (currentOffset > maxValueOffset) currentOffset = maxValueOffset;
-                    NumericValue = (int)((currentOffset + halfStepY) / stepY);
+                    SetValue();
                     break;
                 case GestureStatus.Completed:
                     inAction = false;
@@ -269,7 +287,7 @@ namespace Timeline.Controls
                     float totalPan = currentOffset - panStartOffset;
 
                     if (panTime < swipeTimeMax)
-                        StartSwipeAnimation(100 / panTime.Milliseconds * totalPan, 100);
+                        StartSwipeAnimation((100 / panTime.Milliseconds) * totalPan, 100);
                     else
                         StartAdjustAnimation(100);
                     break;
@@ -289,8 +307,7 @@ namespace Timeline.Controls
 
             minValueOffset = 0.0f;
             maxValueOffset = (MaxValue - MinValue) * stepY;
-            if(!inAction)
-                currentOffset = (NumericValue - MinValue) * stepY;
+            currentOffset = (NumericValue - MinValue) * stepY;
 
             highlighterPaint.StrokeWidth = stepY;
         }
@@ -306,7 +323,7 @@ namespace Timeline.Controls
         {
             swipeSpeed = 0.0f;
             swipeTimer.Change(Timeout.Infinite, Timeout.Infinite);
-            NumericValue = (int)((currentOffset + halfStepY) / stepY);
+            SetValue();
             inAction = false;
             Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
         }
@@ -314,7 +331,7 @@ namespace Timeline.Controls
         private void StartAdjustAnimation(int msInterval)
         {
             inAction = true;
-            adjustToOffset = NumericValue * stepY;
+            adjustToOffset = (NumericValue - MinValue) * stepY;
             adjustTimer.Change(msInterval, msInterval);
         }
 
@@ -323,6 +340,12 @@ namespace Timeline.Controls
             adjustTimer.Change(Timeout.Infinite, Timeout.Infinite);
             inAction = false;
             Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
+        }
+
+        private void SetValue()
+        {
+            NumericValue = MinValue + (int)((currentOffset + halfStepY) / stepY);
+            if (PickerType == ValuePickerType.ItemList) ItemValue = Items.ElementAt(NumericValue);
         }
     }
 }
