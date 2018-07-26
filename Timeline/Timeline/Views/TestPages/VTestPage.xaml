@@ -11,8 +11,9 @@
         <StackLayout Orientation="Vertical">
             <Button Text="RUN TESTS" Command="{Binding CmdRunTests}"/>
             <Button Text="OPEN TIMELINE TEST" Command="{Binding CmdOpenTimeline}"/>
-            <controls:ValuePicker x:Name="valuepicker" HeightRequest="150"/>
-            <Label Text="{Binding NumericValue, Source={Reference valuepicker}}" />
+            <!--<controls:ValuePicker x:Name="valuepicker" HeightRequest="150" Items="{Binding Values}" PickerType="StringList"/>-->
+            <controls:ValuePicker x:Name="valuepicker" HeightRequest="150" NumericValue="{Binding PickedValue}" MinValue="{Binding MinValue}"/>
+            <Label Text="{Binding PickedValue}" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

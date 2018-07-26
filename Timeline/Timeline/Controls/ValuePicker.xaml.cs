@@ -27,7 +27,7 @@ namespace Timeline.Controls
             nameof(PickerType),
             typeof(ValuePickerType),
             typeof(ValuePicker),
-            ValuePickerType.Numeric, BindingMode.TwoWay,
+            ValuePickerType.Numeric, BindingMode.OneWay,
             propertyChanged: OnPickerTypeChanged);
 
         private static void OnPickerTypeChanged(BindableObject bindable, object oldValue, object newValue)
@@ -40,16 +40,45 @@ namespace Timeline.Controls
             set { SetValue(PickerTypeProperty, value); }
         }
 
+        public static readonly BindableProperty ItemsProperty = BindableProperty.Create(
+            nameof(Items),
+            typeof(IEnumerable<object>),
+            typeof(ValuePicker),
+            null, BindingMode.TwoWay,
+            propertyChanged: OnItemsChanged);
+
+        private static void OnItemsChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ValuePicker vp = (ValuePicker)bindable;
+            if (newValue!=null)
+            {
+                vp.MinValue = 0;
+                vp.MaxValue = vp.Items.Count() - 1;
+            }
+            
+            vp.doInitialize = true;
+            vp.canvasView.InvalidateSurface();
+        }
+        public IEnumerable<object> Items
+        {
+            get { return (IEnumerable<object>)GetValue(ItemsProperty); }
+            set { SetValue(ItemsProperty, value); }
+        }
+
         public static readonly BindableProperty MinValueProperty = BindableProperty.Create(
             nameof(MinValue),
             typeof(int),
             typeof(ValuePicker),
-            0, BindingMode.TwoWay,
+            0, BindingMode.OneWay,
             propertyChanged: OnMinValueChanged);
 
         private static void OnMinValueChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((ValuePicker)bindable).InvalidateLayout();
+            ValuePicker vp = (ValuePicker)bindable;
+            if (vp.NumericValue < vp.MinValue) vp.NumericValue = vp.MinValue;
+            if (vp.NumericValue > vp.MaxValue) vp.NumericValue = vp.MaxValue;
+            vp.doInitialize = true;
+            vp.canvasView.InvalidateSurface();
         }
         public int MinValue
         {
@@ -61,12 +90,14 @@ namespace Timeline.Controls
             nameof(MaxValue),
             typeof(int),
             typeof(ValuePicker),
-            100, BindingMode.TwoWay,
+            100, BindingMode.OneWay,
             propertyChanged: OnMaxValueChanged);
 
         private static void OnMaxValueChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((ValuePicker)bindable).InvalidateLayout();
+            ValuePicker vp = (ValuePicker)bindable;
+            vp.doInitialize = true;
+            vp.canvasView.InvalidateSurface();
         }
         public int MaxValue
         {
@@ -83,13 +114,16 @@ namespace Timeline.Controls
 
         private static void OnNumericValueChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((ValuePicker)bindable).InvalidateLayout();
+            ValuePicker vp = (ValuePicker)bindable;
+            vp.doInitialize = true;
+            Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => vp.canvasView.InvalidateSurface());
         }
         public int NumericValue
         {
             get { return (int)GetValue(NumericValueProperty); }
             set { SetValue(NumericValueProperty, value); }
         }
+
         #endregion
 
         private SKPaint primaryPaint;
@@ -114,6 +148,10 @@ namespace Timeline.Controls
         private float swipeSpeed;
         private TimeSpan swipeTimeMax;
         private Timer swipeTimer;
+        private Timer adjustTimer;
+        private float adjustToOffset;
+
+        private bool inAction;
 
         public ValuePicker ()
 		{
@@ -125,24 +163,43 @@ namespace Timeline.Controls
             primaryPaint.TextAlign = SKTextAlign.Center;
             highlighterPaint = new SKPaint();
             highlighterPaint.Color = Color.Yellow.ToSKColor();
-
+            
             swipeTimeMax = TimeSpan.FromMilliseconds(600);
-            swipeTimer = new Timer(SwipeTimerCallback, null, Timeout.Infinite, Timeout.Infinite);
+            swipeTimer = new Timer(SwipeAnimationCallback, null, Timeout.Infinite, Timeout.Infinite);
+            adjustTimer = new Timer(AdjustAnimationCallback, null, Timeout.Infinite, Timeout.Infinite);
             doInitialize = true;
+            inAction = false;
         }
 
-        private void SwipeTimerCallback(object state)
+        private void SwipeAnimationCallback(object state)
         {
             currentOffset += swipeSpeed;
-            
-            swipeSpeed = swipeSpeed * 0.9f;
 
-            if(Math.Abs(swipeSpeed) < stepY / 10)
+            if (currentOffset > maxValueOffset) { currentOffset = maxValueOffset; StopSwipeAnimation(); }
+            else if (currentOffset <minValueOffset) { currentOffset = minValueOffset; StopSwipeAnimation(); }
+            else
             {
-                swipeSpeed = 0.0f;
-                swipeTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                NumericValue = (int)((currentOffset + halfStepY) / stepY);
+                swipeSpeed = swipeSpeed * 0.9f;
+                if (Math.Abs(swipeSpeed) < stepY / 10) { StopSwipeAnimation(); StartAdjustAnimation(100); }
+                Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
             }
-            Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
+        }
+
+        private void AdjustAnimationCallback(object state)
+        {
+            float diff = adjustToOffset - currentOffset;
+
+            if(Math.Abs(diff) < stepY / 20)
+            {
+                currentOffset = adjustToOffset;
+                StopAdjustAnimation();
+            }
+            else
+            {
+                currentOffset = currentOffset + diff * 0.3f;
+                Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
+            }
         }
 
         void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
@@ -158,7 +215,7 @@ namespace Timeline.Controls
 
             canvas.DrawLine(0, halfHeight, fullWidth, halfHeight, highlighterPaint);
 
-            DrawValuesNumeric(canvas);
+            DrawValuesNumeric(canvas);         
         }
 
         private void DrawValuesNumeric(SKCanvas canvas)
@@ -176,7 +233,16 @@ namespace Timeline.Controls
             {
                 if (unit < MinValue || unit > MaxValue) continue;
                 float unitOffset = minValueOffset + (unit - MinValue) * stepY;
-                canvas.DrawTextOnPath(unit.ToString(), path, 0, unitOffset - currentOffset + primaryPaint.FontMetrics.CapHeight/2, primaryPaint);
+                
+                if (PickerType == ValuePickerType.Numeric)
+                {
+                    canvas.DrawTextOnPath(unit.ToString(), path, 0, unitOffset - currentOffset + primaryPaint.FontMetrics.CapHeight / 2, primaryPaint);
+                }
+                else if(PickerType==ValuePickerType.StringList)
+                {
+                    if(Items!=null)
+                        canvas.DrawTextOnPath(Items.ElementAt(unit).ToString(), path, 0, unitOffset - currentOffset + primaryPaint.FontMetrics.CapHeight / 2, primaryPaint);
+                }
             }
         }
 
@@ -185,9 +251,11 @@ namespace Timeline.Controls
             switch(e.StatusType)
             {
                 case GestureStatus.Started:
-                    swipeTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                    StopSwipeAnimation();
+                    StopAdjustAnimation();
                     panStart = DateTime.UtcNow;
                     panStartOffset = currentOffset;
+                    inAction = true;
                     break;
                 case GestureStatus.Running:
                     currentOffset = panStartOffset - (float)e.TotalY * 2;
@@ -196,14 +264,14 @@ namespace Timeline.Controls
                     NumericValue = (int)((currentOffset + halfStepY) / stepY);
                     break;
                 case GestureStatus.Completed:
+                    inAction = false;
                     TimeSpan panTime = DateTime.UtcNow - panStart;
                     float totalPan = currentOffset - panStartOffset;
-                    if(panTime < swipeTimeMax)
-                    {
-                        swipeSpeed = 100 / panTime.Milliseconds * totalPan;
-                        swipeTimer.Change(100, 100);
-                    }
-                    //currentOffset = panStartOffset - (float)e.TotalY;
+
+                    if (panTime < swipeTimeMax)
+                        StartSwipeAnimation(100 / panTime.Milliseconds * totalPan, 100);
+                    else
+                        StartAdjustAnimation(100);
                     break;
             }
 
@@ -221,9 +289,40 @@ namespace Timeline.Controls
 
             minValueOffset = 0.0f;
             maxValueOffset = (MaxValue - MinValue) * stepY;
-            currentOffset = (NumericValue - MinValue) * stepY;
+            if(!inAction)
+                currentOffset = (NumericValue - MinValue) * stepY;
 
             highlighterPaint.StrokeWidth = stepY;
+        }
+
+        private void StartSwipeAnimation(float speed, int msInterval)
+        {
+            inAction = true;
+            swipeSpeed = speed;
+            swipeTimer.Change(msInterval, msInterval);
+        }
+
+        private void StopSwipeAnimation()
+        {
+            swipeSpeed = 0.0f;
+            swipeTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            NumericValue = (int)((currentOffset + halfStepY) / stepY);
+            inAction = false;
+            Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
+        }
+
+        private void StartAdjustAnimation(int msInterval)
+        {
+            inAction = true;
+            adjustToOffset = NumericValue * stepY;
+            adjustTimer.Change(msInterval, msInterval);
+        }
+
+        private void StopAdjustAnimation()
+        {
+            adjustTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            inAction = false;
+            Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => canvasView.InvalidateSurface());
         }
     }
 }
