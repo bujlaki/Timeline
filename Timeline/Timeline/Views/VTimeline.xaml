@@ -16,7 +16,12 @@
             </Grid.RowDefinitions>
 
             <Label BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
-            <controls:TimelineControl Grid.Row="1" x:Name="tlc" EventsSource="{Binding Events, Mode=TwoWay}" LaneCount="{Binding LaneCount}" LongTapCommand="{Binding CmdLongTap}"/>
+            <controls:TimelineControl Grid.Row="1" 
+                                      x:Name="tlc"
+                                      EventsSource="{Binding Events, Mode=TwoWay}" 
+                                      LaneCount="{Binding LaneCount}" 
+                                      LongTapCommand="{Binding CmdLongTap}"
+                                      Pixeltime="{Binding Pixeltime}"/>
             <Label Grid.Row="2" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />
         </Grid>
     </ContentPage.Content>

@@ -27,13 +27,15 @@ namespace Timeline.Objects.Timeline
         public float Y;
         public int Lane;
         public Int64 Ticks;
+        public TimelineUnits ZoomUnit;
 
-        public LongTapEventArg(float _x, float _y, int _lane, Int64 _ticks)
+        public LongTapEventArg(float _x, float _y, int _lane, Int64 _ticks, TimelineUnits _zoomUnit)
         {
             X = _x;
             Y = _y;
             Lane = _lane;
             Ticks = _ticks;
+            ZoomUnit = _zoomUnit;
         }
     }
 }

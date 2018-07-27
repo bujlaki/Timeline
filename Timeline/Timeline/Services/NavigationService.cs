@@ -124,7 +124,14 @@ namespace Timeline.Services
         public void GoToTimelineView(MTimelineInfo timeline)
         {
             _vmLocator.TimelineViewModel.LoadEvents(timeline.TimelineId);
-			_navigation.PushModalAsync(timelineView.Value);
+            try
+            {
+                _navigation.PushModalAsync(timelineView.Value);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GoToTimelineView ERROR: " + ex.Message);
+            }
         }
 
         public void GoToTimelineInfoView()
@@ -132,8 +139,9 @@ namespace Timeline.Services
             _navigation.PushModalAsync(timelineInfoView.Value);
         }
 
-        public void GoToTimelineEventView()
+        public void GoToTimelineEventView(MTimelineEvent tlevent)
         {
+            _vmLocator.TimelineEventViewModel.Event = tlevent;
             _navigation.PushModalAsync(timelineEventView.Value);
         }
 

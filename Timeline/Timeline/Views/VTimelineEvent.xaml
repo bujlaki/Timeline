@@ -8,20 +8,22 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content>
-        <AbsoluteLayout BackgroundColor="DarkGreen">
+        <AbsoluteLayout>
 
             <Frame AbsoluteLayout.LayoutFlags="All" 
                    AbsoluteLayout.LayoutBounds="0,0,1,1" 
-                   BackgroundColor="#88eeebd3">
+                   BackgroundColor="#88eeebd3"
+                   IsVisible="{Binding DatePickerVisible}">
                 <Grid HeightRequest="300" BackgroundColor="#eeebd3" VerticalOptions="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="3*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Label Grid.Row="0" Text="SET DATE" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"/>
                     
-                    <Grid Grid.Row="1" WidthRequest="200" HorizontalOptions="Center">
+                    <Grid Grid.Row="1" WidthRequest="200" HorizontalOptions="Center" BackgroundColor="WhiteSmoke">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -29,47 +31,99 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Label Text="{Binding BCAC}" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="{Binding BCAC}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="20">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding CmdBCAC}" NumberOfTapsRequired="1"/>
                             </Label.GestureRecognizers>
                         </Label>
-                        <StackLayout Grid.Column="1" Orientation="Vertical">
-                            <Button Text="+" HeightRequest="30"/>
-                            <Label Text="{Binding Digit1}" HorizontalOptions="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding CmdDigitTapped}" CommandParameter="1000"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Button Text="-" HeightRequest="30"/>
-                        </StackLayout>
-                        <StackLayout Grid.Column="2" Orientation="Vertical">
-                            <Button Text="+" HeightRequest="30"/>
-                            <Label Text="{Binding Digit2}" HorizontalOptions="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding CmdDigitTapped}" CommandParameter="100"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Button Text="-" HeightRequest="30"/>
-                        </StackLayout>
-                        <StackLayout Grid.Column="3" Orientation="Vertical">
-                            <Button Text="+" HeightRequest="30"/>
-                            <Label Text="{Binding Digit3}" HorizontalOptions="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding CmdDigitTapped}" CommandParameter="10"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Button Text="-" HeightRequest="30"/>
-                        </StackLayout>
-                        <StackLayout Grid.Column="4" Orientation="Vertical">
-                            <Button Text="+" HeightRequest="30"/>
-                            <Label Text="{Binding Digit4}" HorizontalOptions="Center">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding CmdDigitTapped}" CommandParameter="1"/>
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Button Text="-" HeightRequest="30"/>
-                        </StackLayout>
+                        <AbsoluteLayout Grid.Column="1">
+                            <Label AbsoluteLayout.LayoutFlags="All" 
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Text="{Binding Digit1}"
+                                   FontSize="36"/>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,0,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitUp}" CommandParameter="1000"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,1,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitDown}" CommandParameter="1000"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                        </AbsoluteLayout>
+                        <AbsoluteLayout Grid.Column="2">
+                            <Label AbsoluteLayout.LayoutFlags="All" 
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Text="{Binding Digit2}"
+                                   FontSize="36"/>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,0,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitUp}" CommandParameter="100"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,1,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitDown}" CommandParameter="100"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                        </AbsoluteLayout>
+                        <AbsoluteLayout Grid.Column="3">
+                            <Label AbsoluteLayout.LayoutFlags="All" 
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Text="{Binding Digit3}"
+                                   FontSize="36"/>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,0,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitUp}" CommandParameter="10"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,1,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitDown}" CommandParameter="10"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                        </AbsoluteLayout>
+                        <AbsoluteLayout Grid.Column="4">
+                            <Label AbsoluteLayout.LayoutFlags="All" 
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   Text="{Binding Digit4}"
+                                   FontSize="36"/>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,0,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitUp}" CommandParameter="1"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                            <BoxView AbsoluteLayout.LayoutFlags="All"
+                                     AbsoluteLayout.LayoutBounds="0,1,1,0.5"
+                                     BackgroundColor="Transparent">
+                                <BoxView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdDigitDown}" CommandParameter="1"/>
+                                </BoxView.GestureRecognizers>
+                            </BoxView>
+                        </AbsoluteLayout>
                     </Grid>
 
                     <Grid Grid.Row="2" Margin="10,10,10,10">
@@ -80,38 +134,127 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackLayout Grid.Column="0" Orientation="Vertical">
-                            <Label Text="MONTH" HorizontalOptions="Center"/>
+                            <Label Text="MONTH" HorizontalOptions="Center" HeightRequest="20" TextColor="{Binding MonthLabelColor}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdPickerLabelTap}" CommandParameter="1"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                             <controls:ValuePicker PickerType="ItemList" 
                                                   Items="{Binding Months}"
-                                                  VerticalOptions="FillAndExpand"/>
+                                                  NumericValue="{Binding SelectedMonth}"
+                                                  VerticalOptions="FillAndExpand"
+                                                  IsVisible="{Binding MonthPickerVisible}"/>
                         </StackLayout>
                         <StackLayout Grid.Column="1" Orientation="Vertical">
-                            <Label Text="DAY" HorizontalOptions="Center"/>
+                            <Label Text="DAY" HorizontalOptions="Center" HeightRequest="20" TextColor="{Binding DayLabelColor}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdPickerLabelTap}" CommandParameter="2"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                             <controls:ValuePicker PickerType="Numeric" 
                                                   MinValue="1"
                                                   MaxValue="{Binding DaysInMonth}"
-                                                  VerticalOptions="FillAndExpand"/>
+                                                  NumericValue="{Binding SelectedDay}"
+                                                  VerticalOptions="FillAndExpand"
+                                                  IsVisible="{Binding DayPickerVisible}"/>
                         </StackLayout>
                         <StackLayout Grid.Column="2" Orientation="Vertical">
-                            <Label Text="HOUR" HorizontalOptions="Center"/>
+                            <Label Text="HOUR" HorizontalOptions="Center" HeightRequest="20" TextColor="{Binding HourLabelColor}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdPickerLabelTap}" CommandParameter="3"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                             <controls:ValuePicker PickerType="Numeric" 
                                                   MinValue="0"
                                                   MaxValue="23"
-                                                  VerticalOptions="FillAndExpand"/>
+                                                  NumericValue="{Binding SelectedHour}"
+                                                  VerticalOptions="FillAndExpand"
+                                                  IsVisible="{Binding HourPickerVisible}"/>
                         </StackLayout>
                         <StackLayout Grid.Column="3" Orientation="Vertical">
-                            <Label Text="MINUTE" HorizontalOptions="Center"/>
+                            <Label Text="MINUTE" HorizontalOptions="Center" HeightRequest="20" TextColor="{Binding MinuteLabelColor}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CmdPickerLabelTap}" CommandParameter="4"/>
+                                </Label.GestureRecognizers>
+                            </Label>
                             <controls:ValuePicker PickerType="Numeric" 
                                                   MinValue="0"
                                                   MaxValue="59"
-                                                  VerticalOptions="FillAndExpand"/>
+                                                  NumericValue="{Binding SelectedMinute}"
+                                                  VerticalOptions="FillAndExpand"
+                                                  IsVisible="{Binding MinutePickerVisible}"/>
                         </StackLayout>
                     </Grid>
+
+                    <AbsoluteLayout Grid.Row="3">
+                        <Button Text="SET" 
+                                AbsoluteLayout.LayoutFlags="All"
+                                AbsoluteLayout.LayoutBounds="0.25,0,0.25,1"
+                                Command="{Binding CmdSetDate}" CommandParameter="1"/>
+                        <Button Text="CANCEL" 
+                                AbsoluteLayout.LayoutFlags="All"
+                                AbsoluteLayout.LayoutBounds="0.75,0,0.25,1"
+                                Command="{Binding CmdSetDate}" CommandParameter="0"/>
+                    </AbsoluteLayout>
+                    
                 </Grid>
                 
             </Frame>
 
-            <Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width,Factor=0.9,Constant=0}"
+            <ScrollView>
+                <StackLayout Orientation="Vertical">
+                    <Image Source="title"/>
+
+                    <controls:XEntry Grid.Row="1" 
+                             VerticalOptions="Start"
+                             Text="{Binding Event.Title, Mode=OneWayToSource}" 
+                             TextColor="#eeebd3" 
+                             FontSize="16"
+                             Placeholder="title"
+                             PlaceholderColor="#bfd9f3"/>
+
+                    <Label Grid.Row="2" Text="Description"/>
+                    <Editor Grid.Row="3"
+                            Text="{Binding Event.Description, Mode=OneWayToSource}"
+                            TextColor="#234b64"
+                            BackgroundColor="#eeebd3"
+                            FontSize="14"/>
+
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Text="Set Start Date" Command="{Binding CmdStartDate}"/>
+                        <Label Grid.Column="1" Text="{Binding StartDateStr}" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Text="Set End Date" Command="{Binding CmdEndDate}"/>
+                        <Label Grid.Column="1" Text="{Binding EndDateStr}" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Button Grid.Row="6" 
+                    Text="Create" 
+                    TextColor="#234B64"
+                    BackgroundColor="#bfd9f3"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Command="{Binding CmdCreate}"
+                    CommandParameter="1"
+                    BorderRadius="10"
+                    BorderWidth="2"
+                    BorderColor="#eeebd3"/>
+                </StackLayout>
+            </ScrollView>
+            
+            <!--<Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width,Factor=0.9,Constant=0}"
                   VerticalOptions="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*"/>
@@ -140,6 +283,26 @@
                             BackgroundColor="#eeebd3"
                             FontSize="14"/>
 
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Text="Set Start Date" Command="{Binding CmdStartDate}"/>
+                    <Label Grid.Column="1" Text="{Binding StartDateStr}" VerticalOptions="Center"/>
+                </Grid>
+
+                <Grid Grid.Row="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Text="Set End Date" Command="{Binding CmdEndDate}"/>
+                    <Label Grid.Column="1" Text="{Binding EndDateStr}" VerticalOptions="Center"/>
+                </Grid>
+                
                 <Button Grid.Row="6" 
                     Text="Create" 
                     TextColor="#234B64"
@@ -152,7 +315,7 @@
                     BorderWidth="2"
                     BorderColor="#eeebd3"/>
 
-            </Grid>
+            </Grid>-->
         </AbsoluteLayout>
 
 

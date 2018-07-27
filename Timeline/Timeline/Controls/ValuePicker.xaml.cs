@@ -96,6 +96,8 @@ namespace Timeline.Controls
         private static void OnMaxValueChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ValuePicker vp = (ValuePicker)bindable;
+            if (vp.NumericValue < vp.MinValue) vp.NumericValue = vp.MinValue;
+            if (vp.NumericValue > vp.MaxValue) vp.NumericValue = vp.MaxValue;
             vp.doInitialize = true;
             vp.canvasView.InvalidateSurface();
         }

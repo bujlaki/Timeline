@@ -29,7 +29,7 @@ namespace Timeline.ViewModels.Base
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected void UpdateAll()
+        protected void UpdateAllProperties()
         {
             RaisePropertyChanged(String.Empty);
         }

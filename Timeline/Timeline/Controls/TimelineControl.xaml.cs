@@ -19,14 +19,44 @@ namespace Timeline.Controls
 {
     public partial class TimelineControl : ContentView
     {
-        
+
         #region "Bindable properties"
-		public static readonly BindableProperty EventsSourceProperty = BindableProperty.Create(
+
+        public static readonly BindableProperty DateProperty = BindableProperty.Create(
+            nameof(Date),
+            typeof(TimelineDateTime),
+            typeof(TimelineControl),
+            null, BindingMode.TwoWay,
+            propertyChanged: OnDateChanged);
+        private static void OnDateChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
+        public TimelineDateTime Date
+        {
+            get { return (TimelineDateTime)GetValue(DateProperty); }
+            set { SetValue(DateProperty, value); }
+        }
+
+        public static readonly BindableProperty EventsSourceProperty = BindableProperty.Create(
             nameof(Timeline),
             typeof(Collection<MTimelineEvent>),
             typeof(TimelineControl),
             new Collection<MTimelineEvent>(), BindingMode.TwoWay,
             propertyChanged: OnEventsSourceChanged);
+        private static void OnEventsSourceChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (((TimelineControl)bindable).EventsSource.Count > 0)
+                ((TimelineControl)bindable).Date = new TimelineDateTime(((TimelineControl)bindable).EventsSource[0].StartDate.Year);
+            else
+                ((TimelineControl)bindable).Date = new TimelineDateTime(DateTime.UtcNow);
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
+        public Collection<MTimelineEvent> EventsSource
+        {
+            get { return (Collection<MTimelineEvent>)GetValue(EventsSourceProperty); }
+            set { SetValue(EventsSourceProperty, value); }
+        }
 
         public static readonly BindableProperty LaneCountProperty = BindableProperty.Create(
             nameof(Timeline),
@@ -34,50 +64,6 @@ namespace Timeline.Controls
             typeof(TimelineControl),
             0, BindingMode.TwoWay,
             propertyChanged: OnLaneCountChanged);
-
-        public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
-            nameof(Zoom),
-            typeof(double),
-            typeof(TimelineControl),
-            (double)100000, BindingMode.OneWay,
-            propertyChanged: OnZoomChanged);
-
-        public static readonly BindableProperty ZoomUnitProperty = BindableProperty.Create(
-            nameof(ZoomUnit),
-            typeof(TimelineUnits),
-            typeof(TimelineControl),
-            TimelineUnits.Year, BindingMode.OneWay,
-            propertyChanged: OnZoomUnitChanged);
-	
-        public static readonly BindableProperty DateStrProperty = BindableProperty.Create(
-            nameof(DateStr),
-            typeof(string),
-            typeof(TimelineControl),
-            "", BindingMode.OneWay);
-
-        public static readonly BindableProperty EventsStrProperty = BindableProperty.Create(
-            nameof(EventsStr),
-            typeof(string),
-            typeof(TimelineControl),
-            "", BindingMode.OneWay);
-
-        public static readonly BindableProperty LongTapCommandProperty = BindableProperty.Create(nameof(LongTapCommand), typeof(ICommand), typeof(TimelineControl), null);
-
-        public ICommand LongTapCommand
-        {
-            get { return (ICommand)GetValue(LongTapCommandProperty); }
-            set { SetValue(LongTapCommandProperty, value); }
-        }
-
-        private static void OnEventsSourceChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (((TimelineControl)bindable).EventsSource.Count > 0)
-                ((TimelineControl)bindable).date = new TimelineDateTime(((TimelineControl)bindable).EventsSource[0].StartDate.Year);
-            else
-                ((TimelineControl)bindable).date = new TimelineDateTime(DateTime.UtcNow);
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
         private static void OnLaneCountChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (((TimelineControl)bindable).LaneCount > 0)
@@ -85,47 +71,88 @@ namespace Timeline.Controls
 
             ((TimelineControl)bindable).InvalidateLayout();
         }
-
-        private static void OnZoomChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-        private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-        
-		public Collection<MTimelineEvent> EventsSource
-        {
-			get { return (Collection<MTimelineEvent>)GetValue(EventsSourceProperty); }
-			set { SetValue(EventsSourceProperty, value); }
-        }
         public int LaneCount
         {
             get { return (int)GetValue(LaneCountProperty); }
             set { SetValue(LaneCountProperty, value); }
+        }
+
+        public static readonly BindableProperty ZoomProperty = BindableProperty.Create(
+            nameof(Zoom),
+            typeof(double),
+            typeof(TimelineControl),
+            (double)100000, BindingMode.OneWay,
+            propertyChanged: OnZoomChanged);
+        private static void OnZoomChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((TimelineControl)bindable).InvalidateLayout();
         }
         public double Zoom
         {
             get { return (double)GetValue(ZoomProperty); }
             set { SetValue(ZoomProperty, value); }
         }
+
+        public static readonly BindableProperty ZoomUnitProperty = BindableProperty.Create(
+            nameof(ZoomUnit),
+            typeof(TimelineUnits),
+            typeof(TimelineControl),
+            TimelineUnits.Year, BindingMode.OneWay,
+            propertyChanged: OnZoomUnitChanged);
+        private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
         public TimelineUnits ZoomUnit
         {
             get { return (TimelineUnits)GetValue(ZoomUnitProperty); }
             set { SetValue(ZoomUnitProperty, value); }
         }
+
+        public static readonly BindableProperty PixeltimeProperty = BindableProperty.Create(
+            nameof(Pixeltime),
+            typeof(Int64),
+            typeof(TimelineControl),
+            (Int64)0, BindingMode.OneWayToSource);
+        public Int64 Pixeltime
+        {
+            get { return (Int64)GetValue(PixeltimeProperty); }
+            set { SetValue(PixeltimeProperty, value); }
+        }
+
+        public static readonly BindableProperty DateStrProperty = BindableProperty.Create(
+            nameof(DateStr),
+            typeof(string),
+            typeof(TimelineControl),
+            "", BindingMode.OneWay);
         public string DateStr
         {
             get { return (string)GetValue(DateStrProperty); }
             set { SetValue(DateStrProperty, value); }
         }
+
+        public static readonly BindableProperty EventsStrProperty = BindableProperty.Create(
+            nameof(EventsStr),
+            typeof(string),
+            typeof(TimelineControl),
+            "", BindingMode.OneWay);
         public string EventsStr
         {
             get { return (string)GetValue(EventsStrProperty); }
             set { SetValue(EventsStrProperty, value); }
         }
+
+        public static readonly BindableProperty LongTapCommandProperty = BindableProperty.Create(
+            nameof(LongTapCommand), 
+            typeof(ICommand), 
+            typeof(TimelineControl), 
+            null);
+        public ICommand LongTapCommand
+        {
+            get { return (ICommand)GetValue(LongTapCommandProperty); }
+            set { SetValue(LongTapCommandProperty, value); }
+        }
+
         #endregion
 
         string[] shortMonthNames = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -134,10 +161,10 @@ namespace Timeline.Controls
 
         TimelineTheme theme;
 
-        TimelineDateTime date;
+        //TimelineDateTime date;
         TimelineDateTime unitDate;
 
-        Int64 pixeltime;
+        //Int64 pixeltime;
         float unitXWidth;
         float subunitXWidth;
         bool showSubUnitText;
@@ -188,15 +215,15 @@ namespace Timeline.Controls
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
             if (EventsSource.Count > 0)
-                date = new TimelineDateTime(EventsSource[0].StartDate.Year);
+                Date = new TimelineDateTime(EventsSource[0].StartDate.Year);
             else
-                date = new TimelineDateTime(DateTime.UtcNow);
+                Date = new TimelineDateTime(DateTime.UtcNow);
 
 			unitDate = new TimelineDateTime();
-            DateStr = date.DateStr(ZoomUnit);
+            DateStr = Date.DateStr(ZoomUnit);
             EventsStr = "";
 
-			pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
+			Pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
 			showSubUnitText = false;
             lanesOffsetY = 0;
 
@@ -221,7 +248,8 @@ namespace Timeline.Controls
                     //Console.WriteLine("LONGTAP");
                     if (args.InitialRawLocation.Y < timelineBottomY) break;
                     int clickedLane = ((int)args.InitialRawLocation.Y - (int)timelineBottomY - lanesOffsetY) / laneHeight;
-                    LongTapEventArg arg = new LongTapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, 0);
+                    Int64 clickedTicks = Date.Ticks + ((int)args.InitialRawLocation.X - halfWidth) * Pixeltime;
+                    LongTapEventArg arg = new LongTapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, clickedTicks, ZoomUnit);
                     if (LongTapCommand != null && LongTapCommand.CanExecute(null))
                     {
                         LongTapCommand.Execute(arg);
@@ -235,16 +263,16 @@ namespace Timeline.Controls
                     {
                         if (Math.Abs(args.Data.Y) < Math.Abs(args.Data.X))
                         {
-                            date.AddTicks(-2 * (long)args.Data.X * pixeltime);
-                            DateStr = date.DateStr(ZoomUnit - 1);
+                            Date.AddTicks(-2 * (long)args.Data.X * Pixeltime);
+                            DateStr = Date.DateStr(ZoomUnit - 1);
                         }
                     }
 					catch(OverflowException)
                     {
                         if (args.Data.X < 0)
-                            date = TimelineDateTime.MaxValue;
+                            Date = TimelineDateTime.MaxValue;
                         else
-                            date = TimelineDateTime.MinValue;
+                            Date = TimelineDateTime.MinValue;
                     }
 
                     //Y AXIS -- MOVE EVENT LANES
@@ -266,9 +294,9 @@ namespace Timeline.Controls
 					Zoom -= Zoom * 0.005 * args.Data.X;
                     if (Zoom < 4) Zoom = 4;
 					if (Zoom > 2073600) Zoom = 2073600;
-                    pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
+                    Pixeltime = (long)(Zoom * TimeSpan.TicksPerSecond);
                     AdjustZoomUnit();
-                    DateStr = date.DateStr(ZoomUnit - 1);
+                    DateStr = Date.DateStr(ZoomUnit - 1);
                     canvasView.InvalidateSurface();
                     break;
 
@@ -289,8 +317,8 @@ namespace Timeline.Controls
 
             canvas.Clear();
 
-            Int64 minTicks = date.Ticks - halfWidth * pixeltime;
-            Int64 maxTicks = date.Ticks + halfWidth * pixeltime;
+            Int64 minTicks = Date.Ticks - halfWidth * Pixeltime;
+            Int64 maxTicks = Date.Ticks + halfWidth * Pixeltime;
 
             //TIMELINE
             canvas.DrawRect(0, 0, info.Width, timelineHeight, theme.TimelinePaint);
@@ -324,7 +352,7 @@ namespace Timeline.Controls
             unitDate.SetDate(1, 1, 1, 0, 0);
             do  //DRAW AC PART
             {
-                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                unitPos = (unitDate.Ticks - minTicks) / Pixeltime;
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
                 canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
@@ -338,7 +366,7 @@ namespace Timeline.Controls
             unitDate.SetDate(1, 1, 1, 0, 0);
             do  //DRAW BC PART
             {
-                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                unitPos = (unitDate.Ticks - minTicks) / Pixeltime;
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
                 canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
@@ -352,13 +380,13 @@ namespace Timeline.Controls
 
         private void DrawUnitsAndSubUnitsAC(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
         {
-            date.CopyTo(ref unitDate, ZoomUnit);
+            Date.CopyTo(ref unitDate, ZoomUnit);
             while (unitDate.Ticks > minTicks) unitDate.Add(ZoomUnit, -1);
 
             float unitPos;
             do
             {
-                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                unitPos = (unitDate.Ticks - minTicks) / Pixeltime;
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
                 canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
@@ -377,13 +405,13 @@ namespace Timeline.Controls
 
         private void DrawUnitsAndSubUnitsBC(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
         {
-            date.CopyTo(ref unitDate, ZoomUnit);
+            Date.CopyTo(ref unitDate, ZoomUnit);
             while (unitDate.Ticks < maxTicks) unitDate.Add(ZoomUnit, 1);
 
             float unitPos;
             do
             {
-                unitPos = (unitDate.Ticks - minTicks) / pixeltime;
+                unitPos = (unitDate.Ticks - minTicks) / Pixeltime;
                 canvas.DrawLine(unitPos, unitMarkY1, unitPos, unitMarkY2, theme.UnitMarkPaint);   //UNIT MARK
                 canvas.DrawText(GetUnitText(unitDate), unitPos, unitTextY, theme.UnitTextPaint);  //UNIT TEXT
 
@@ -409,7 +437,7 @@ namespace Timeline.Controls
             {
                 while (subUnitDate.Ticks > toTicks)
                 {
-                    subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
+                    subUnitPos = (subUnitDate.Ticks - minTicks) / Pixeltime;
                     canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, theme.SubUnitMarkPaint);                                //SUBUNIT MARK
                     if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, theme.SubUnitTextPaint);      //SUBUNIT TEXT
 
@@ -420,7 +448,7 @@ namespace Timeline.Controls
             {
                 while (subUnitDate.Ticks < toTicks)
                 {
-                    subUnitPos = (subUnitDate.Ticks - minTicks) / pixeltime;
+                    subUnitPos = (subUnitDate.Ticks - minTicks) / Pixeltime;
                     canvas.DrawLine(subUnitPos, subUnitMarkY1, subUnitPos, subUnitMarkY2, theme.SubUnitMarkPaint);                                //SUBUNIT MARK
                     if (showSubUnitText) canvas.DrawText(GetSubUnitText(subUnitDate), subUnitPos + 3, subUnitTextY, theme.SubUnitTextPaint);      //SUBUNIT TEXT
 
@@ -490,7 +518,7 @@ namespace Timeline.Controls
 
 				if((e.EndDate.Ticks>minTicks)&&(e.StartDate.Ticks<maxTicks))
 				{
-                    bool isCurrent = e.StartDate.Ticks < date.Ticks && e.EndDate.Ticks > date.Ticks;
+                    bool isCurrent = e.StartDate.Ticks < Date.Ticks && e.EndDate.Ticks > Date.Ticks;
                     if(isCurrent) AddToEventsStr(e);
 					DrawTimelineEvent(e, canvas, minTicks, isCurrent);
 				}
@@ -503,8 +531,8 @@ namespace Timeline.Controls
 			float endX;
 			float eventTop;
 
-			startX = (e.StartDate.Ticks - minTicks) / pixeltime;
-			endX = (e.EndDate.Ticks - minTicks) / pixeltime - 1;
+			startX = (e.StartDate.Ticks - minTicks) / Pixeltime;
+			endX = (e.EndDate.Ticks - minTicks) / Pixeltime - 1;
 			eventTop = eventsTopY + e.LaneNumber * laneHeight + lanesOffsetY;
 
             if (eventTop > fullheight) return; //OUT OF SCREEN

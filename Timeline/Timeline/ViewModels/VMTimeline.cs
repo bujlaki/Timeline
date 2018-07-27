@@ -15,6 +15,21 @@ namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
+        private TimelineUnits zoomUnit;
+        public TimelineUnits ZoomUnit
+        {
+            get { return zoomUnit; }
+            set { zoomUnit = value; RaisePropertyChanged("ZoomUnit"); }
+        }
+
+        private TimelineDateTime date;
+        public TimelineDateTime Date
+        {
+            get { return date; }
+            set { date = value; RaisePropertyChanged("Date"); }
+        }
+
+        public Int64 Pixeltime { get; }
 
         public Command CmdLongTap { get; set; }
         public ObservableCollection<MTimelineEvent> Events { get; set; }
@@ -23,7 +38,6 @@ namespace Timeline.ViewModels
 		public VMTimeline() : base()
         {
             CmdLongTap = new Command(LongTapExecute);
-
             Events = new ObservableCollection<MTimelineEvent>();
         }
 
@@ -31,7 +45,11 @@ namespace Timeline.ViewModels
         {
             LongTapEventArg arg = (LongTapEventArg)obj;
 
-            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView());
+            //new event
+            TimelineDateTime tld = TimelineDateTime.FromTicks(arg.Ticks);
+            tld.Precision = arg.ZoomUnit;
+            
+            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("new event", tld)));
         }
 
         public void LoadEvents(string timelineId)

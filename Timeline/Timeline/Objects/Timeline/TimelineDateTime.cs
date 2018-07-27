@@ -124,6 +124,11 @@ namespace Timeline.Objects.Timeline
             }
         }
 
+        public string DateStr()
+        {
+            return DateStr(Precision);
+        }
+
         public string DateStr(TimelineUnits unit)
         {
             switch (unit)
