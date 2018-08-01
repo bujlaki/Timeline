@@ -156,6 +156,8 @@ namespace Timeline.Controls
         private int fullWidth;
         private int stepY;
         private float halfStepY;
+        private int maxFontSize;
+        private int dFontSize;
 
         //VISUALIZE
         private float minValueOffset;
@@ -253,7 +255,13 @@ namespace Timeline.Controls
             {
                 if (unit < MinValue || unit > MaxValue) continue;
                 float unitOffset = minValueOffset + (unit - MinValue) * stepY;
-                
+
+                float ydiff = Math.Abs(currentOffset - unitOffset);
+                //int fontSize = maxFontSize - (int)(Math.Sqrt(Math.Abs(ydiff / halfHeight)) * dFontSize);
+                //int fontSize = maxFontSize - (int)(Math.Pow(ydiff / halfHeight,2) * dFontSize);
+                int fontSize = maxFontSize - (int)(ydiff / halfHeight * dFontSize);
+                primaryPaint.TextSize = fontSize;
+
                 if (PickerType == ValuePickerType.Numeric)
                 {
                     canvas.DrawTextOnPath(unit.ToString(), path, 0, unitOffset - currentOffset + primaryPaint.FontMetrics.CapHeight / 2, primaryPaint);
@@ -304,12 +312,18 @@ namespace Timeline.Controls
             fullHeight = info.Height;
             halfWidth = info.Width / 2;
             fullWidth = info.Width;
-            stepY = info.Height / 6;
-            halfStepY = (float)stepY / 2.0f;
+            stepY = fullHeight / 6;
+            halfStepY = stepY / 2.0f;
+            maxFontSize = (int)(stepY);
+            dFontSize = (int)(maxFontSize * 0.6f);
 
             minValueOffset = 0.0f;
             maxValueOffset = (MaxValue - MinValue) * stepY;
             currentOffset = (NumericValue - MinValue) * stepY;
+
+            var x = Xamarin.Essentials.DeviceDisplay.ScreenMetrics.Density;
+            var xx = Xamarin.Essentials.DeviceDisplay.ScreenMetrics.Height;
+            var xxx = Xamarin.Essentials.DeviceDisplay.ScreenMetrics.Width;
 
             highlighterPaint.StrokeWidth = stepY;
         }
