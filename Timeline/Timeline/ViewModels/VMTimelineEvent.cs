@@ -363,6 +363,9 @@ namespace Timeline.ViewModels
             
         private void CmdCreateExecute(object obj)
         {
+            //check if field values are correct
+
+            MessagingCenter.Send<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", this.Event);
             App.services.Navigation.GoBack();
         }
     }

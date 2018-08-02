@@ -123,7 +123,8 @@ namespace Timeline.Services
 
         public void GoToTimelineView(MTimelineInfo timeline)
         {
-            _vmLocator.TimelineViewModel.LoadEvents(timeline.TimelineId);
+            _vmLocator.TimelineViewModel.TimelineId = timeline.TimelineId;
+            _vmLocator.TimelineViewModel.LoadEvents();
             try
             {
                 _navigation.PushModalAsync(timelineView.Value);

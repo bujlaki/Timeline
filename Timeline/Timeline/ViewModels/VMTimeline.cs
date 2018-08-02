@@ -31,14 +31,24 @@ namespace Timeline.ViewModels
 
         public Int64 Pixeltime { get; }
 
-        public Command CmdLongTap { get; set; }
+        public string TimelineId { get; set; }
         public ObservableCollection<MTimelineEvent> Events { get; set; }
         public int LaneCount { get; set; }
 
-		public VMTimeline() : base()
+        public Command CmdLongTap { get; set; }
+
+        public VMTimeline() : base()
         {
             CmdLongTap = new Command(LongTapExecute);
             Events = new ObservableCollection<MTimelineEvent>();
+
+            //subscribe to events
+            MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", TimelineEvent_created);
+        }
+
+        private void TimelineEvent_created(VMTimelineEvent arg1, MTimelineEvent arg2)
+        {
+            throw new NotImplementedException();
         }
 
         private void LongTapExecute(object obj)
@@ -52,10 +62,11 @@ namespace Timeline.ViewModels
             MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("new event", tld)));
         }
 
-        public void LoadEvents(string timelineId)
+        public void LoadEvents()
         {
+            if (TimelineId == "") return;
             Task.Run(async () => {
-                Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(timelineId));
+                Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(TimelineId));
                 LaneCount = EventManager.SortEventsToLanes(Events, 10);
             });
         }
