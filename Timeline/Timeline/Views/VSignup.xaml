@@ -48,45 +48,24 @@
                         </Grid.RowDefinitions>
 
                         <controls:XEntry Grid.Row="0" 
-                                         VerticalOptions="FillAndExpand"
-                                         Text="{Binding Username, Mode=OneWayToSource}" 
-                                         TextColor="#eeebd3" 
-                                         FontSize="18"
-                                         Placeholder="username"
-                                         PlaceholderColor="#bfd9f3"/>
+                                         Text="{Binding Username, Mode=OneWayToSource}"
+                                         Placeholder="username"/>
 
                         <controls:XEntry Grid.Row="1" 
-                                         VerticalOptions="FillAndExpand"
                                          IsPassword="true" 
                                          Text="{Binding Password, Mode=OneWayToSource}"
-                                         TextColor="#eeebd3"
-                                         FontSize="18"
-                                         Placeholder="password"
-                                         PlaceholderColor="#bfd9f3"/>
+                                         Placeholder="password"/>
 
                         <controls:XEntry Grid.Row="2" 
-                                         VerticalOptions="FillAndExpand"
                                          Text="{Binding Email, Mode=OneWayToSource}"
-                                         TextColor="#eeebd3"
-                                         FontSize="18"
-                                         Placeholder="e-mail"
-                                         PlaceholderColor="#bfd9f3"/>
+                                         Placeholder="e-mail"/>
 
                         <Button Grid.Row="3" 
                                 Text="Submit" 
-                                Command="{Binding CmdSignup}"
-                                TextColor="#234B64"
-                                BackgroundColor="#bfd9f3"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center"
-                                BorderRadius="10"
-                                BorderWidth="2"
-                                BorderColor="#eeebd3"/>
+                                Command="{Binding CmdSignup}"/>
                         
                     </Grid>
                 </Frame>
-
-                
 
             </Grid>
         </Grid>

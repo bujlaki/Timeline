@@ -49,6 +49,7 @@ namespace Timeline.ViewModels
             try
             {
                 if (!Lock()) return;
+
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
                     await App.services.Authentication.LoginCognito("baz", "password");

@@ -48,7 +48,7 @@ namespace Timeline.ViewModels
 
         private void TimelineEvent_created(VMTimelineEvent arg1, MTimelineEvent arg2)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("TimelineEvent created");
         }
 
         private void LongTapExecute(object obj)

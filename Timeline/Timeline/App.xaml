@@ -6,59 +6,17 @@
              xmlns:converters="clr-namespace:Timeline.Converters"
              x:Class="Timeline.App">
     <Application.Resources>
-        <ResourceDictionary MergedWith="styles:SMain">
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <styles:ControlTemplates/>
+                <styles:Colors/>
+                <styles:ViewStyles/>
+            </ResourceDictionary.MergedDictionaries>
+            
             <viewmodel:VMLocator x:Key="vmLocator" />
+            
             <converters:InverseBoolConverter x:Key="inverseBoolConverter" />
 
-            <ControlTemplate x:Key="UserPagesTemplate">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="7*"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0" BackgroundColor="#234B64">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5*"/>
-                            <ColumnDefinition Width="2*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Image Grid.Column="0" Source="menu">
-                            <Image.GestureRecognizers>
-                                <TapGestureRecognizer Command="{TemplateBinding Parent.BindingContext.CmdMenu}"/>
-                            </Image.GestureRecognizers>
-                        </Image>
-
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            
-                            <Label Grid.Row="0" Grid.RowSpan="2"
-                                   Text="{TemplateBinding Parent.BindingContext.User.UserName}" 
-                                   TextColor="#f4bd4f"
-                                   FontSize="24"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="Center"/>
-                            
-                            <!--<Label Grid.Row="1" 
-                                   Text="{TemplateBinding Parent.BindingContext.User.Email}" 
-                                   TextColor="#234B64"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="Start"/>-->
-                        </Grid>
-
-                        <Image Grid.Column="2" Source="{TemplateBinding Parent.BindingContext.User.PhotoUrl}" />
-
-                    </Grid>
-
-                    <BoxView Grid.Row="0" VerticalOptions="End" HeightRequest="2" BackgroundColor="White" />
-                    
-                    <ContentPresenter Grid.Row="1" />
-                </Grid>
-            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -4,9 +4,9 @@ using Xamarin.Forms;
 
 namespace Timeline.Styles
 {
-    public partial class SMain
+    public partial class ControlTemplates : ResourceDictionary
     {
-        public SMain()
+        public ControlTemplates()
         {
             InitializeComponent();
         }

@@ -42,33 +42,18 @@
                         </Grid.RowDefinitions>
 
                         <controls:XEntry Grid.Row="0" 
-                                         VerticalOptions="FillAndExpand"
                                          Text="{Binding Username, Mode=OneWayToSource}" 
-                                         TextColor="#eeebd3" 
-                                         FontSize="18"
-                                         Placeholder="username"
-                                         PlaceholderColor="#bfd9f3"/>
+                                         Placeholder="username"/>
 
                         <controls:XEntry Grid.Row="1" 
-                                         VerticalOptions="FillAndExpand"
                                          IsPassword="true" 
                                          Text="{Binding Password, Mode=OneWayToSource}"
-                                         TextColor="#eeebd3"
-                                         FontSize="18"
-                                         Placeholder="password"
-                                         PlaceholderColor="#bfd9f3"/>
+                                         Placeholder="password"/>
 
                         <Button Grid.Row="2" 
                                 Text="Login" 
-                                TextColor="#234B64"
-                                BackgroundColor="#bfd9f3"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center"
                                 Command="{Binding CmdUserPassLogin}"
-                                CommandParameter="1"
-                                BorderRadius="10"
-                                BorderWidth="2"
-                                BorderColor="#eeebd3"/>
+                                CommandParameter="1"/>
 
                     </Grid>
                 </Frame>
@@ -80,43 +65,31 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" 
+                           Style="{StaticResource linkLabel}"
                            Text="Forgot password?" 
                            HorizontalOptions="Start"
-                           VerticalOptions="End"
-                           FontAttributes="Bold" 
-                           TextColor="#f4bd4f"
-                           FontSize="16">
+                           VerticalOptions="End">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdForgotPassword}" CommandParameter="1"/>
                         </Label.GestureRecognizers>
                     </Label>
 
                     <Label Grid.Column="1"
+                           Style="{StaticResource linkLabel}"
                            Text="New account" 
                            HorizontalOptions="End"
-                           VerticalOptions="End"
-                           FontAttributes="Bold" 
-                           TextColor="#f4bd4f"
-                           FontSize="16">
+                           VerticalOptions="End">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdSignup}" CommandParameter="1"/>
                         </Label.GestureRecognizers>
                     </Label>
                 </Grid>
 
-
                 <Button Grid.Row="6" 
                         Text="Login with Google"
-                        BackgroundColor="#bfd9f3"
-                        TextColor="#234B64"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
-                        CommandParameter="1"
-                        BorderRadius="10"
-                        BorderWidth="2"
-                        BorderColor="#eeebd3"/>
+                        CommandParameter="1"/>
 
                 <Button Grid.Row="7"
                         Text="GO TO TESTPAGE"

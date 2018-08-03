@@ -21,6 +21,12 @@
     <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="App.xaml.cs">
       <DependentUpon>*.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Styles\ViewStyles.xaml.cs">
+      <DependentUpon>ViewStyles.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Styles\ControlTemplates.xaml.cs">
+      <DependentUpon>ControlTemplates.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\VTimelineInfo.xaml.cs">
       <DependentUpon>VTimelineInfo.xaml</DependentUpon>
     </Compile>
@@ -35,6 +41,12 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Controls\ValuePicker.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Styles\ViewStyles.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Styles\Colors.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\VLogin.xaml">

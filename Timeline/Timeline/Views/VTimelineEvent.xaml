@@ -201,7 +201,7 @@
                 
             </Frame>
 
-            <ScrollView>
+            <ScrollView Margin="20,0,20,0">
                 <StackLayout Orientation="Vertical">
                     <Image Source="title"/>
 
@@ -211,18 +211,14 @@
                             <ColumnDefinition Width="5*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0" Text="Title" TextColor="#eeebd3" FontSize="16"/>
-                        <controls:XEntry VerticalOptions="Start"
-                                         Grid.Column="1"
+                        <Label Grid.Column="0" Text="Title" Style="{StaticResource fieldLabel}"/>
+                        <controls:XEntry Grid.Column="1"
                                          Text="{Binding Event.Title, Mode=OneWayToSource}"                                     
-                                         TextColor="#eeebd3" 
-                                         FontSize="16"
-                                         Placeholder="title"
-                                         PlaceholderColor="#bfd9f3"/>
+                                         Placeholder="title"/>
                     </Grid>
 
 
-                    <Label Text="Description" TextColor="#eeebd3" FontSize="16"/>
+                    <Label Text="Description" Style="{StaticResource fieldLabel}"/>
                     <Editor Text="{Binding Event.Description, Mode=OneWayToSource}"
                             HeightRequest="100"
                             TextColor="#234b64"
@@ -231,117 +227,39 @@
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" 
-                                Text="Set Start Date" 
-                                Command="{Binding CmdStartDate}"
-                                BackgroundColor="#bfd9f3"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center"
-                                BorderRadius="10"
-                                BorderWidth="2"
-                                BorderColor="#eeebd3"/>
-                        <Label Grid.Column="1" Text="{Binding StartDateStr}" VerticalOptions="Center"/>
+                        <Label Grid.Column="0" Text="Start date:" Style="{StaticResource fieldLabel}"/>
+                        <Label Grid.Column="1" Text="{Binding StartDateStr}" Style="{StaticResource fieldValueLabel}"/>
+                        <Button Grid.Column="2" 
+                                Text="SET" 
+                                Command="{Binding CmdStartDate}"/>
                     </Grid>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" 
-                                Text="Set End Date" 
-                                Command="{Binding CmdEndDate}"
-                                BackgroundColor="#bfd9f3"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Center"
-                                BorderRadius="10"
-                                BorderWidth="2"
-                                BorderColor="#eeebd3"/>
-                        <Label Grid.Column="1" Text="{Binding EndDateStr}" VerticalOptions="Center"/>
+                        <Label Grid.Column="0" Text="End date:" Style="{StaticResource fieldLabel}"/>
+                        <Label Grid.Column="1" Text="{Binding EndDateStr}" Style="{StaticResource fieldValueLabel}"/>
+                        <Button Grid.Column="2" 
+                                Text="SET" 
+                                Command="{Binding CmdEndDate}"/>
                     </Grid>
 
                     <Button Text="Create" 
-                            TextColor="#234B64"
-                            BackgroundColor="#bfd9f3"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Center"
                             Command="{Binding CmdCreate}"
-                            CommandParameter="1"
-                            BorderRadius="10"
-                            BorderWidth="2"
-                            BorderColor="#eeebd3"/>
+                            CommandParameter="1"/>
                 </StackLayout>
             </ScrollView>
             
-            <!--<Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width,Factor=0.9,Constant=0}"
-                  VerticalOptions="Center">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Image Source="title"/>
-
-                <controls:XEntry Grid.Row="1" 
-                             VerticalOptions="Start"
-                             Text="{Binding Event.Title, Mode=OneWayToSource}" 
-                             TextColor="#eeebd3" 
-                             FontSize="16"
-                             Placeholder="title"
-                             PlaceholderColor="#bfd9f3"/>
-
-                <Label Grid.Row="2" Text="Description"/>
-                <Editor Grid.Row="3"
-                            Text="{Binding Event.Description, Mode=OneWayToSource}"
-                            TextColor="#234b64"
-                            BackgroundColor="#eeebd3"
-                            FontSize="14"/>
-
-                <Grid Grid.Row="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Column="0" Text="Set Start Date" Command="{Binding CmdStartDate}"/>
-                    <Label Grid.Column="1" Text="{Binding StartDateStr}" VerticalOptions="Center"/>
-                </Grid>
-
-                <Grid Grid.Row="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Column="0" Text="Set End Date" Command="{Binding CmdEndDate}"/>
-                    <Label Grid.Column="1" Text="{Binding EndDateStr}" VerticalOptions="Center"/>
-                </Grid>
-                
-                <Button Grid.Row="6" 
-                    Text="Create" 
-                    TextColor="#234B64"
-                    BackgroundColor="#bfd9f3"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"
-                    Command="{Binding CmdCreate}"
-                    CommandParameter="1"
-                    BorderRadius="10"
-                    BorderWidth="2"
-                    BorderColor="#eeebd3"/>
-
-            </Grid>-->
         </AbsoluteLayout>
-
 
     </ContentPage.Content>
 </ContentPage>
