@@ -73,13 +73,8 @@ namespace Timeline.ViewModels
 
                 using (UserDialogs.Instance.Loading("Logging in..."))
                 {
-                    await App.services.Authentication.LoginCognito(username, password);
+                    await App.services.Authentication.LoginCognito(username, password, this);
                 }
-
-                //SUCCESS
-                App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
-                await App.services.Database.CreateUser(App.services.Authentication.Login);
-                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
             }
             catch (Exception ex)
             {
@@ -89,7 +84,13 @@ namespace Timeline.ViewModels
 
         public void OnAuthCompleted()
         {
-            throw new NotImplementedException();
+            //SUCCESS
+            App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
+            Task.Run(async () =>
+            {
+                await App.services.Database.CreateUser(App.services.Authentication.Login);
+            });
+            App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
         }
 
         public void OnAuthFailed(string message, Exception exception)

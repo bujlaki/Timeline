@@ -109,10 +109,9 @@ namespace Timeline.Services
             //set the user
             _vmLocator.UserPagesViewModel.User = Task.Run(async () => await App.services.Database.GetUser(userid)).Result;
             
-            
             if (clearStack)
             {
-                Application.Current.MainPage = new NavigationPage(userpagesView.Value);
+                MainThread.BeginInvokeOnMainThread(()=> { Application.Current.MainPage = new NavigationPage(userpagesView.Value); });
                 _navigation.PopToRootAsync();
             }
             else

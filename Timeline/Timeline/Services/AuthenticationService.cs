@@ -54,7 +54,7 @@ namespace Timeline.Services
             }
         }
 
-        public async Task LoginCognito(string username, string password)
+        public async Task LoginCognito(string username, string password, IAuthenticationDelegate authDelegate)
         {
             try
             {
@@ -62,11 +62,14 @@ namespace Timeline.Services
 
                 await cognitoAuth.ValidateUser(username, password, loginDataRef);
                 Login.Type = LoginType.Cognito;
+
+                authDelegate.OnAuthCompleted();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("LoginCognito Exception: " + ex.Message);
-                throw ex;
+                authDelegate.OnAuthFailed("Cognito authentication failed: " + ex.Message, ex);
+                //throw ex;
             }
         }
 

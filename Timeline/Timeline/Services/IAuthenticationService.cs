@@ -13,7 +13,7 @@ namespace Timeline.Services
         LoginData Login { get; }
         Task GetCachedCredentials();
         void AuthenticateGoogle(IAuthenticationDelegate _delegate);
-        Task LoginCognito(string username, string password);
+        Task LoginCognito(string username, string password, IAuthenticationDelegate authDelegate);
         Task SignupCognito(string username, string password, string email);
         Task VerifyUserCognito(string username, string verificationCode);
         void SignOut();

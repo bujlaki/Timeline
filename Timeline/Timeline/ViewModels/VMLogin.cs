@@ -1,5 +1,6 @@
 ﻿using Acr.UserDialogs;
 using System;
+using System.Threading.Tasks;
 using Timeline.Services;
 using Xamarin.Forms;
 
@@ -44,26 +45,15 @@ namespace Timeline.ViewModels
             App.services.Navigation.GoToTestPage();
         }
 
-        async void CmdBazLoginExecute(object obj)
+        void CmdBazLoginExecute(object obj)
         {
-            try
-            {
-                if (!Lock()) return;
+            Busy = true;
+            BusyMessage = "Logging in...";
 
-                using (UserDialogs.Instance.Loading("Logging in..."))
-                {
-                    await App.services.Authentication.LoginCognito("baz", "password");
-                }
-
-                App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
-                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
-                Unlock();
-            }
-            catch (Exception ex)
+            Task.Run(async () =>
             {
-                Unlock();
-                UserDialogs.Instance.Alert(ex.Message, "Login error");
-            }
+                await App.services.Authentication.LoginCognito("baz", "password", this);
+            });
         }
 
         void CmdGoogleLoginExecute(object obj)
@@ -81,25 +71,15 @@ namespace Timeline.ViewModels
             }
         }
 
-        async void CmdUserPassLoginExecute(object obj)
+        void CmdUserPassLoginExecute(object obj)
         {
-            try
-            {
-                if (!Lock()) return;
-                using (UserDialogs.Instance.Loading("Logging in..."))
-                {
-                    await App.services.Authentication.LoginCognito(username, password);
-                }
+            Busy = true;
+            BusyMessage = "Logging in...";
 
-                App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
-                App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
-                Unlock();
-            }
-            catch (Exception ex)
+            Task.Run(async () =>
             {
-                Unlock();
-                UserDialogs.Instance.Alert(ex.Message, "Login error");
-            }
+                await App.services.Authentication.LoginCognito(username, password, this);
+            });
         }
 
         async void CmdForgotPasswordExecute(object obj)
@@ -120,11 +100,15 @@ namespace Timeline.ViewModels
         {
             App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
             App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
+            Busy = false;
+            Unlock();
         }
 
         public void OnAuthFailed(string message, Exception exception)
         {
-
+            Busy = false;
+            Unlock();
+            UserDialogs.Instance.Alert(exception.Message, "Login error");
         }
     }
 }

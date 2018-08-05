@@ -9,13 +9,20 @@ namespace Timeline.ViewModels.Base
     public class VMBase : INotifyPropertyChanged
     {
         private object syncLock = new object();
-        private bool busy = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private bool busy = false;
         public bool Busy {
             get { return busy; }
             set { busy = value; RaisePropertyChanged("Busy"); }
+        }
+
+        private string busyMessage = "";
+        public string BusyMessage
+        {
+            get { return busyMessage; }
+            set { busyMessage = value; RaisePropertyChanged("BusyMessage"); }
         }
 
         public VMBase()

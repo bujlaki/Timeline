@@ -8,101 +8,68 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content> <!--" IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}"-->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <AbsoluteLayout>
+            
+            <Image Source="title" AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"/>
 
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <controls:XEntry AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.25, 0.8, 0.1" 
+                             Text="{Binding Username, Mode=OneWayToSource}" 
+                             Placeholder="username"/>
 
-                <Image Source="title"/>
+            <controls:XEntry AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.35, 0.8, 0.1" 
+                             HorizontalOptions="FillAndExpand"
+                             IsPassword="true" 
+                             Text="{Binding Password, Mode=OneWayToSource}"
+                             Placeholder="password"/>
 
-                <Frame Grid.Row="1" Grid.RowSpan="3"
-                       BackgroundColor="#307496"
-                       CornerRadius="20" 
-                       Margin="-10">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.5, AutoSize, AutoSize" 
+                    Text="Login" 
+                    Command="{Binding CmdUserPassLogin}"
+                    CommandParameter="1"/>
 
-                        <controls:XEntry Grid.Row="0" 
-                                         Text="{Binding Username, Mode=OneWayToSource}" 
-                                         Placeholder="username"/>
-
-                        <controls:XEntry Grid.Row="1" 
-                                         IsPassword="true" 
-                                         Text="{Binding Password, Mode=OneWayToSource}"
-                                         Placeholder="password"/>
-
-                        <Button Grid.Row="2" 
-                                Text="Login" 
-                                Command="{Binding CmdUserPassLogin}"
-                                CommandParameter="1"/>
-
-                    </Grid>
-                </Frame>
-
-                <Grid Grid.Row="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Column="0" 
+            <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.1, 0.6, AutoSize, AutoSize"
                            Style="{StaticResource linkLabel}"
                            Text="Forgot password?" 
                            HorizontalOptions="Start"
                            VerticalOptions="End">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdForgotPassword}" CommandParameter="1"/>
-                        </Label.GestureRecognizers>
-                    </Label>
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CmdForgotPassword}" CommandParameter="1"/>
+                </Label.GestureRecognizers>
+            </Label>
 
-                    <Label Grid.Column="1"
+            <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.9, 0.6, AutoSize, AutoSize"
                            Style="{StaticResource linkLabel}"
                            Text="New account" 
                            HorizontalOptions="End"
                            VerticalOptions="End">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdSignup}" CommandParameter="1"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Grid>
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CmdSignup}" CommandParameter="1"/>
+                </Label.GestureRecognizers>
+            </Label>
 
-                <Button Grid.Row="6" 
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.8, AutoSize, AutoSize" 
                         Text="Login with Google"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
                         CommandParameter="1"/>
 
-                <Button Grid.Row="7"
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.9, AutoSize, AutoSize"
                         Text="GO TO TESTPAGE"
                         Command="{Binding CmdTest}"
                         IsVisible="True"/>
 
-                <Button Grid.Row="8"
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 1, AutoSize, AutoSize"
                         Text="LOGIN BAZ"
                         Command="{Binding CmdBazLogin}"
                         IsVisible="True"/>
 
-            </Grid>
-        </Grid>
+            <controls:AbsActivityIndicator AbsoluteLayout.LayoutFlags="All" 
+                                           AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                                           IsShowing="{Binding Busy}"
+                                           IsVisible="{Binding Busy}"
+                                           Message="{Binding BusyMessage}"/>
+        </AbsoluteLayout>
+
 
     </ContentPage.Content>
 
