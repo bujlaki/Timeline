@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
@@ -45,7 +42,11 @@ namespace Timeline
                 if (services.Authentication.Login.Type != Objects.Auth.LoginType.None) //if logged in
                 {
                     MainPage = new NavigationPage(services.Navigation.UserPagesView());
-                    locator.UserPagesViewModel.User = Task.Run(async () => await App.services.Database.GetUser(App.services.Authentication.Login.UserId)).Result;
+                    locator.UserPagesViewModel.User = Task.Run(async () => 
+                    {
+                        App.services.Database.Connect(App.services.Authentication.Login.AWSCredentials);
+                        return await App.services.Database.GetUserOrCreate(App.services.Authentication.Login);
+                    }).Result;
                 }
                 else
                 {

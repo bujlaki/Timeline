@@ -14,8 +14,8 @@ namespace Timeline.Services
         Task GetCachedCredentials();
         void AuthenticateGoogle(IAuthenticationDelegate _delegate);
         Task LoginCognito(string username, string password, IAuthenticationDelegate authDelegate);
-        Task SignupCognito(string username, string password, string email);
-        Task VerifyUserCognito(string username, string verificationCode);
+        Task SignupCognito(string username, string password, string email, ISignupDelegate signupDelegate);
+        Task VerifyUserCognito(string username, string verificationCode, IAccountVerificationDelegate verificationDelegate);
         void SignOut();
     }
 
@@ -23,5 +23,17 @@ namespace Timeline.Services
     {
         void OnAuthCompleted();
         void OnAuthFailed(string message, Exception exception);
+    }
+
+    public interface ISignupDelegate
+    {
+        void OnSignupCompleted();
+        void OnSignupFailed(string message, Exception exception);
+    }
+
+    public interface IAccountVerificationDelegate
+    {
+        void OnVerificationCompleted();
+        void OnVerificationFailed(string message, Exception exception);
     }
 }

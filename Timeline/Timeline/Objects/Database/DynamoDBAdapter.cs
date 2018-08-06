@@ -11,6 +11,8 @@ namespace Timeline.Objects.Database
     {
         public static Document User2DynamoDoc(MUser user)
         {
+            if (user == null) return null;
+
             var doc = new Document();
             doc.Add("userid", user.UserId);
             doc.Add("username", user.UserName);
@@ -23,6 +25,8 @@ namespace Timeline.Objects.Database
 
         public static MUser DynamoDoc2User(Document doc)
         {
+            if (doc == null) return null;
+
             var user = new MUser();
             user.UserId = doc["userid"].AsString();
             user.UserName = doc.ContainsKey("username") ? doc["username"].AsString() : "";
@@ -37,6 +41,8 @@ namespace Timeline.Objects.Database
 
         public static Document TimelineInfo2DynamoDoc(MTimelineInfo info)
         {
+            if (info == null) return null;
+
             var doc = new Document();
             doc.Add("timelineid", info.TimelineId);
             doc.Add("name", info.Name);
@@ -46,6 +52,8 @@ namespace Timeline.Objects.Database
 
         public static MTimelineInfo DynamoDoc2TimelineInfo(Document doc)
         {
+            if (doc == null) return null;
+
             var tli = new MTimelineInfo(doc["timelineid"]);
             tli.Name = doc.ContainsKey("name") ? doc["name"].AsString() : "";
             tli.Description = doc.ContainsKey("description") ? doc["description"].AsString() : ""; 
@@ -54,21 +62,25 @@ namespace Timeline.Objects.Database
 
         public static Document TimelineEvent2DynamoDoc(MTimelineEvent tlevent)
         {
+            if (tlevent == null) return null;
+
             var doc = new Document();
             doc.Add("timelineid", tlevent.TimelineId);
             doc.Add("title", tlevent.Title);
-            doc.Add("description", tlevent.Description);
-            doc.Add("image", tlevent.ImageBase64);
-            doc.Add("url", tlevent.URL);
-            doc.Add("data", tlevent.Data);
-            doc.Add("startdate", tlevent.StartDate.ToString());
-            doc.Add("enddate", tlevent.EndDate.ToString());
-            doc.Add("precision", tlevent.Precision.ToString());
+            doc.Add("description", GetDDBEntry(tlevent.Description));
+            doc.Add("image", GetDDBEntry(tlevent.ImageBase64));
+            doc.Add("url", GetDDBEntry(tlevent.URL));
+            doc.Add("data", GetDDBEntry(tlevent.Data));
+            doc.Add("startdate", tlevent.StartDate.Ticks);
+            doc.Add("enddate", tlevent.EndDate.Ticks);
+            doc.Add("precision", tlevent.Precision);
             return doc;
         }
 
         public static MTimelineEvent DynamoDoc2TimelineEvent(Document doc)
         {
+            if (doc == null) return null;
+
             var tlevent = new MTimelineEvent();
             tlevent.TimelineId = doc.ContainsKey("timelineid") ? doc["timelineid"].AsString() : "";
             tlevent.Title = doc.ContainsKey("title") ? doc["title"].AsString() : "";

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
@@ -48,6 +49,11 @@ namespace Timeline.ViewModels
 
         private void TimelineEvent_created(VMTimelineEvent arg1, MTimelineEvent arg2)
         {
+            arg2.TimelineId = this.TimelineId;
+            Events.Add(arg2);
+
+            App.services.Database.StoreEvent(arg2);
+            RaiseCollectionItemChanged(NotifyCollectionChangedAction.Add, arg2);
             Console.WriteLine("TimelineEvent created");
         }
 
@@ -57,7 +63,7 @@ namespace Timeline.ViewModels
 
             //new event
             TimelineDateTime tld = TimelineDateTime.FromTicks(arg.Ticks);
-            tld.Precision = arg.ZoomUnit;
+            tld.Precision = arg.ZoomUnit - 1;
             
             MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("new event", tld)));
         }
@@ -68,6 +74,7 @@ namespace Timeline.ViewModels
             Task.Run(async () => {
                 Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(TimelineId));
                 LaneCount = EventManager.SortEventsToLanes(Events, 10);
+                RaisePropertyChanged("Events");
             });
         }
     }

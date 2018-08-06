@@ -108,7 +108,7 @@ namespace Timeline.ViewModels
         {
             Busy = false;
             Unlock();
-            UserDialogs.Instance.Alert(exception.Message, "Login error");
+            UserDialogs.Instance.Alert(message, "Login failed");
         }
     }
 }

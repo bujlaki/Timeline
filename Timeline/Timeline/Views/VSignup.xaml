@@ -34,67 +34,13 @@
             <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.8, AutoSize, AutoSize"
                     Text="Submit" 
                     Command="{Binding CmdSignup}"/>
+
+            <controls:AbsActivityIndicator AbsoluteLayout.LayoutFlags="All" 
+                                           AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                                           IsShowing="{Binding Busy}"
+                                           IsVisible="{Binding Busy}"
+                                           Message="{Binding BusyMessage}"/>
         </AbsoluteLayout>
-        <!--<Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="3*"/>
-                </Grid.RowDefinitions>
 
-                <Image Source="title"/>
-                
-                <Label Grid.Row="1" Text="SIGNUP" 
-                       VerticalOptions="Start"
-                       HorizontalOptions="Center"
-                       FontSize="28"
-                       TextColor="#FBF0D2"/>
-
-                <Frame Grid.Row="2" Grid.RowSpan="4"
-                       BackgroundColor="#307496"
-                       CornerRadius="20" 
-                       Margin="-10">
-
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <controls:XEntry Grid.Row="0" 
-                                         Text="{Binding Username, Mode=OneWayToSource}"
-                                         Placeholder="username"/>
-
-                        <controls:XEntry Grid.Row="1" 
-                                         IsPassword="true" 
-                                         Text="{Binding Password, Mode=OneWayToSource}"
-                                         Placeholder="password"/>
-
-                        <controls:XEntry Grid.Row="2" 
-                                         Text="{Binding Email, Mode=OneWayToSource}"
-                                         Placeholder="e-mail"/>
-
-                        <Button Grid.Row="3" 
-                                Text="Submit" 
-                                Command="{Binding CmdSignup}"/>
-                        
-                    </Grid>
-                </Frame>
-
-            </Grid>
-        </Grid>-->
     </ContentPage.Content>
 </ContentPage>

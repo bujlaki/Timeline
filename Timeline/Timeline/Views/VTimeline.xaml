@@ -18,7 +18,7 @@
             <Label BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
             <controls:TimelineControl Grid.Row="1" 
                                       x:Name="tlc"
-                                      EventsSource="{Binding Events, Mode=TwoWay}" 
+                                      ItemsSource="{Binding Events, Mode=TwoWay}" 
                                       LaneCount="{Binding LaneCount}" 
                                       LongTapCommand="{Binding CmdLongTap}"
                                       Pixeltime="{Binding Pixeltime}"/>

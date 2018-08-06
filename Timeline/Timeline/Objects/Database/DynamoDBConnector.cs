@@ -21,7 +21,7 @@ namespace Timeline.Objects.Database
         }
 
         #region "MDBUser"
-        public async Task CreateUser(LoginData login)
+        public async Task<MUser> CreateUser(LoginData login)
         {
             try
             {
@@ -32,6 +32,7 @@ namespace Timeline.Objects.Database
                 user.Email = login.Email;
                 user.PhotoUrl = login.Picture;
                 await table.PutItemAsync(DynamoDBAdapter.User2DynamoDoc(user));
+                return user;
             }
             catch (Exception ex)
             {
@@ -85,6 +86,20 @@ namespace Timeline.Objects.Database
         #endregion
 
         #region "MDBTimelineEvent"
+        public async Task StoreEvent(MTimelineEvent tlevent)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "TimelineEvents");
+                await table.PutItemAsync(DynamoDBAdapter.TimelineEvent2DynamoDoc(tlevent));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("StoreEvents ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task StoreEvents(List<MTimelineEvent> timelineEvents)
         {
             try

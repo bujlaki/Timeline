@@ -14,6 +14,7 @@ using Timeline.Models;
 using Timeline.Objects.Timeline;
 using Timeline.Objects.TouchTracking;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Timeline.Controls
 {
@@ -38,24 +39,52 @@ namespace Timeline.Controls
             set { SetValue(DateProperty, value); }
         }
 
-        public static readonly BindableProperty EventsSourceProperty = BindableProperty.Create(
-            nameof(Timeline),
-            typeof(Collection<MTimelineEvent>),
+        public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
+            nameof(ItemsSource),
+            typeof(ObservableCollection<MTimelineEvent>),
             typeof(TimelineControl),
-            new Collection<MTimelineEvent>(), BindingMode.TwoWay,
-            propertyChanged: OnEventsSourceChanged);
-        private static void OnEventsSourceChanged(BindableObject bindable, object oldValue, object newValue)
+            new ObservableCollection<MTimelineEvent>(), BindingMode.TwoWay,
+            propertyChanged: OnItemsSourceChanged);
+        private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (((TimelineControl)bindable).EventsSource.Count > 0)
-                ((TimelineControl)bindable).Date = new TimelineDateTime(((TimelineControl)bindable).EventsSource[0].StartDate.Year);
+            if (bindable.BindingContext is INotifyCollectionChanged)
+            {
+                (bindable.BindingContext as INotifyCollectionChanged).CollectionChanged += ((TimelineControl)bindable).ItemsSource_CollectionChanged1;
+            }
+
+            if (((TimelineControl)bindable).ItemsSource.Count > 0)
+                ((TimelineControl)bindable).Date = new TimelineDateTime(((TimelineControl)bindable).ItemsSource[0].StartDate.Year);
             else
                 ((TimelineControl)bindable).Date = new TimelineDateTime(DateTime.UtcNow);
             ((TimelineControl)bindable).InvalidateLayout();
         }
-        public Collection<MTimelineEvent> EventsSource
+
+        private void ItemsSource_CollectionChanged1(object sender, NotifyCollectionChangedEventArgs e)
         {
-            get { return (Collection<MTimelineEvent>)GetValue(EventsSourceProperty); }
-            set { SetValue(EventsSourceProperty, value); }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (MTimelineEvent tlevent in e.NewItems)
+                        ItemsSource.Add(tlevent);
+                    break;
+            }
+            Console.WriteLine("CollectionChanged1");
+        }
+
+        public ObservableCollection<MTimelineEvent> ItemsSource
+        {
+            get { return (ObservableCollection<MTimelineEvent>)GetValue(ItemsSourceProperty); }
+            set { SetValue(ItemsSourceProperty, value); }
+        }
+        private static void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            
+            switch(e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    break;
+            }
+            Console.WriteLine("CollectionChanged");
         }
 
         public static readonly BindableProperty LaneCountProperty = BindableProperty.Create(
@@ -214,8 +243,8 @@ namespace Timeline.Controls
 			gestureRecognizer = new TouchGestureRecognizer();
 			gestureRecognizer.OnGestureRecognized += GestureRecognizer_OnGestureRecognized;
 
-            if (EventsSource.Count > 0)
-                Date = new TimelineDateTime(EventsSource[0].StartDate.Year);
+            if (ItemsSource.Count > 0)
+                Date = new TimelineDateTime(ItemsSource[0].StartDate.Year);
             else
                 Date = new TimelineDateTime(DateTime.UtcNow);
 
@@ -341,7 +370,7 @@ namespace Timeline.Controls
             SKRect clipRect = new SKRect(0, timelineBottomY, info.Width, info.Height);
             canvas.ClipRect(clipRect);
 
-			if (EventsSource.Count > 0) DrawTimelineEvents(canvas, minTicks, maxTicks);
+			if (ItemsSource.Count > 0) DrawTimelineEvents(canvas, minTicks, maxTicks);
         }
 
         #region "UNITS AND SUBUNITS DRAWING"
@@ -512,7 +541,7 @@ namespace Timeline.Controls
 		{
             int topLane = -lanesOffsetY / laneHeight;
             EventsStr = "";
-            foreach (MTimelineEvent e in this.EventsSource)
+            foreach (MTimelineEvent e in this.ItemsSource)
 			{
                 if (e.LaneNumber < topLane) continue;
 

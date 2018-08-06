@@ -46,6 +46,18 @@ namespace Timeline.Services
             return await ddb.GetUserById(userId);
         }
 
+        public async Task<MUser> GetUserOrCreate(LoginData login)
+        {
+            MUser u = await ddb.GetUserById(login.UserId);
+            if (u == null) u = await ddb.CreateUser(login);
+            return u;
+        }
+
+        public async Task StoreEvent(MTimelineEvent tlevent)
+        {
+            await ddb.StoreEvent(tlevent);
+        }
+
         public async Task StoreEvents(List<MTimelineEvent> timelineEvents)
         {
             await ddb.StoreEvents(timelineEvents);
@@ -55,5 +67,6 @@ namespace Timeline.Services
         {
             return await ddb.GetEvents(timelineId);
         }
+
     }
 }

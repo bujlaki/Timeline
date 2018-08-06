@@ -1,31 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xamarin.Forms;
 
 using Timeline.Services;
-using Timeline.Objects.Auth.Google;
 using Acr.UserDialogs;
-using System.Threading.Tasks;
 
 namespace Timeline.ViewModels
 {
-    public class VMSignup : Base.VMBase, IAuthenticationDelegate
+    public class VMSignup : Base.VMBase, IAuthenticationDelegate, ISignupDelegate, IAccountVerificationDelegate
     {
-
-        string loginResult;
         string username;
         string password;
         string email;
 
         public Command CmdSignup { get; set; }
-
-        public string LoginResult
-        {
-            get { return loginResult; }
-            set { loginResult = value; RaisePropertyChanged("LoginResult"); }
-        }
 
         public string Username
         {
@@ -50,36 +39,14 @@ namespace Timeline.ViewModels
             CmdSignup = new Command(CmdSignupExecute);
         }
 
-        async void CmdSignupExecute(object obj)
+        void CmdSignupExecute(object obj)
         {
-            try
+            Busy = true;
+            BusyMessage = "Signing up...";
+            Task.Run(async () =>
             {
-                using (UserDialogs.Instance.Loading("Please wait..."))
-                {
-                    await App.services.Authentication.SignupCognito(username, password, email);
-                }
-
-                PromptConfig pc = new PromptConfig
-                {    
-                    Title = "Check your email for the verification code!",
-                };
-                    
-                PromptResult pr = await UserDialogs.Instance.PromptAsync(pc);
-
-                using (UserDialogs.Instance.Loading("Confirming verification code..."))
-                {
-                    await App.services.Authentication.VerifyUserCognito(username, pr.Text);
-                }
-
-                using (UserDialogs.Instance.Loading("Logging in..."))
-                {
-                    await App.services.Authentication.LoginCognito(username, password, this);
-                }
-            }
-            catch (Exception ex)
-            {
-                UserDialogs.Instance.Alert(ex.Message, "Signup error");
-            }
+                await App.services.Authentication.SignupCognito(username, password, email, this);
+            });
         }
 
         public void OnAuthCompleted()
@@ -89,13 +56,55 @@ namespace Timeline.ViewModels
             Task.Run(async () =>
             {
                 await App.services.Database.CreateUser(App.services.Authentication.Login);
-            });
+            }).Wait();
             App.services.Navigation.GoToUserPagesPage(App.services.Authentication.Login.UserId, true);
+            Busy = false;
+            Unlock();
         }
 
         public void OnAuthFailed(string message, Exception exception)
         {
-            throw new NotImplementedException();
+            Busy = false;
+        }
+
+        public void OnSignupCompleted()
+        {
+            Busy = false;
+            PromptConfig pc = new PromptConfig
+            {
+                Title = "Check your email for the verification code!",
+            };
+
+            PromptResult pr;
+            Task.Run(async () =>
+            {
+                pr = await UserDialogs.Instance.PromptAsync(pc);
+
+                BusyMessage = "Confirming verification code...";
+                Busy = true;
+                await App.services.Authentication.VerifyUserCognito(username, pr.Text, this);
+            });
+        }
+
+        public void OnSignupFailed(string message, Exception exception)
+        {
+            Busy = false;
+            UserDialogs.Instance.Alert(message, "Signup failed");
+        }
+
+        public void OnVerificationCompleted()
+        {
+            BusyMessage = "Logging in...";
+            Task.Run(async () =>
+            {
+                await App.services.Authentication.LoginCognito(username, password, this);
+            });
+        }
+
+        public void OnVerificationFailed(string message, Exception exception)
+        {
+            Busy = false;
+            UserDialogs.Instance.Alert(message, "Account verification failed");
         }
     }
 }

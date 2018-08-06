@@ -44,7 +44,26 @@ namespace Timeline.Objects.Timeline
                 return c.ToString() + "00";
             }
         }
-        public TimelineUnits Precision { get; set; }
+
+        private TimelineUnits precision;
+        public TimelineUnits Precision {
+            get
+            {
+                return precision;
+            }
+            set
+            {
+                precision = value;
+                switch (precision)
+                {
+                    case TimelineUnits.Hour: SetDate(Year, Month, Day, Hour, 0); break;
+                    case TimelineUnits.Day: SetDate(Year, Month, Day, 0, 0); break;
+                    case TimelineUnits.Month: SetDate(Year, Month, 1, 0, 0); break;
+                    case TimelineUnits.Year: SetDate(Year, 1, 1, 0, 0); break;
+                    case TimelineUnits.Decade: SetDate((Year / 10) * 10, 1, 1, 0, 0); break;
+                }
+            }
+        }
 
         public static new TimelineDateTime MaxValue
         {

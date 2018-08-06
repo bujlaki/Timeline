@@ -59,7 +59,6 @@ namespace Timeline.Services
             try
             {
                 Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
-
                 await cognitoAuth.ValidateUser(username, password, loginDataRef);
                 Login.Type = LoginType.Cognito;
 
@@ -69,35 +68,38 @@ namespace Timeline.Services
             {
                 Console.WriteLine("LoginCognito Exception: " + ex.Message);
                 authDelegate.OnAuthFailed("Cognito authentication failed: " + ex.Message, ex);
-                //throw ex;
             }
         }
 
-        public async Task SignupCognito(string username, string password, string email)
+        public async Task SignupCognito(string username, string password, string email, ISignupDelegate signupDelegate)
         {
             try
             {
                 Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
                 await cognitoAuth.SignupUser(username, password, email, loginDataRef);
+
+                signupDelegate.OnSignupCompleted();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("SignupCognito Exception: " + ex.Message);
-                throw ex;
+                signupDelegate.OnSignupFailed("Cognito signup failed: " + ex.Message, ex);
             }
         }
 
-        public async Task VerifyUserCognito(string username, string verificationCode)
+        public async Task VerifyUserCognito(string username, string verificationCode, IAccountVerificationDelegate verificationDelegate)
         {
             try
             {
                 Ref<LoginData> loginDataRef = new Ref<LoginData>(Login);
                 await cognitoAuth.VerifyAccessCode(username, verificationCode, loginDataRef);
+
+                verificationDelegate.OnVerificationCompleted();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("VerifyUserCognito Exception: " + ex.Message);
-                throw ex;
+                verificationDelegate.OnVerificationFailed("Cognito verification failed: " + ex.Message, ex);
             }
         }
 
