@@ -67,12 +67,12 @@ namespace Timeline.Objects.Database
             var doc = new Document();
             doc.Add("timelineid", tlevent.TimelineId);
             doc.Add("title", tlevent.Title);
-            doc.Add("description", GetDDBEntry(tlevent.Description));
-            doc.Add("image", GetDDBEntry(tlevent.ImageBase64));
-            doc.Add("url", GetDDBEntry(tlevent.URL));
-            doc.Add("data", GetDDBEntry(tlevent.Data));
+            if (!string.IsNullOrEmpty(tlevent.Description)) doc.Add("description", tlevent.Description);
+            if (!string.IsNullOrEmpty(tlevent.ImageBase64)) doc.Add("image", tlevent.ImageBase64);
+            if (!string.IsNullOrEmpty(tlevent.URL)) doc.Add("url", tlevent.URL);
+            if (!string.IsNullOrEmpty(tlevent.Data)) doc.Add("data", tlevent.Data);
             doc.Add("startdate", tlevent.StartDate.Ticks);
-            doc.Add("enddate", tlevent.EndDate.Ticks);
+            if (tlevent.EndDate!=null) doc.Add("enddate", tlevent.EndDate.Ticks);
             doc.Add("precision", tlevent.Precision);
             return doc;
         }

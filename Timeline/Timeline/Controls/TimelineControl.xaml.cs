@@ -47,44 +47,17 @@ namespace Timeline.Controls
             propertyChanged: OnItemsSourceChanged);
         private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (bindable.BindingContext is INotifyCollectionChanged)
-            {
-                (bindable.BindingContext as INotifyCollectionChanged).CollectionChanged += ((TimelineControl)bindable).ItemsSource_CollectionChanged1;
-            }
-
             if (((TimelineControl)bindable).ItemsSource.Count > 0)
                 ((TimelineControl)bindable).Date = new TimelineDateTime(((TimelineControl)bindable).ItemsSource[0].StartDate.Year);
             else
                 ((TimelineControl)bindable).Date = new TimelineDateTime(DateTime.UtcNow);
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-
-        private void ItemsSource_CollectionChanged1(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (MTimelineEvent tlevent in e.NewItems)
-                        ItemsSource.Add(tlevent);
-                    break;
-            }
-            Console.WriteLine("CollectionChanged1");
+            ((TimelineControl)bindable).canvasView.InvalidateSurface();
         }
 
         public ObservableCollection<MTimelineEvent> ItemsSource
         {
             get { return (ObservableCollection<MTimelineEvent>)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
-        }
-        private static void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            
-            switch(e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    break;
-            }
-            Console.WriteLine("CollectionChanged");
         }
 
         public static readonly BindableProperty LaneCountProperty = BindableProperty.Create(

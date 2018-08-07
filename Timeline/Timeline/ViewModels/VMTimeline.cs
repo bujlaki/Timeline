@@ -53,7 +53,6 @@ namespace Timeline.ViewModels
             Events.Add(arg2);
 
             App.services.Database.StoreEvent(arg2);
-            RaiseCollectionItemChanged(NotifyCollectionChangedAction.Add, arg2);
             Console.WriteLine("TimelineEvent created");
         }
 
