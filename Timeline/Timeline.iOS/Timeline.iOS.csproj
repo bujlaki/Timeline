@@ -146,4 +146,10 @@
   <ItemGroup>
     <BundleResource Include="Resources\bkgPopup.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\calendar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\calendar48.png" />
+  </ItemGroup>
 </Project>

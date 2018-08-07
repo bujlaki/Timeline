@@ -201,9 +201,10 @@
                 
             </Frame>
 
-            <ScrollView Margin="20,0,20,0">
+            <Image AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize" Source="title"/>
+            
+            <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.9, 0.7">
                 <StackLayout Orientation="Vertical">
-                    <Image Source="title"/>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -213,8 +214,7 @@
 
                         <Label Grid.Column="0" Text="Title" Style="{StaticResource fieldLabel}"/>
                         <controls:XEntry Grid.Column="1"
-                                         Text="{Binding Event.Title, Mode=OneWayToSource}"                                     
-                                         Placeholder="title"/>
+                                         Text="{Binding Event.Title, Mode=OneWayToSource}"/>
                     </Grid>
 
 
@@ -232,11 +232,16 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0" Text="Start date:" Style="{StaticResource fieldLabel}"/>
+                        <Label Grid.Column="0" Text="Startdate:" Style="{StaticResource fieldLabel}"/>
                         <Label Grid.Column="1" Text="{Binding StartDateStr}" Style="{StaticResource fieldValueLabel}"/>
-                        <Button Grid.Column="2" 
-                                Text="SET" 
-                                Command="{Binding CmdStartDate}"/>
+                        <Image Grid.Column="2" Source="calendar48">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdStartDate}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <!--<Button Grid.Column="2" 
+                                Image="calendar"
+                                Command="{Binding CmdStartDate}"/>-->
                     </Grid>
 
                     <Grid>
@@ -246,19 +251,26 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0" Text="End date:" Style="{StaticResource fieldLabel}"/>
+                        <Label Grid.Column="0" Text="Enddate:" Style="{StaticResource fieldLabel}"/>
                         <Label Grid.Column="1" Text="{Binding EndDateStr}" Style="{StaticResource fieldValueLabel}"/>
-                        <Button Grid.Column="2" 
-                                Text="SET" 
-                                Command="{Binding CmdEndDate}"/>
+                        <Image Grid.Column="2" Source="calendar48">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdEndDate}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <!--<Button Grid.Column="2" 
+                                Image="calendar"
+                                Command="{Binding CmdEndDate}"/>-->
                     </Grid>
 
-                    <Button Text="Create" 
-                            Command="{Binding CmdCreate}"
-                            CommandParameter="1"/>
+
                 </StackLayout>
             </ScrollView>
-            
+
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.9, AutoSize, AutoSize" 
+                    Text="Create" 
+                    Command="{Binding CmdCreate}"
+                    CommandParameter="1"/>
         </AbsoluteLayout>
 
     </ContentPage.Content>
