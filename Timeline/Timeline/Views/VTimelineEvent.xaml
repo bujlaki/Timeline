@@ -216,7 +216,7 @@
 
                         <Label Grid.Column="0" Text="Title" Style="{StaticResource fieldLabel}"/>
                         <controls:XEntry Grid.Column="1"
-                                         Text="{Binding Event.Title, Mode=OneWayToSource}"/>
+                                         Text="{Binding Event.Title, Mode=TwoWay}"/>
                     </Grid>
                     
                     <Grid>
@@ -249,7 +249,7 @@
                     </Grid>
 
                     <Label Text="Description" Style="{StaticResource fieldLabel}"/>
-                    <Editor Text="{Binding Event.Description, Mode=OneWayToSource}"
+                    <Editor Text="{Binding Event.Description, Mode=TwoWay}"
                             HeightRequest="50"
                             TextColor="#234b64"
                             BackgroundColor="#eeebd3"
@@ -263,18 +263,22 @@
 
                         <Label Grid.Column="0" Text="URL" Style="{StaticResource fieldLabel}"/>
                         <controls:XEntry Grid.Column="1"
-                                         Text="{Binding Event.URL, Mode=OneWayToSource}"/>
+                                         Text="{Binding Event.URL, Mode=TwoWay}"/>
                     </Grid>
 
                     <Label Text="Custom data" Style="{StaticResource fieldLabel}"/>
-                    <Editor Text="{Binding Event.Description, Mode=OneWayToSource}"
+                    <Editor Text="{Binding Event.Data, Mode=TwoWay}"
                             HeightRequest="50"
                             TextColor="#234b64"
                             BackgroundColor="#eeebd3"
                             FontSize="14"/>
 
                     <Label Text="Image" Style="{StaticResource fieldLabel}"/>
-                    <Image WidthRequest="200" HeightRequest="200" HorizontalOptions="Center" Source="{Binding Event.Image}" BackgroundColor="White">
+                    <Image WidthRequest="100" 
+                           HeightRequest="100" 
+                           HorizontalOptions="Center" 
+                           Source="{Binding EventImageSource, Mode=OneWay}" 
+                           BackgroundColor="White">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdImage}"/>
                         </Image.GestureRecognizers>

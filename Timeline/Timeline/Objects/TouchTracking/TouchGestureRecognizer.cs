@@ -113,14 +113,14 @@ namespace Timeline.Objects.TouchTracking
                             TimeSpan timeDiff = DateTime.UtcNow - info.InitialTime;
                             if (timeDiff < TimeSpan.FromMilliseconds(Timings.shortTapMilliseconds))
                             {
-                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Tap, info.InitialPoint, SKPoint.Empty));
+                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Tap, info.InitialPoint, info.InitialRawPoint));
                             }
                         } else {
                             //check for SWIPE
                             SKPoint lastDiff = info.NewPoint - info.PreviousPoint;
                             if(Math.Abs(lastDiff.X)>5 || Math.Abs(lastDiff.Y)>5)
                             {
-                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Swipe, lastDiff, SKPoint.Empty));
+                                OnGestureRecognized(this, new TouchGestureEventArgs(id, TouchGestureType.Swipe, lastDiff, info.InitialRawPoint));
                             }
                         }
                     }

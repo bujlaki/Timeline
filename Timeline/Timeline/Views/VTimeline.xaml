@@ -20,6 +20,7 @@
                                       x:Name="tlc"
                                       ItemsSource="{Binding Events, Mode=TwoWay}" 
                                       LaneCount="{Binding LaneCount}" 
+                                      TapCommand="{Binding CmdTap}"
                                       LongTapCommand="{Binding CmdLongTap}"
                                       Pixeltime="{Binding Pixeltime}"/>
             <Label Grid.Row="2" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />

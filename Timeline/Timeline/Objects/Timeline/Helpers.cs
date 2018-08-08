@@ -21,7 +21,7 @@ namespace Timeline.Objects.Timeline
         Landscape
     }
 
-    public class LongTapEventArg
+    public class TapEventArg
     {
         public float X;
         public float Y;
@@ -29,7 +29,7 @@ namespace Timeline.Objects.Timeline
         public Int64 Ticks;
         public TimelineUnits ZoomUnit;
 
-        public LongTapEventArg(float _x, float _y, int _lane, Int64 _ticks, TimelineUnits _zoomUnit)
+        public TapEventArg(float _x, float _y, int _lane, Int64 _ticks, TimelineUnits _zoomUnit)
         {
             X = _x;
             Y = _y;

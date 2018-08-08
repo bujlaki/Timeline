@@ -41,6 +41,15 @@ namespace Timeline.ViewModels
             get { return Event.EndDate.DateStr(); }
         }
 
+        public ImageSource EventImageSource
+        {
+            get
+            {
+                if (Event.Image == null) return null;
+                return Event.Image.Source;
+            }
+        }
+
         private bool datePickerVisible;
         public bool DatePickerVisible
         {
@@ -339,17 +348,26 @@ namespace Timeline.ViewModels
         {
             if(CrossMedia.Current.Initialize().Result)
             {
-                PickMediaOptions options = null;
+                if (!CrossMedia.Current.IsPickPhotoSupported) return;
+
+                PickMediaOptions options = new PickMediaOptions();
+                options.PhotoSize = PhotoSize.MaxWidthHeight;
+                options.MaxWidthHeight = 200;
                 MediaFile img = await CrossMedia.Current.PickPhotoAsync(options);
+
                 if (img == null) return;
+
+                var stream = img.GetStream();
+                var bytes = new byte[stream.Length];
+                await stream.ReadAsync(bytes, 0, (int)stream.Length);
+                Event.ImageBase64 = System.Convert.ToBase64String(bytes);
+
+                stream.Seek(0, System.IO.SeekOrigin.Begin);
                 Image eventImg = new Image();
-                eventImg.Source = ImageSource.FromStream(() =>
-                {
-                    var stream = img.GetStream();
-                    return stream;
-                });
+                eventImg.Source = ImageSource.FromStream(() => stream);
+
                 Event.Image = eventImg;
-                RaisePropertyChanged("Event");
+                RaisePropertyChanged("EventImageSource");
             }
         }
 

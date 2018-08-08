@@ -144,6 +144,17 @@ namespace Timeline.Controls
             set { SetValue(EventsStrProperty, value); }
         }
 
+        public static readonly BindableProperty TapCommandProperty = BindableProperty.Create(
+            nameof(TapCommand),
+            typeof(ICommand),
+            typeof(TimelineControl),
+            null);
+        public ICommand TapCommand
+        {
+            get { return (ICommand)GetValue(TapCommandProperty); }
+            set { SetValue(TapCommandProperty, value); }
+        }
+
         public static readonly BindableProperty LongTapCommandProperty = BindableProperty.Create(
             nameof(LongTapCommand), 
             typeof(ICommand), 
@@ -240,21 +251,32 @@ namespace Timeline.Controls
 
         void GestureRecognizer_OnGestureRecognized(object sender, TouchGestureEventArgs args)
         {
+            int clickedLane;
+            Int64 clickedTicks;
+
             switch (args.Type)
             {
                 case TouchGestureType.Tap:
                     //Console.WriteLine("TAP");
+                    if (args.InitialRawLocation.Y < timelineBottomY) break;
+                    clickedLane = ((int)args.InitialRawLocation.Y - (int)timelineBottomY - lanesOffsetY) / laneHeight;
+                    clickedTicks = Date.Ticks + ((int)args.InitialRawLocation.X - halfWidth) * Pixeltime;
+                    TapEventArg taparg = new TapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, clickedTicks, ZoomUnit);
+                    if (TapCommand != null && TapCommand.CanExecute(null))
+                    {
+                        TapCommand.Execute(taparg);
+                    }
                     break;
 
                 case TouchGestureType.LongTap:
                     //Console.WriteLine("LONGTAP");
                     if (args.InitialRawLocation.Y < timelineBottomY) break;
-                    int clickedLane = ((int)args.InitialRawLocation.Y - (int)timelineBottomY - lanesOffsetY) / laneHeight;
-                    Int64 clickedTicks = Date.Ticks + ((int)args.InitialRawLocation.X - halfWidth) * Pixeltime;
-                    LongTapEventArg arg = new LongTapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, clickedTicks, ZoomUnit);
+                    clickedLane = ((int)args.InitialRawLocation.Y - (int)timelineBottomY - lanesOffsetY) / laneHeight;
+                    clickedTicks = Date.Ticks + ((int)args.InitialRawLocation.X - halfWidth) * Pixeltime;
+                    TapEventArg longtaparg = new TapEventArg(args.InitialRawLocation.X, args.InitialRawLocation.Y, clickedLane, clickedTicks, ZoomUnit);
                     if (LongTapCommand != null && LongTapCommand.CanExecute(null))
                     {
-                        LongTapCommand.Execute(arg);
+                        LongTapCommand.Execute(longtaparg);
                     }
                     break;
 

@@ -36,10 +36,12 @@ namespace Timeline.ViewModels
         public ObservableCollection<MTimelineEvent> Events { get; set; }
         public int LaneCount { get; set; }
 
+        public Command CmdTap { get; set; }
         public Command CmdLongTap { get; set; }
 
         public VMTimeline() : base()
         {
+            CmdTap = new Command(TapExecute);
             CmdLongTap = new Command(LongTapExecute);
             Events = new ObservableCollection<MTimelineEvent>();
 
@@ -56,9 +58,20 @@ namespace Timeline.ViewModels
             Console.WriteLine("TimelineEvent created");
         }
 
+        private void TapExecute(object obj)
+        {
+            TapEventArg arg = (TapEventArg)obj;
+
+            //tapped event
+            MTimelineEvent tlevent = EventManager.GetEventAt(Events, arg.Lane, arg.Ticks);
+            if (tlevent == null) return;
+
+            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(tlevent));
+        }
+
         private void LongTapExecute(object obj)
         {
-            LongTapEventArg arg = (LongTapEventArg)obj;
+            TapEventArg arg = (TapEventArg)obj;
 
             //new event
             TimelineDateTime tld = TimelineDateTime.FromTicks(arg.Ticks);
