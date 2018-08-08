@@ -4,8 +4,12 @@ using System.Collections.ObjectModel;
 using System.Text;
 using Xamarin.Forms;
 
+using Plugin.Media;
+
 using Timeline.Models;
 using Timeline.Objects.Timeline;
+using System.Threading.Tasks;
+using Plugin.Media.Abstractions;
 
 namespace Timeline.ViewModels
 {
@@ -18,6 +22,7 @@ namespace Timeline.ViewModels
         public Command CmdEndDate { get; set; }
         public Command CmdSetDate { get; set; }
         public Command CmdPickerLabelTap { get; set; }
+        public Command CmdImage { get; set; }
         public Command CmdCreate { get; set; }
 
         private MTimelineEvent tlevent;
@@ -188,6 +193,7 @@ namespace Timeline.ViewModels
         {
             CmdCreate = new Command(CmdCreateExecute);
 
+            CmdImage = new Command(CmdImageExecute);
             CmdStartDate = new Command(CmdStartDateExecute);
             CmdEndDate = new Command(CmdEndDateExecute);
             CmdSetDate = new Command(CmdSetDateExecute);
@@ -326,6 +332,24 @@ namespace Timeline.ViewModels
                 case "2": DayPickerVisible = !DayPickerVisible; break;
                 case "3": HourPickerVisible = !HourPickerVisible; break;
                 case "4": MinutePickerVisible = !MinutePickerVisible; break;
+            }
+        }
+
+        private async void CmdImageExecute(object obj)
+        {
+            if(CrossMedia.Current.Initialize().Result)
+            {
+                PickMediaOptions options = null;
+                MediaFile img = await CrossMedia.Current.PickPhotoAsync(options);
+                if (img == null) return;
+                Image eventImg = new Image();
+                eventImg.Source = ImageSource.FromStream(() =>
+                {
+                    var stream = img.GetStream();
+                    return stream;
+                });
+                Event.Image = eventImg;
+                RaisePropertyChanged("Event");
             }
         }
 

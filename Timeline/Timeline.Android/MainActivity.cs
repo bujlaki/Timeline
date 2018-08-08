@@ -39,6 +39,10 @@ namespace Timeline.Droid
             Window.SetStatusBarColor(Android.Graphics.Color.Argb(255, 35, 75, 100));
         }
 
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Android.Content.PM.Permission[] grantResults)
+        {
+            Plugin.Permissions.PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }
 

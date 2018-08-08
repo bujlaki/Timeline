@@ -42,11 +42,6 @@ namespace Timeline.ViewModels.Base
             RaisePropertyChanged(String.Empty);
         }
 
-        public void RaiseCollectionItemChanged(NotifyCollectionChangedAction action, object item = null)
-        {
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, item));
-        }
-
         protected bool Lock()
         {
             lock (syncLock)

@@ -129,6 +129,9 @@
     <PackageReference Include="SkiaSharp.Views.Forms">
       <Version>1.60.2</Version>
     </PackageReference>
+    <PackageReference Include="Xam.Plugin.Media">
+      <Version>4.0.1.5</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Essentials">
       <Version>0.8.0-preview</Version>
     </PackageReference>
@@ -151,5 +154,11 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\calendar48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\calendar36.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\noimage.png" />
   </ItemGroup>
 </Project>

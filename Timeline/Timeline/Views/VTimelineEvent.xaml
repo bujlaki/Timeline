@@ -22,7 +22,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Label Grid.Row="0" Text="SET DATE" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"/>
-                    
+
                     <Grid Grid.Row="1" WidthRequest="200" HorizontalOptions="Center" BackgroundColor="WhiteSmoke">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -196,12 +196,14 @@
                                 AbsoluteLayout.LayoutBounds="0.75,0,0.25,1"
                                 Command="{Binding CmdSetDate}" CommandParameter="0"/>
                     </AbsoluteLayout>
-                    
+
                 </Grid>
-                
+
             </Frame>
 
-            <Image AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize" Source="title"/>
+            <controls:PageTitleControl Title="CREATE EVENT"
+                                       AbsoluteLayout.LayoutFlags="All"
+                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
             
             <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.9, 0.7">
                 <StackLayout Orientation="Vertical">
@@ -216,58 +218,71 @@
                         <controls:XEntry Grid.Column="1"
                                          Text="{Binding Event.Title, Mode=OneWayToSource}"/>
                     </Grid>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
+                        <Image Grid.Column="0" Source="calendar36">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdStartDate}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Label Grid.Column="1" 
+                               Text="{Binding StartDateStr}" 
+                               Style="{StaticResource fieldValueLabel}" 
+                               HorizontalOptions="Start"/>
+                        <Label Grid.Column="2" 
+                               Text="{Binding EndDateStr}" 
+                               Style="{StaticResource fieldValueLabel}" 
+                               HorizontalOptions="End"
+                               HorizontalTextAlignment="End"/>
+                        <Image Grid.Column="3" Source="calendar36">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdEndDate}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Grid>
 
                     <Label Text="Description" Style="{StaticResource fieldLabel}"/>
                     <Editor Text="{Binding Event.Description, Mode=OneWayToSource}"
-                            HeightRequest="100"
+                            HeightRequest="50"
                             TextColor="#234b64"
                             BackgroundColor="#eeebd3"
                             FontSize="14"/>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0" Text="Startdate:" Style="{StaticResource fieldLabel}"/>
-                        <Label Grid.Column="1" Text="{Binding StartDateStr}" Style="{StaticResource fieldValueLabel}"/>
-                        <Image Grid.Column="2" Source="calendar48">
-                            <Image.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding CmdStartDate}"/>
-                            </Image.GestureRecognizers>
-                        </Image>
-                        <!--<Button Grid.Column="2" 
-                                Image="calendar"
-                                Command="{Binding CmdStartDate}"/>-->
+                        <Label Grid.Column="0" Text="URL" Style="{StaticResource fieldLabel}"/>
+                        <controls:XEntry Grid.Column="1"
+                                         Text="{Binding Event.URL, Mode=OneWayToSource}"/>
                     </Grid>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <Label Text="Custom data" Style="{StaticResource fieldLabel}"/>
+                    <Editor Text="{Binding Event.Description, Mode=OneWayToSource}"
+                            HeightRequest="50"
+                            TextColor="#234b64"
+                            BackgroundColor="#eeebd3"
+                            FontSize="14"/>
 
-                        <Label Grid.Column="0" Text="Enddate:" Style="{StaticResource fieldLabel}"/>
-                        <Label Grid.Column="1" Text="{Binding EndDateStr}" Style="{StaticResource fieldValueLabel}"/>
-                        <Image Grid.Column="2" Source="calendar48">
-                            <Image.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding CmdEndDate}"/>
-                            </Image.GestureRecognizers>
-                        </Image>
-                        <!--<Button Grid.Column="2" 
-                                Image="calendar"
-                                Command="{Binding CmdEndDate}"/>-->
-                    </Grid>
-
-
+                    <Label Text="Image" Style="{StaticResource fieldLabel}"/>
+                    <Image WidthRequest="200" HeightRequest="200" HorizontalOptions="Center" Source="{Binding Event.Image}" BackgroundColor="White">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdImage}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
                 </StackLayout>
             </ScrollView>
 
-            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.9, AutoSize, AutoSize" 
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
                     Text="Create" 
                     Command="{Binding CmdCreate}"
                     CommandParameter="1"/>
