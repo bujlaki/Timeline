@@ -10,6 +10,7 @@ using Timeline.Models;
 using Timeline.Objects.Timeline;
 using System.Threading.Tasks;
 using Plugin.Media.Abstractions;
+using System.IO;
 
 namespace Timeline.ViewModels
 {
@@ -24,6 +25,10 @@ namespace Timeline.ViewModels
         public Command CmdPickerLabelTap { get; set; }
         public Command CmdImage { get; set; }
         public Command CmdCreate { get; set; }
+        public Command CmdUpdate { get; set; }
+
+        public string PageTitle { get; set; }
+        public bool IsNewEvent { get; set; }
 
         private MTimelineEvent tlevent;
         public MTimelineEvent Event {
@@ -201,6 +206,7 @@ namespace Timeline.ViewModels
         public VMTimelineEvent() : base()
         {
             CmdCreate = new Command(CmdCreateExecute);
+            CmdUpdate = new Command(CmdUpdateExecute);
 
             CmdImage = new Command(CmdImageExecute);
             CmdStartDate = new Command(CmdStartDateExecute);
@@ -293,6 +299,7 @@ namespace Timeline.ViewModels
             SelectedHour = Event.StartDate.Hour;
             SelectedMinute = Event.StartDate.Minute;
             BCAC = Event.StartDate.Year < 0 ? "BC" : "AC";
+            InitPickerPrecision(Event.StartDate);
             DatePickerVisible = true;
         }
 
@@ -306,7 +313,36 @@ namespace Timeline.ViewModels
             SelectedHour = Event.EndDate.Hour;
             SelectedMinute = Event.EndDate.Minute;
             BCAC = Event.EndDate.Year < 0 ? "BC" : "AC";
+            InitPickerPrecision(Event.EndDate);
             DatePickerVisible = true;
+        }
+
+        private void InitPickerPrecision(TimelineDateTime tld)
+        {
+            switch(tld.Precision)
+            {
+                case TimelineUnits.Minute:
+                    MinutePickerVisible = true;
+                    break;
+                case TimelineUnits.Hour:
+                    HourPickerVisible = true;
+                    MinutePickerVisible = false;
+                    break;
+                case TimelineUnits.Day:
+                    DayPickerVisible = true;
+                    HourPickerVisible = false;
+                    MinutePickerVisible = false;
+                    break;
+                case TimelineUnits.Month:
+                    MonthPickerVisible = true;
+                    DayPickerVisible = false;
+                    HourPickerVisible = false;
+                    MinutePickerVisible = false;
+                    break;
+                default:
+                    MonthPickerVisible = false;
+                    break;
+            }
         }
 
         private void CmdSetDateExecute(object obj)
@@ -362,11 +398,11 @@ namespace Timeline.ViewModels
                 await stream.ReadAsync(bytes, 0, (int)stream.Length);
                 Event.ImageBase64 = System.Convert.ToBase64String(bytes);
 
-                stream.Seek(0, System.IO.SeekOrigin.Begin);
-                Image eventImg = new Image();
-                eventImg.Source = ImageSource.FromStream(() => stream);
+                ImageSource imgSrc;
+                imgSrc = ImageSource.FromStream(() => new MemoryStream(bytes));
 
-                Event.Image = eventImg;
+                stream.Close();
+                Event.Image.Source = imgSrc;
                 RaisePropertyChanged("EventImageSource");
             }
         }
@@ -406,8 +442,14 @@ namespace Timeline.ViewModels
         private void CmdCreateExecute(object obj)
         {
             //check if field values are correct
-
             MessagingCenter.Send<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", this.Event);
+            App.services.Navigation.GoBack();
+        }
+
+        private void CmdUpdateExecute(object obj)
+        {
+            //check if field values are correct
+            MessagingCenter.Send<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", this.Event);
             App.services.Navigation.GoBack();
         }
     }

@@ -25,9 +25,11 @@ namespace Timeline.Models
 
         public MTimelineEvent()
         {
+            Image = new Image();
+            ClearImage();
         }
 
-		public MTimelineEvent(string _title, TimelineDateTime _startdate, int _length=1)
+		public MTimelineEvent(string _title, TimelineDateTime _startdate, int _length=1) : this()
         {
             TimelineDateTime tempDate = new TimelineDateTime();
 
@@ -38,5 +40,8 @@ namespace Timeline.Models
             EndDate = tempDate;
         }
 
+        public void ClearImage() {
+            Image.Source = "noimage";
+        }
     }
 }

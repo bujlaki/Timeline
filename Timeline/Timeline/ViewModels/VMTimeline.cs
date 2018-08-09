@@ -16,6 +16,8 @@ namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
+        public string Title { get; set; }
+
         private TimelineUnits zoomUnit;
         public TimelineUnits ZoomUnit
         {
@@ -38,15 +40,19 @@ namespace Timeline.ViewModels
 
         public Command CmdTap { get; set; }
         public Command CmdLongTap { get; set; }
+        public Command CmdAddEvent { get; set; }
 
         public VMTimeline() : base()
         {
             CmdTap = new Command(TapExecute);
             CmdLongTap = new Command(LongTapExecute);
+            CmdAddEvent = new Command(CmdAddEventExecute);
             Events = new ObservableCollection<MTimelineEvent>();
+            Date = new TimelineDateTime();
 
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", TimelineEvent_created);
+            MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", TimelineEvent_updated);
         }
 
         private void TimelineEvent_created(VMTimelineEvent arg1, MTimelineEvent arg2)
@@ -55,7 +61,16 @@ namespace Timeline.ViewModels
             Events.Add(arg2);
 
             App.services.Database.StoreEvent(arg2);
-            Console.WriteLine("TimelineEvent created");
+            RaisePropertyChanged("ItemsSource");
+        }
+
+        private void TimelineEvent_updated(VMTimelineEvent arg1, MTimelineEvent arg2)
+        {
+            arg2.TimelineId = this.TimelineId;
+            Events.Add(arg2);
+
+            App.services.Database.UpdateEvent(arg2);
+            RaisePropertyChanged("ItemsSource");
         }
 
         private void TapExecute(object obj)
@@ -65,7 +80,11 @@ namespace Timeline.ViewModels
             //tapped event
             MTimelineEvent tlevent = EventManager.GetEventAt(Events, arg.Lane, arg.Ticks);
             if (tlevent == null) return;
-
+            if (tlevent.Image == null)
+            {
+                tlevent.Image = new Image();
+                tlevent.ClearImage();
+            }
             MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(tlevent));
         }
 
@@ -77,7 +96,16 @@ namespace Timeline.ViewModels
             TimelineDateTime tld = TimelineDateTime.FromTicks(arg.Ticks);
             tld.Precision = arg.ZoomUnit - 1;
             
-            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("new event", tld)));
+            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("", tld)));
+        }
+
+        private void CmdAddEventExecute(object obj)
+        {
+            //new event
+            TimelineDateTime tld = TimelineDateTime.FromTicks(Date.Ticks);
+            tld.Precision = ZoomUnit - 1;
+
+            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("", tld)));
         }
 
         public void LoadEvents()

@@ -47,11 +47,22 @@ namespace Timeline.Controls
             propertyChanged: OnItemsSourceChanged);
         private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            if (((TimelineControl)bindable).ItemsSource.Count > 0)
-                ((TimelineControl)bindable).Date = new TimelineDateTime(((TimelineControl)bindable).ItemsSource[0].StartDate.Year);
+            TimelineControl tlc = (TimelineControl)bindable;
+
+            //signup to CollectionChanged, so we can update the Canvas when an event is added
+            if (oldValue != null) ((ObservableCollection<MTimelineEvent>)oldValue).CollectionChanged -= tlc.OnItemsSourceCollectionChanged;
+            if (newValue != null) ((ObservableCollection<MTimelineEvent>)newValue).CollectionChanged += tlc.OnItemsSourceCollectionChanged;
+
+            if (tlc.ItemsSource.Count > 0)
+                tlc.Date = new TimelineDateTime(tlc.ItemsSource[0].StartDate.Year);
             else
-                ((TimelineControl)bindable).Date = new TimelineDateTime(DateTime.UtcNow);
-            ((TimelineControl)bindable).canvasView.InvalidateSurface();
+                tlc.Date = new TimelineDateTime(DateTime.UtcNow);
+            tlc.canvasView.InvalidateSurface();
+        }
+
+        private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            canvasView.InvalidateSurface();
         }
 
         public ObservableCollection<MTimelineEvent> ItemsSource

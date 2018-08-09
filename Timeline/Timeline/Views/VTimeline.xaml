@@ -8,22 +8,44 @@
              BindingContext="{Binding TimelineViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
-        <Grid Margin="0,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <AbsoluteLayout>
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 0.9">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <Label BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" />
-            <controls:TimelineControl Grid.Row="1" 
-                                      x:Name="tlc"
-                                      ItemsSource="{Binding Events, Mode=TwoWay}" 
-                                      LaneCount="{Binding LaneCount}" 
-                                      TapCommand="{Binding CmdTap}"
-                                      LongTapCommand="{Binding CmdLongTap}"
-                                      Pixeltime="{Binding Pixeltime}"/>
-            <Label Grid.Row="2" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />
-        </Grid>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Text="{Binding Title}" FontSize="24"/>
+                    <Label Grid.Column="1" BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" FontSize="24" VerticalTextAlignment="End"/>
+                </Grid>
+                
+                <controls:TimelineControl Grid.Row="1" 
+                                          x:Name="tlc"
+                                          ItemsSource="{Binding Events, Mode=TwoWay}" 
+                                          LaneCount="{Binding LaneCount}" 
+                                          TapCommand="{Binding CmdTap}"
+                                          LongTapCommand="{Binding CmdLongTap}"
+                                          Pixeltime="{Binding Pixeltime}"/>
+                <Label Grid.Row="2" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />
+            </Grid>
+
+            <BoxView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 1, 1, 0.1" Color="#f4bd4f"/>
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 1, 1, 0.1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="1" Text="New Event" Command="{Binding CmdAddEvent}"/>
+                
+            </Grid>
+        </AbsoluteLayout>
     </ContentPage.Content>
 </ContentPage>

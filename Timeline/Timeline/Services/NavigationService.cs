@@ -142,6 +142,17 @@ namespace Timeline.Services
         public void GoToTimelineEventView(MTimelineEvent tlevent)
         {
             _vmLocator.TimelineEventViewModel.Event = tlevent;
+            if (string.IsNullOrEmpty(tlevent.Title))
+            {
+                _vmLocator.TimelineEventViewModel.PageTitle = "CREATE EVENT";
+                _vmLocator.TimelineEventViewModel.IsNewEvent = true;
+            }
+            else
+            {
+                _vmLocator.TimelineEventViewModel.PageTitle = "EDIT EVENT";
+                _vmLocator.TimelineEventViewModel.IsNewEvent = false;
+            }
+
             _navigation.PushModalAsync(timelineEventView.Value);
         }
 

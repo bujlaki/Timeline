@@ -12,7 +12,7 @@
 
             <Frame AbsoluteLayout.LayoutFlags="All" 
                    AbsoluteLayout.LayoutBounds="0,0,1,1" 
-                   BackgroundColor="#88eeebd3"
+                   BackgroundColor="Transparent"
                    IsVisible="{Binding DatePickerVisible}">
                 <Grid HeightRequest="300" BackgroundColor="#eeebd3" VerticalOptions="Center">
                     <Grid.RowDefinitions>
@@ -21,9 +21,11 @@
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Text="SET DATE" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"/>
+                    
+                    <BoxView Grid.Row="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="#f4bd4f"/>
+                    <Label Grid.Row="0" Text="SET DATE" HorizontalOptions="Center" VerticalOptions="Center" FontSize="20" TextColor="Black"/>
 
-                    <Grid Grid.Row="1" WidthRequest="200" HorizontalOptions="Center" BackgroundColor="WhiteSmoke">
+                    <Grid Grid.Row="1" WidthRequest="200" HorizontalOptions="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -31,18 +33,19 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Label Text="{Binding BCAC}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="20">
+                        <Label Text="{Binding BCAC}" VerticalOptions="Center" HorizontalOptions="Center" FontSize="20" TextColor="Black">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding CmdBCAC}" NumberOfTapsRequired="1"/>
                             </Label.GestureRecognizers>
                         </Label>
                         <AbsoluteLayout Grid.Column="1">
                             <Label AbsoluteLayout.LayoutFlags="All" 
-                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.8"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    Text="{Binding Digit1}"
-                                   FontSize="36"/>
+                                   FontSize="40"
+                                   TextColor="Black"/>
                             <BoxView AbsoluteLayout.LayoutFlags="All"
                                      AbsoluteLayout.LayoutBounds="0,0,1,0.5"
                                      BackgroundColor="Transparent">
@@ -60,11 +63,12 @@
                         </AbsoluteLayout>
                         <AbsoluteLayout Grid.Column="2">
                             <Label AbsoluteLayout.LayoutFlags="All" 
-                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.8"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    Text="{Binding Digit2}"
-                                   FontSize="36"/>
+                                   FontSize="40"
+                                   TextColor="Black"/>
                             <BoxView AbsoluteLayout.LayoutFlags="All"
                                      AbsoluteLayout.LayoutBounds="0,0,1,0.5"
                                      BackgroundColor="Transparent">
@@ -82,11 +86,12 @@
                         </AbsoluteLayout>
                         <AbsoluteLayout Grid.Column="3">
                             <Label AbsoluteLayout.LayoutFlags="All" 
-                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.8"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    Text="{Binding Digit3}"
-                                   FontSize="36"/>
+                                   FontSize="40"
+                                   TextColor="Black"/>
                             <BoxView AbsoluteLayout.LayoutFlags="All"
                                      AbsoluteLayout.LayoutBounds="0,0,1,0.5"
                                      BackgroundColor="Transparent">
@@ -104,11 +109,12 @@
                         </AbsoluteLayout>
                         <AbsoluteLayout Grid.Column="4">
                             <Label AbsoluteLayout.LayoutFlags="All" 
-                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.5"
+                                   AbsoluteLayout.LayoutBounds="0,0.5,1,0.8"
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
                                    Text="{Binding Digit4}"
-                                   FontSize="36"/>
+                                   FontSize="40"
+                                   TextColor="Black"/>
                             <BoxView AbsoluteLayout.LayoutFlags="All"
                                      AbsoluteLayout.LayoutBounds="0,0,1,0.5"
                                      BackgroundColor="Transparent">
@@ -201,7 +207,7 @@
 
             </Frame>
 
-            <controls:PageTitleControl Title="CREATE EVENT"
+            <controls:PageTitleControl Title="{Binding PageTitle}"
                                        AbsoluteLayout.LayoutFlags="All"
                                        AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
             
@@ -289,7 +295,14 @@
             <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
                     Text="Create" 
                     Command="{Binding CmdCreate}"
-                    CommandParameter="1"/>
+                    CommandParameter="1"
+                    IsVisible="{Binding IsNewEvent}"/>
+
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
+                    Text="Update" 
+                    Command="{Binding CmdUpdate}"
+                    CommandParameter="1"
+                    IsVisible="{Binding IsNewEvent, Converter={StaticResource inverseBoolConverter}}"/>
         </AbsoluteLayout>
 
     </ContentPage.Content>

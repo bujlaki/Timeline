@@ -95,7 +95,21 @@ namespace Timeline.Objects.Database
             }
             catch (Exception ex)
             {
-                Console.WriteLine("StoreEvents ERROR: " + ex.Message);
+                Console.WriteLine("StoreEvent ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task UpdateEvent(MTimelineEvent tlevent)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "TimelineEvents");
+                await table.UpdateItemAsync(DynamoDBAdapter.TimelineEvent2DynamoDoc(tlevent));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("UpdateEvent ERROR: " + ex.Message);
                 throw ex;
             }
         }
