@@ -13,6 +13,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="2*"/>
+                    <RowDefinition Height="5"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -23,7 +24,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Text="{Binding Title}" FontSize="24"/>
-                    <Label Grid.Column="1" BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" FontSize="24" VerticalTextAlignment="End"/>
+                    <Label Grid.Column="1" BindingContext="{x:Reference tlc}" Text="{Binding DateStr}" FontSize="24" VerticalOptions="End"/>
                 </Grid>
                 
                 <controls:TimelineControl Grid.Row="1" 
@@ -33,10 +34,34 @@
                                           TapCommand="{Binding CmdTap}"
                                           LongTapCommand="{Binding CmdLongTap}"
                                           Pixeltime="{Binding Pixeltime}"/>
-                <Label Grid.Row="2" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />
+
+                <BoxView Grid.Row="2" Color="#234b64" HeightRequest="2" HorizontalOptions="FillAndExpand"/>
+
+                <Label Grid.Row="3" BindingContext="{x:Reference tlc}" Text="{Binding EventsStr}" />
+
+                <Grid Grid.Row="3" IsVisible="{Binding EventInfoVisible}" BackgroundColor="#eeebd3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ScrollView Grid.Column="0">
+                        <StackLayout BindingContext="{Binding EventSelected}" Orientation="Vertical">
+                            <Label Text="{Binding Title}"/>
+                            <Label Text="{Binding Description}"/>
+                            <Image Source="{Binding Image.Source}" VerticalOptions="FillAndExpand"/>
+                        </StackLayout>
+                    </ScrollView>
+
+                    <StackLayout Grid.Column="1" Orientation="Vertical">
+                        <Button Image="close36" Command="{Binding CmdCloseEventInfo}" WidthRequest="44" HeightRequest="44" Margin="10"/>
+                        <Button Image="edit36" Command="{Binding CmdEditEventInfo}" WidthRequest="44" HeightRequest="44" Margin="10"/>
+                    </StackLayout>
+                </Grid>
+
             </Grid>
 
-            <BoxView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 1, 1, 0.1" Color="#f4bd4f"/>
+            <BoxView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 1, 1, 0.1" Color="#234b64"/>
             <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 1, 1, 0.1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

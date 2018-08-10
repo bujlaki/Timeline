@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 using SkiaSharp;
@@ -28,7 +29,7 @@ namespace Timeline.Objects.Timeline
         public void Load(string userid)
         {
             TimelinePaint = new SKPaint();
-            TimelinePaint.Color = SKColor.Parse(Preferences.Get("timeline_color", SKColors.SkyBlue.ToString()));
+            TimelinePaint.Color = SKColor.Parse(Preferences.Get("timeline_color", "#bfd9f3"));
 
             UnitMarkPaint = new SKPaint();
             UnitMarkPaint.Color = SKColor.Parse(Preferences.Get("unitmark_color", SKColors.Black.ToString()));

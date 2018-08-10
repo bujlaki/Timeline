@@ -16,7 +16,11 @@ namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
-        public string Title { get; set; }
+        private string title = "";
+        public string Title {
+            get { return title; }
+            set { title = value; RaisePropertyChanged("Title"); }
+        }
 
         private TimelineUnits zoomUnit;
         public TimelineUnits ZoomUnit
@@ -38,18 +42,36 @@ namespace Timeline.ViewModels
         public ObservableCollection<MTimelineEvent> Events { get; set; }
         public int LaneCount { get; set; }
 
+        private bool eventInfoVisible = false;
+        public bool EventInfoVisible {
+            get { return eventInfoVisible; }
+            set { eventInfoVisible = value; RaisePropertyChanged("EventInfoVisible"); }
+        }
+
+        private MTimelineEvent eventSelected = null;
+        public MTimelineEvent EventSelected {
+            get { return eventSelected; }
+            set { eventSelected = value; RaisePropertyChanged("EventSelected"); }
+        }
+
         public Command CmdTap { get; set; }
         public Command CmdLongTap { get; set; }
         public Command CmdAddEvent { get; set; }
+        public Command CmdCloseEventInfo { get; set; }
+        public Command CmdEditEventInfo { get; set; }
 
         public VMTimeline() : base()
         {
             CmdTap = new Command(TapExecute);
             CmdLongTap = new Command(LongTapExecute);
             CmdAddEvent = new Command(CmdAddEventExecute);
+            CmdCloseEventInfo = new Command(CmdCloseEventInfoExecute);
+            CmdEditEventInfo = new Command(CmdEditEventInfoExecute);
+
             Events = new ObservableCollection<MTimelineEvent>();
             Date = new TimelineDateTime();
-
+            EventInfoVisible = false;
+            
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", TimelineEvent_created);
             MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", TimelineEvent_updated);
@@ -85,7 +107,10 @@ namespace Timeline.ViewModels
                 tlevent.Image = new Image();
                 tlevent.ClearImage();
             }
-            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(tlevent));
+
+            EventSelected = tlevent;
+            EventInfoVisible = true;
+            //MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(tlevent));
         }
 
         private void LongTapExecute(object obj)
@@ -106,6 +131,18 @@ namespace Timeline.ViewModels
             tld.Precision = ZoomUnit - 1;
 
             MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("", tld)));
+        }
+
+        private void CmdCloseEventInfoExecute(object obj)
+        {
+            EventInfoVisible = false;
+            EventSelected = null;
+        }
+
+        private void CmdEditEventInfoExecute(object obj)
+        {
+            if(EventSelected!=null)
+                MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(EventSelected));
         }
 
         public void LoadEvents()

@@ -122,6 +122,7 @@ namespace Timeline.Services
 
         public void GoToTimelineView(MTimelineInfo timeline)
         {
+            _vmLocator.TimelineViewModel.Title = timeline.Name;
             _vmLocator.TimelineViewModel.TimelineId = timeline.TimelineId;
             _vmLocator.TimelineViewModel.LoadEvents();
             try

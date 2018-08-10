@@ -161,4 +161,10 @@
   <ItemGroup>
     <BundleResource Include="Resources\noimage.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\close36.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\edit36.png" />
+  </ItemGroup>
 </Project>
