@@ -15,27 +15,42 @@
             
             <Label Grid.Row="0" 
                    Text="TIMELINE LIST"
-                   HeightRequest="100"
-                   FontSize="32"
-                   VerticalOptions="Start" 
-                   HorizontalOptions="CenterAndExpand" />
+                   Style="{StaticResource titleLabel}"/>
 
             <ListView Grid.Row="1" 
                       ItemsSource="{Binding User.Timelines}"
                       Margin="30,0,30,0"
-                      RowHeight="100"
+                      RowHeight="80"
                       SelectedItem="{Binding SelectedTimeline, Mode=TwoWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid Margin="5,5,5,5" BackgroundColor="#bfd9f3">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Label Text="{Binding Name}" Margin="10,0,10,5" TextColor="#f4bd4f" FontSize="16" FontAttributes="Bold"/>
-                                <Label Text="{Binding Description}" Grid.Row="1" Margin="10,5,10,10" TextColor="#234b64" FontSize="12"/>
-                            </Grid>
+                            <AbsoluteLayout>
+                                <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 0.95" 
+                                       CornerRadius="15" 
+                                       BorderColor="{StaticResource bkgColor3}"
+                                       Padding="3">
+
+                                    
+                                    <Grid Margin="0" 
+                                          BackgroundColor="{StaticResource bkgColor2}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Text="{Binding Name}" 
+                                               Grid.Row="0"
+                                               Margin="10,0,10,5" 
+                                               Style="{StaticResource linkLabel}"/>
+                                        <Label Text="{Binding Description}" 
+                                               Grid.Row="1" 
+                                               Margin="10,5,10,10" 
+                                               TextColor="{StaticResource textColor1}" 
+                                               FontSize="12"/>
+                                    </Grid>
+                                </Frame>
+                            </AbsoluteLayout>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

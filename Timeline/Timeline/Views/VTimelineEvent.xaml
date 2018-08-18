@@ -10,7 +10,7 @@
     <ContentPage.Content>
         <AbsoluteLayout>
 
-            <!--<Frame AbsoluteLayout.LayoutFlags="All" 
+            <Frame AbsoluteLayout.LayoutFlags="All" 
                    AbsoluteLayout.LayoutBounds="0,0,1,1" 
                    BackgroundColor="Transparent"
                    IsVisible="{Binding DatePickerVisible}">
@@ -205,7 +205,7 @@
 
                 </Grid>
 
-            </Frame>-->
+            </Frame>
 
             <controls:PageTitleControl Title="{Binding PageTitle}"
                                        AbsoluteLayout.LayoutFlags="All"

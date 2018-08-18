@@ -21,6 +21,7 @@ namespace Timeline.ViewModels
 
         public Command CmdStartDate { get; set; }
         public Command CmdEndDate { get; set; }
+        public Command CmdClearEndDate { get; set; }
         public Command CmdSetDate { get; set; }
         public Command CmdPickerLabelTap { get; set; }
         public Command CmdImage { get; set; }
@@ -43,7 +44,10 @@ namespace Timeline.ViewModels
 
         public string EndDateStr
         {
-            get { return Event.EndDate.DateStr(); }
+            get {
+                if (!Event.EndDateSet) return "";
+                return Event.EndDate.DateStr();
+            }
         }
 
         public ImageSource EventImageSource
@@ -211,6 +215,7 @@ namespace Timeline.ViewModels
             CmdImage = new Command(CmdImageExecute);
             CmdStartDate = new Command(CmdStartDateExecute);
             CmdEndDate = new Command(CmdEndDateExecute);
+            CmdClearEndDate = new Command(CmdClearEndDateExecute);
             CmdSetDate = new Command(CmdSetDateExecute);
             CmdPickerLabelTap = new Command(CmdPickerLabelTapExecute);
             CmdBCAC = new Command(CmdBCACExecute);
@@ -293,13 +298,7 @@ namespace Timeline.ViewModels
         {
             //setup date picker
             settingStartDate = true;
-            SetYearDigits(Math.Abs(Event.StartDate.Year));
-            SelectedMonth = Event.StartDate.Month - 1;
-            SelectedDay = Event.StartDate.Day;
-            SelectedHour = Event.StartDate.Hour;
-            SelectedMinute = Event.StartDate.Minute;
-            BCAC = Event.StartDate.Year < 0 ? "BC" : "AC";
-            InitPickerPrecision(Event.StartDate);
+            InitPicker(Event.StartDate);
             DatePickerVisible = true;
         }
 
@@ -307,19 +306,29 @@ namespace Timeline.ViewModels
         {
             //setup date picker
             settingStartDate = false;
-            SetYearDigits(Math.Abs(Event.EndDate.Year));
-            SelectedMonth = Event.EndDate.Month - 1;
-            SelectedDay = Event.EndDate.Day;
-            SelectedHour = Event.EndDate.Hour;
-            SelectedMinute = Event.EndDate.Minute;
-            BCAC = Event.EndDate.Year < 0 ? "BC" : "AC";
-            InitPickerPrecision(Event.EndDate);
+            InitPicker(Event.EndDate);
             DatePickerVisible = true;
         }
 
-        private void InitPickerPrecision(TimelineDateTime tld)
+        private void CmdClearEndDateExecute(object obj)
         {
-            switch(tld.Precision)
+            //setup date picker
+            Event.EndDate = TimelineDateTime.AddTo(Event.StartDate);
+            Event.EndDateSet = false;
+            RaisePropertyChanged("EndDateStr");
+        }
+
+        //initialize picker values, and visibility of ValuePicker controls base on TimelineDateTime precision
+        private void InitPicker(TimelineDateTime tld)
+        {
+            SetYearDigits(Math.Abs(tld.Year));
+            SelectedMonth = tld.Month - 1;
+            SelectedDay = tld.Day;
+            SelectedHour = tld.Hour;
+            SelectedMinute = tld.Minute;
+            BCAC = tld.Year < 0 ? "BC" : "AC";
+
+            switch (tld.Precision)
             {
                 case TimelineUnits.Minute:
                     MinutePickerVisible = true;
@@ -359,18 +368,14 @@ namespace Timeline.ViewModels
                     Event.StartDate.Precision = GetDatePrecision();
                     RaisePropertyChanged("StartDateStr");
 
-                    if(!Event.EndDateSet) //set enddate also
-                    {
-                        TimelineDateTime tempDate = new TimelineDateTime();
-                        Event.StartDate.CopyTo(ref tempDate);
-                        tempDate.Add(1);
-                        Event.EndDate = tempDate;
-                    }
+                    //set end date if it is not set manually
+                    if (!Event.EndDateSet) Event.EndDate = TimelineDateTime.AddTo(Event.StartDate);
                 }
                 else
                 {
                     Event.EndDate = new TimelineDateTime(year, selectedMonth + 1, selectedDay, selectedHour, selectedMinute);
                     Event.EndDate.Precision = GetDatePrecision();
+                    Event.EndDateSet = true;
                     RaisePropertyChanged("EndDateStr");
                 }
             }
@@ -415,6 +420,7 @@ namespace Timeline.ViewModels
             }
         }
 
+        //set year digits of the picker control, base on the year
         private void SetYearDigits(int year)
         {
             Digit1 = year / 1000;
@@ -426,18 +432,21 @@ namespace Timeline.ViewModels
             Digit4 = year;
         }
 
+        //calculate current year based on the year digits
         private void UpdateYear()
         {
             currentYear = Digit1 * 1000 + Digit2 * 100 + Digit3 * 10 + Digit4;
             UpdateDays();
         }
 
+        //calculate the number of days in the current month
         private void UpdateDays()
         {
             if (currentYear < 1) return;
             DaysInMonth = DateTime.DaysInMonth(currentYear, selectedMonth + 1);
         }
 
+        //returns precision based on picker values
         private TimelineUnits GetDatePrecision()
         {
             if (minutePickerVisible) return TimelineUnits.Minute;
@@ -447,6 +456,7 @@ namespace Timeline.ViewModels
             return TimelineUnits.Year;
         }
             
+
         private void CmdCreateExecute(object obj)
         {
             //check if field values are correct

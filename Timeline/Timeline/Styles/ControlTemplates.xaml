@@ -10,20 +10,23 @@
                 <RowDefinition Height="7*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" BackgroundColor="{StaticResource bkgColor1}">
+            <Grid Grid.Row="0" BackgroundColor="{StaticResource bkgColor2}">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="5*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
 
-                <Image Grid.Column="0" Source="menu44">
+                <Image Grid.Column="1" Source="menu32"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Command="{TemplateBinding Parent.BindingContext.CmdMenu}"/>
                     </Image.GestureRecognizers>
                 </Image>
 
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -43,7 +46,7 @@
                                    HorizontalOptions="Start"/>-->
                 </Grid>
 
-                <Image Grid.Column="2" Source="{TemplateBinding Parent.BindingContext.User.PhotoUrl}" />
+                <Image Grid.Column="3" Source="{TemplateBinding Parent.BindingContext.User.PhotoUrl}" />
 
             </Grid>
 

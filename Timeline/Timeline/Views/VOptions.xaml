@@ -8,8 +8,7 @@
     <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
         <StackLayout>
             <Label Text="OPTIONS"
-                   VerticalOptions="CenterAndExpand" 
-                   HorizontalOptions="CenterAndExpand" />
+                   Style="{StaticResource titleLabel}"/>
         </StackLayout>
     </ContentView>
 </ContentPage>

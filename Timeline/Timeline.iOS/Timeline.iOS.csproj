@@ -191,4 +191,7 @@
   <ItemGroup>
     <BundleResource Include="Resources\close32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\menu32.png" />
+  </ItemGroup>
 </Project>

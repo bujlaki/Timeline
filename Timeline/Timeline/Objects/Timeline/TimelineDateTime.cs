@@ -226,5 +226,12 @@ namespace Timeline.Objects.Timeline
             }
         }
 
+        public static TimelineDateTime AddTo(TimelineDateTime tldate)
+        {
+            TimelineDateTime tempDate = new TimelineDateTime();
+            tldate.CopyTo(ref tempDate);
+            tempDate.Add(1);
+            return tempDate;
+        }
     }
 }
