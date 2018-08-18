@@ -3,4 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Timeline.Styles.Colors">
 
+    <Color x:Key="bkgColor1">#234b64</Color>
+    <Color x:Key="bkgColor2">#307496</Color>
+    <Color x:Key="bkgColor3">#bfd9f3</Color>
+    <Color x:Key="textColor1">#eeebd3</Color>
+    <Color x:Key="textColor2">#f4bd4f</Color>
 </ResourceDictionary>

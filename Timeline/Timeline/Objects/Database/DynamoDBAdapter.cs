@@ -4,6 +4,7 @@ using System.Text;
 
 using Amazon.DynamoDBv2.DocumentModel;
 using Timeline.Models;
+using Timeline.Objects.Timeline;
 
 namespace Timeline.Objects.Database
 {
@@ -73,7 +74,7 @@ namespace Timeline.Objects.Database
             if (!string.IsNullOrEmpty(tlevent.Data)) doc.Add("data", tlevent.Data);
             doc.Add("startdate", tlevent.StartDate.Ticks);
             if (tlevent.EndDate!=null) doc.Add("enddate", tlevent.EndDate.Ticks);
-            doc.Add("precision", tlevent.Precision);
+            doc.Add("precision", (byte)tlevent.StartDate.Precision);
             return doc;
         }
 
@@ -89,9 +90,11 @@ namespace Timeline.Objects.Database
             tlevent.Image = tlevent.ImageBase64.Length>0 ? ImageFromBase64(tlevent.ImageBase64) : null;
             tlevent.URL = doc.ContainsKey("url") ? doc["url"].AsString() : "";
             tlevent.Data = doc.ContainsKey("data") ? doc["data"].AsString() : "";
-            tlevent.StartDate = Timeline.TimelineDateTime.FromTicks(Int64.Parse(doc["startdate"].AsString()));
+            tlevent.StartDate = TimelineDateTime.FromTicks(Int64.Parse(doc["startdate"].AsString()));
             tlevent.EndDate = doc.ContainsKey("enddate") ? Timeline.TimelineDateTime.FromTicks(Int64.Parse(doc["enddate"].AsString())) : null;
             tlevent.Precision = byte.Parse(doc["precision"].AsString());
+            tlevent.StartDate.Precision = (TimelineUnits)tlevent.Precision;
+            tlevent.EndDate.Precision = (TimelineUnits)tlevent.Precision;
             return tlevent;
         }
 

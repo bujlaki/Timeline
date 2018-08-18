@@ -167,4 +167,28 @@
   <ItemGroup>
     <BundleResource Include="Resources\edit36.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\close18.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\edit18.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\datetime18.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\menu44.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\addevent32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\search32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\edit32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\close32.png" />
+  </ItemGroup>
 </Project>

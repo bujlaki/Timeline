@@ -36,6 +36,13 @@ namespace Timeline.ViewModels
             set { date = value; RaisePropertyChanged("Date"); }
         }
 
+        private EventTree eventTree;
+        public EventTree EventTree
+        {
+            get { return eventTree; }
+            set { eventTree = value; RaisePropertyChanged("EventTree"); }
+        }
+
         public Int64 Pixeltime { get; }
 
         public string TimelineId { get; set; }
@@ -110,7 +117,6 @@ namespace Timeline.ViewModels
 
             EventSelected = tlevent;
             EventInfoVisible = true;
-            //MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(tlevent));
         }
 
         private void LongTapExecute(object obj)
@@ -151,6 +157,7 @@ namespace Timeline.ViewModels
             Task.Run(async () => {
                 Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(TimelineId));
                 LaneCount = EventManager.SortEventsToLanes(Events, 10);
+                //EventTree = EventManager.BuildEventTree(Events);
                 RaisePropertyChanged("Events");
             });
         }

@@ -21,6 +21,7 @@ namespace Timeline.Models
         public Image Image { get; set; }
         public TimelineDateTime StartDate { get; set; }
         public TimelineDateTime EndDate { get; set; }
+        public bool EndDateSet { get; set; }
         public int LaneNumber { get; set; }
 
         public MTimelineEvent()
@@ -38,6 +39,7 @@ namespace Timeline.Models
 			StartDate.CopyTo(ref tempDate);
             tempDate.Add(_length);
             EndDate = tempDate;
+            EndDateSet = false;
         }
 
         public void ClearImage() {

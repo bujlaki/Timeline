@@ -358,6 +358,14 @@ namespace Timeline.ViewModels
                     Event.StartDate = new TimelineDateTime(year, selectedMonth + 1, selectedDay, selectedHour, selectedMinute);
                     Event.StartDate.Precision = GetDatePrecision();
                     RaisePropertyChanged("StartDateStr");
+
+                    if(!Event.EndDateSet) //set enddate also
+                    {
+                        TimelineDateTime tempDate = new TimelineDateTime();
+                        Event.StartDate.CopyTo(ref tempDate);
+                        tempDate.Add(1);
+                        Event.EndDate = tempDate;
+                    }
                 }
                 else
                 {

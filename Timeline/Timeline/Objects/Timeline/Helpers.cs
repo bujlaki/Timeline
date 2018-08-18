@@ -12,7 +12,8 @@ namespace Timeline.Objects.Timeline
         Month,
         Year,
         Decade,
-        Century
+        Century,
+        All
     }
 
     public enum TimelineOrientation

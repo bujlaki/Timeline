@@ -8,8 +8,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <styles:ControlTemplates/>
                 <styles:Colors/>
+                <styles:ControlTemplates/>
                 <styles:ViewStyles/>
             </ResourceDictionary.MergedDictionaries>
             

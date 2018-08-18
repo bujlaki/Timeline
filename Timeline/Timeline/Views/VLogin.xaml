@@ -6,28 +6,36 @@
              Title="LOGIN"
              BindingContext="{Binding LoginViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False"
-             BackgroundColor="#234b64">
-    <ContentPage.Content> <!--" IsEnabled="{Binding Busy,Converter={StaticResource inverseBoolConverter}}"-->
+             BackgroundImage="bkg">
+    <ContentPage.Content>
         <AbsoluteLayout>
             
-            <Image Source="title" AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"/>
+            <!--<Image Source="title" AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"/>-->
 
-            <controls:XEntry AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.25, 0.8, 0.1" 
+            <Label AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.8, 0.1, 0.8, 0.1"
+                   FontSize="28"
+                   TextColor="{StaticResource textColor1}"
+                   HorizontalOptions="Center"
+                   Text="LOGIN"/>
+
+            <controls:XEntry AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.8, 0.3, 0.8, 0.1" 
+                             VerticalOptions="Start"
                              Text="{Binding Username, Mode=OneWayToSource}" 
                              Placeholder="username"/>
 
-            <controls:XEntry AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.35, 0.8, 0.1" 
-                             HorizontalOptions="FillAndExpand"
+            <controls:XEntry AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.8, 0.4, 0.8, 0.1" 
+                             VerticalOptions="Start"
                              IsPassword="true" 
                              Text="{Binding Password, Mode=OneWayToSource}"
                              Placeholder="password"/>
 
-            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.5, AutoSize, AutoSize" 
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional" AbsoluteLayout.LayoutBounds="0.8, 0.5, 0.8, AutoSize" 
                     Text="Login" 
                     Command="{Binding CmdUserPassLogin}"
-                    CommandParameter="1"/>
+                    CommandParameter="1"
+                    HorizontalOptions="Center"/>
 
-            <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.1, 0.6, AutoSize, AutoSize"
+            <!--<Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.1, 0.6, AutoSize, AutoSize"
                            Style="{StaticResource linkLabel}"
                            Text="Forgot password?" 
                            HorizontalOptions="Start"
@@ -35,30 +43,30 @@
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding CmdForgotPassword}" CommandParameter="1"/>
                 </Label.GestureRecognizers>
-            </Label>
+            </Label>-->
 
-            <Label AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.9, 0.6, AutoSize, AutoSize"
+            <Label AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional" AbsoluteLayout.LayoutBounds="0.8, 0.6, 0.8, AutoSize"
                            Style="{StaticResource linkLabel}"
-                           Text="New account" 
-                           HorizontalOptions="End"
+                           Text="Create a new account" 
+                           HorizontalOptions="Center"
                            VerticalOptions="End">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding CmdSignup}" CommandParameter="1"/>
                 </Label.GestureRecognizers>
             </Label>
 
-            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.8, AutoSize, AutoSize" 
+            <Button  AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional" AbsoluteLayout.LayoutBounds="0.8, 0.8, 0.8, AutoSize" 
                         Text="Login with Google"
                         Image="google"
                         Command="{Binding CmdGoogleLogin}"
                         CommandParameter="1"/>
 
-            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.9, AutoSize, AutoSize"
+            <Button  AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional" AbsoluteLayout.LayoutBounds="0.8, 0.9, 0.8, AutoSize"
                         Text="GO TO TESTPAGE"
                         Command="{Binding CmdTest}"
                         IsVisible="True"/>
 
-            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 1, AutoSize, AutoSize"
+            <Button  AbsoluteLayout.LayoutFlags="PositionProportional,WidthProportional" AbsoluteLayout.LayoutBounds="0.8, 1, 0.8, AutoSize"
                         Text="LOGIN BAZ"
                         Command="{Binding CmdBazLogin}"
                         IsVisible="True"/>

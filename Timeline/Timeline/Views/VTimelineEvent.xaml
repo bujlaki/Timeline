@@ -6,11 +6,11 @@
              Title="TIMELINE_EVENT"
              BindingContext="{Binding TimelineEventViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False"
-             BackgroundColor="#234b64">
+             BackgroundColor="{StaticResource bkgColor1}">
     <ContentPage.Content>
         <AbsoluteLayout>
 
-            <Frame AbsoluteLayout.LayoutFlags="All" 
+            <!--<Frame AbsoluteLayout.LayoutFlags="All" 
                    AbsoluteLayout.LayoutBounds="0,0,1,1" 
                    BackgroundColor="Transparent"
                    IsVisible="{Binding DatePickerVisible}">
@@ -205,7 +205,7 @@
 
                 </Grid>
 
-            </Frame>
+            </Frame>-->
 
             <controls:PageTitleControl Title="{Binding PageTitle}"
                                        AbsoluteLayout.LayoutFlags="All"
@@ -217,54 +217,91 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="44"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0" Text="Title" Style="{StaticResource fieldLabel}"/>
-                        <controls:XEntry Grid.Column="1"
-                                         Text="{Binding Event.Title, Mode=TwoWay}"/>
-                    </Grid>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0"
+                               Text="Start"
+                               Style="{StaticResource fieldLabel}"
+                               HorizontalOptions="Start"/>
+                        
+                        <Label Grid.Column="1"
+                               Text="{Binding StartDateStr}" 
+                               Style="{StaticResource fieldValueLabel}" 
+                               HorizontalOptions="Start"/>
 
-                        <Image Grid.Column="0" Source="calendar36">
+                        <Image Grid.Column="2"
+                               Source="edit32">
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding CmdStartDate}"/>
                             </Image.GestureRecognizers>
                         </Image>
-                        <Label Grid.Column="1" 
-                               Text="{Binding StartDateStr}" 
-                               Style="{StaticResource fieldValueLabel}" 
+
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="44"/>
+                            <ColumnDefinition Width="44"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0"
+                               Text="End"
+                               Style="{StaticResource fieldLabel}"
                                HorizontalOptions="Start"/>
-                        <Label Grid.Column="2" 
+
+                        <Label Grid.Column="1"
                                Text="{Binding EndDateStr}" 
                                Style="{StaticResource fieldValueLabel}" 
-                               HorizontalOptions="End"
-                               HorizontalTextAlignment="End"/>
-                        <Image Grid.Column="3" Source="calendar36">
+                               HorizontalOptions="Start"/>
+
+                        <Image Grid.Column="2"
+                               Source="close32">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdClearEndDate}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+
+                        <Image Grid.Column="3"
+                               Source="edit32">
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding CmdEndDate}"/>
                             </Image.GestureRecognizers>
                         </Image>
                     </Grid>
+                                       
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Label Text="Description" Style="{StaticResource fieldLabel}"/>
-                    <Editor Text="{Binding Event.Description, Mode=TwoWay}"
-                            HeightRequest="50"
+                        <Label Grid.Column="0" Text="Title" Style="{StaticResource fieldLabel}"/>
+                        <controls:XEntry Grid.Column="1" Text="{Binding Event.Title, Mode=TwoWay}"/>
+                    </Grid>
+
+                   
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Description" Style="{StaticResource fieldLabel}" VerticalOptions="Start"/>
+                        <Editor Grid.Column="1" Text="{Binding Event.Description, Mode=TwoWay}"
+                            HeightRequest="80"
                             TextColor="#234b64"
                             BackgroundColor="#eeebd3"
                             FontSize="14"/>
+                    </Grid>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
 
                         <Label Grid.Column="0" Text="URL" Style="{StaticResource fieldLabel}"/>
@@ -272,23 +309,38 @@
                                          Text="{Binding Event.URL, Mode=TwoWay}"/>
                     </Grid>
 
-                    <Label Text="Custom data" Style="{StaticResource fieldLabel}"/>
-                    <Editor Text="{Binding Event.Data, Mode=TwoWay}"
-                            HeightRequest="50"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Custom data" Style="{StaticResource fieldLabel}" VerticalOptions="Start"/>
+                        <Editor Grid.Column="1" Text="{Binding Event.Data, Mode=TwoWay}"
+                            HeightRequest="80"
                             TextColor="#234b64"
                             BackgroundColor="#eeebd3"
                             FontSize="14"/>
+                    </Grid>
 
-                    <Label Text="Image" Style="{StaticResource fieldLabel}"/>
-                    <Image WidthRequest="100" 
-                           HeightRequest="100" 
-                           HorizontalOptions="Center" 
-                           Source="{Binding EventImageSource, Mode=OneWay}" 
-                           BackgroundColor="White">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdImage}"/>
-                        </Image.GestureRecognizers>
-                    </Image>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Text="Image" Style="{StaticResource fieldLabel}" VerticalOptions="Start"/>
+                        <Image Grid.Column="1" 
+                               WidthRequest="100" 
+                               HeightRequest="100" 
+                               HorizontalOptions="Start" 
+                               Source="{Binding EventImageSource, Mode=OneWay}" 
+                               BackgroundColor="White">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdImage}"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Grid>
                 </StackLayout>
             </ScrollView>
 
