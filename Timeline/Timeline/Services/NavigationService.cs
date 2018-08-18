@@ -124,6 +124,7 @@ namespace Timeline.Services
         {
             _vmLocator.TimelineViewModel.Title = timeline.Name;
             _vmLocator.TimelineViewModel.TimelineId = timeline.TimelineId;
+            _vmLocator.TimelineViewModel.ZoomUnit = Objects.Timeline.TimelineUnits.Year;
             _vmLocator.TimelineViewModel.LoadEvents();
             try
             {

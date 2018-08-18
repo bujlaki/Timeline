@@ -110,7 +110,7 @@ namespace Timeline.Controls
             nameof(ZoomUnit),
             typeof(TimelineUnits),
             typeof(TimelineControl),
-            TimelineUnits.Year, BindingMode.OneWay,
+            TimelineUnits.Year, BindingMode.TwoWay,
             propertyChanged: OnZoomUnitChanged);
         private static void OnZoomUnitChanged(BindableObject bindable, object oldValue, object newValue)
         {
