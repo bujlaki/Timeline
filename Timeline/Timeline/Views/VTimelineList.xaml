@@ -25,32 +25,29 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <AbsoluteLayout>
-                                <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 0.95" 
-                                       CornerRadius="15" 
-                                       BorderColor="{StaticResource bkgColor3}"
-                                       Padding="3">
+                            <Grid Margin="0"
+                                  BackgroundColor="{StaticResource bkgColor2}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="2"/>
+                                </Grid.RowDefinitions>
 
-                                    
-                                    <Grid Margin="0" 
-                                          BackgroundColor="{StaticResource bkgColor2}">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-
-                                        <Label Text="{Binding Name}" 
-                                               Grid.Row="0"
-                                               Margin="10,0,10,5" 
-                                               Style="{StaticResource linkLabel}"/>
-                                        <Label Text="{Binding Description}" 
-                                               Grid.Row="1" 
-                                               Margin="10,5,10,10" 
-                                               TextColor="{StaticResource textColor1}" 
-                                               FontSize="12"/>
-                                    </Grid>
-                                </Frame>
-                            </AbsoluteLayout>
+                                <Label Text="{Binding Name}" 
+                                       Grid.Row="0"
+                                       Margin="5, 0, 5, 0" 
+                                       Style="{StaticResource linkLabel}"/>
+                                
+                                <Label Text="{Binding Description}" 
+                                       Grid.Row="1" 
+                                       Margin="5, 0, 5, 0" 
+                                       TextColor="{StaticResource textColor1}" 
+                                       VerticalOptions="FillAndExpand"
+                                       HorizontalOptions="FillAndExpand"
+                                       FontSize="12"/>
+                                
+                                <BoxView Grid.Row="2" Color="{StaticResource bkgColor1}"/>
+                            </Grid>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

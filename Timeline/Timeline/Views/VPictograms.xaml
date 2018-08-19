@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Timeline.Controls"
+             x:Class="Timeline.Views.VPictograms"
+             Title="PICTOGRAMS"
+             BindingContext="{Binding PictogramsViewModel, Source={StaticResource vmLocator}}"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource bkgColor1}">
+    <ContentPage.Content>
+        <AbsoluteLayout>
+            <controls:PageTitleControl Title="Select image"
+                                       AbsoluteLayout.LayoutFlags="All"
+                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
+
+            <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 1, 1, 0.8">
+                <controls:WrapLayout ItemsSource="{Binding Pictograms}" 
+                                     ColumnSpacing="10" RowSpacing="10"
+                                     VerticalOptions="Start"/>
+            </ScrollView>
+
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
-
+using Amazon.DynamoDBv2.Model;
 using Timeline.Models;
 using Timeline.Objects.Auth;
 
@@ -100,6 +100,21 @@ namespace Timeline.Objects.Database
             }
         }
 
+        public async Task DeleteEvent(MTimelineEvent tlevent)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "TimelineEvents");
+                await table.DeleteItemAsync(tlevent.TimelineId, tlevent.EventId);
+                //await table.PutItemAsync(DynamoDBAdapter.TimelineEvent2DynamoDoc(tlevent));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("StoreEvent ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task UpdateEvent(MTimelineEvent tlevent)
         {
             try
@@ -131,22 +146,60 @@ namespace Timeline.Objects.Database
             }
         }
 
+        //public async Task<List<MTimelineEvent>> GetEvents(string timelineId)
+        //{
+        //    try
+        //    {
+        //        List<MTimelineEvent> results = new List<MTimelineEvent>();
+
+        //        Table table = Table.LoadTable(client, "TimelineEvents");
+        //        QueryFilter filter = new QueryFilter("timelineid", QueryOperator.Equal, timelineId);
+        //        Search search = table.Query(filter);
+
+        //        do
+        //        {
+        //            var docSet = await search.GetNextSetAsync();
+        //            foreach (Document doc in docSet) results.Add( DynamoDBAdapter.DynamoDoc2TimelineEvent(doc) );
+
+        //        } while (!search.IsDone);
+
+        //        return results;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("GetEvents ERROR: " + ex.Message);
+        //        throw ex;
+        //    }
+        //}
+
         public async Task<List<MTimelineEvent>> GetEvents(string timelineId)
         {
             try
             {
                 List<MTimelineEvent> results = new List<MTimelineEvent>();
 
-                Table table = Table.LoadTable(client, "TimelineEvents");
-                QueryFilter filter = new QueryFilter("timelineid", QueryOperator.Equal, timelineId);
-                Search search = table.Query(filter);
+                Dictionary<string, AttributeValue> lastKeyEvaluated = null;
+
+                QueryRequest request = new QueryRequest("TimelineEvents");
+                request.IndexName = "timelineid-startdate-index";
+                request.ExpressionAttributeValues.Add(":timelineIdValue", new AttributeValue(timelineId));
+                request.KeyConditionExpression = "timelineid=:timelineIdValue";
 
                 do
                 {
-                    var docSet = await search.GetNextSetAsync();
-                    foreach (Document doc in docSet) results.Add( DynamoDBAdapter.DynamoDoc2TimelineEvent(doc) );
+                    request.ExclusiveStartKey = lastKeyEvaluated;
 
-                } while (!search.IsDone);
+                    var response = await client.QueryAsync(request);
+                    
+                    foreach(Dictionary<string, AttributeValue> data in response.Items)
+                    {
+                        Document doc = Document.FromAttributeMap(data);
+                        results.Add(DynamoDBAdapter.DynamoDoc2TimelineEvent(doc));
+                    }
+
+                    lastKeyEvaluated = response.LastEvaluatedKey;
+
+                } while (lastKeyEvaluated != null && lastKeyEvaluated.Count != 0);
 
                 return results;
             }

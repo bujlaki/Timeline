@@ -105,6 +105,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"/>
                         <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
 
                     <Image Grid.Row="0" 
@@ -121,6 +122,14 @@
                            VerticalOptions="Center">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdEditEventInfo}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Image Grid.Row="2" 
+                           Source="delete32"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdDeleteEvent}"/>
                         </Image.GestureRecognizers>
                     </Image>
                 </Grid>

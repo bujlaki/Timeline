@@ -6,6 +6,7 @@ namespace Timeline.Services.Base
         public INavigationService Navigation;
         public IAuthenticationService Authentication;
         public IDBService Database;
+        public IStorage Storage;
 
         public void Set(INavigationService _navsvc)
         {
@@ -20,6 +21,11 @@ namespace Timeline.Services.Base
         public void Set(IDBService _dbsvc)
         {
             Database = _dbsvc;
+        }
+
+        public void Set(IStorage _storagesvc)
+        {
+            Storage = _storagesvc;
         }
     }
 }

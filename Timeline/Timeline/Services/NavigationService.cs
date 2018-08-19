@@ -31,6 +31,7 @@ namespace Timeline.Services
         private Lazy<VTimeline> timelineView;
         private Lazy<VTimelineInfo> timelineInfoView;
         private Lazy<VTimelineEvent> timelineEventView;
+        private Lazy<VPictograms> pictogramsView;
 
         public NavigationService(VMLocator loc)
         {
@@ -48,6 +49,7 @@ namespace Timeline.Services
             timelineView = new Lazy<VTimeline>(() => new VTimeline());
             timelineInfoView = new Lazy<VTimelineInfo>(() => new VTimelineInfo());
             timelineEventView = new Lazy<VTimelineEvent>(() => new VTimelineEvent());
+            pictogramsView = new Lazy<VPictograms>(() => new VPictograms());
         }
 
 		public Page LoginPage()
@@ -156,6 +158,12 @@ namespace Timeline.Services
             }
 
             _navigation.PushModalAsync(timelineEventView.Value);
+        }
+
+        public void GoToPictogramsView()
+        {
+            _vmLocator.PictogramsViewModel.LoadPictograms();
+            _navigation.PushModalAsync(pictogramsView.Value);
         }
 
         public void GoBack() => _navigation.PopModalAsync();

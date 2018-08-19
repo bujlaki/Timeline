@@ -14,6 +14,7 @@ namespace Timeline.ViewModels.Base
 		private Lazy<VMTimeline> timelineViewModel;
         private Lazy<VMTimelineInfo> timelineInfoViewModel;
         private Lazy<VMTimelineEvent> timelineEventViewModel;
+        private Lazy<VMPictograms> pictogramsViewModel;
         
         public VMLocator()
         {
@@ -25,6 +26,7 @@ namespace Timeline.ViewModels.Base
             timelineViewModel = new Lazy<VMTimeline>(() => new VMTimeline());
             timelineInfoViewModel = new Lazy<VMTimelineInfo>(() => new VMTimelineInfo());
             timelineEventViewModel = new Lazy<VMTimelineEvent>(() => new VMTimelineEvent());
+            pictogramsViewModel = new Lazy<VMPictograms>(() => new VMPictograms());
         }
         
 		public TestViewModels.VMTestPage TestViewModel {
@@ -53,6 +55,10 @@ namespace Timeline.ViewModels.Base
 
         public VMTimelineEvent TimelineEventViewModel {
             get { return timelineEventViewModel.Value; }
+        }
+
+        public VMPictograms PictogramsViewModel {
+            get { return pictogramsViewModel.Value; }
         }
     }
 }

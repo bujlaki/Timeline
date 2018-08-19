@@ -5,6 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Embedded\Piktograms\birth128.png" />
+    <None Remove="Embedded\Piktograms\crown128.png" />
+    <None Remove="Embedded\Piktograms\rip128.png" />
+    <None Remove="Embedded\Piktograms\war128.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded\Piktograms\birth128.png" />
+    <EmbeddedResource Include="Embedded\Piktograms\crown128.png" />
+    <EmbeddedResource Include="Embedded\Piktograms\rip128.png" />
+    <EmbeddedResource Include="Embedded\Piktograms\war128.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Acr.UserDialogs" Version="7.0.1" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.10.2" />
     <PackageReference Include="AWSSDK.Extensions.CognitoAuthentication" Version="0.9.4" />
@@ -57,6 +71,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\VLogin.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\VPictograms.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\VTimelineInfo.xaml">

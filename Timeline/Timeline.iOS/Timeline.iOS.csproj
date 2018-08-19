@@ -194,4 +194,13 @@
   <ItemGroup>
     <BundleResource Include="Resources\menu32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\delete32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\browse32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\gallery32.png" />
+  </ItemGroup>
 </Project>

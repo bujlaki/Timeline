@@ -58,6 +58,11 @@ namespace Timeline.Services
             await ddb.StoreEvent(tlevent);
         }
 
+        public async Task DeleteEvent(MTimelineEvent tlevent)
+        {
+            await ddb.DeleteEvent(tlevent);
+        }
+
         public async Task UpdateEvent(MTimelineEvent tlevent)
         {
             await ddb.UpdateEvent(tlevent);

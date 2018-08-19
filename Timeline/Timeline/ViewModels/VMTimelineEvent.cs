@@ -5,6 +5,7 @@ using System.Text;
 using Xamarin.Forms;
 
 using Plugin.Media;
+using Acr.UserDialogs;
 
 using Timeline.Models;
 using Timeline.Objects.Timeline;
@@ -25,6 +26,7 @@ namespace Timeline.ViewModels
         public Command CmdSetDate { get; set; }
         public Command CmdPickerLabelTap { get; set; }
         public Command CmdImage { get; set; }
+        public Command CmdPictogram { get; set; }
         public Command CmdCreate { get; set; }
         public Command CmdUpdate { get; set; }
 
@@ -213,6 +215,7 @@ namespace Timeline.ViewModels
             CmdUpdate = new Command(CmdUpdateExecute);
 
             CmdImage = new Command(CmdImageExecute);
+            CmdPictogram = new Command(CmdPictogramExecute);
             CmdStartDate = new Command(CmdStartDateExecute);
             CmdEndDate = new Command(CmdEndDateExecute);
             CmdClearEndDate = new Command(CmdClearEndDateExecute);
@@ -239,6 +242,8 @@ namespace Timeline.ViewModels
             Months.Add("October");
             Months.Add("November");
             Months.Add("December");
+
+            MessagingCenter.Subscribe<VMPictograms, string>(this, "Pictogram_selected", Pictogram_selected);
         }
 
         private void CmdDigitUpExecute(object obj)
@@ -420,6 +425,27 @@ namespace Timeline.ViewModels
             }
         }
 
+        private void CmdPictogramExecute(object obj)
+        {
+            App.services.Navigation.GoToPictogramsView();
+        }
+
+        private async void Pictogram_selected(VMPictograms arg1, string arg2)
+        {
+            string fname = arg2;
+            FileStream stream = new FileStream(fname, FileMode.Open);
+            var bytes = new byte[stream.Length];
+            await stream.ReadAsync(bytes, 0, (int)stream.Length);
+            Event.ImageBase64 = System.Convert.ToBase64String(bytes);
+
+            ImageSource imgSrc;
+            imgSrc = ImageSource.FromStream(() => new MemoryStream(bytes));
+
+            stream.Close();
+            Event.Image.Source = imgSrc;
+            RaisePropertyChanged("EventImageSource");
+        }
+
         //set year digits of the picker control, base on the year
         private void SetYearDigits(int year)
         {
@@ -460,6 +486,16 @@ namespace Timeline.ViewModels
         private void CmdCreateExecute(object obj)
         {
             //check if field values are correct
+            if (Event.Title == "")
+            {
+                ToastConfig tc = new ToastConfig("Please set the title");
+                tc.Duration = TimeSpan.FromSeconds(2);
+                tc.BackgroundColor = (Color)App.Current.Resources["textColor1"];
+                tc.MessageTextColor = (Color)App.Current.Resources["bkgColor1"];
+                UserDialogs.Instance.Toast(tc);
+                return;
+            }
+
             MessagingCenter.Send<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", this.Event);
             App.services.Navigation.GoBack();
         }
@@ -467,6 +503,16 @@ namespace Timeline.ViewModels
         private void CmdUpdateExecute(object obj)
         {
             //check if field values are correct
+            if (Event.Title == "")
+            {
+                ToastConfig tc = new ToastConfig("Please set the title");
+                tc.Duration = TimeSpan.FromSeconds(2);
+                tc.BackgroundColor = (Color)App.Current.Resources["textColor1"];
+                tc.MessageTextColor = (Color)App.Current.Resources["bkgColor1"];
+                UserDialogs.Instance.Toast(tc);
+                return;
+            }
+
             MessagingCenter.Send<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", this.Event);
             App.services.Navigation.GoBack();
         }

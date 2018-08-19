@@ -7,6 +7,7 @@ namespace Timeline.Models
 {
     public class MTimelineEvent
     {
+        public string EventId { get; set; }
         public string TimelineId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
@@ -26,6 +27,7 @@ namespace Timeline.Models
 
         public MTimelineEvent()
         {
+            EventId = Guid.NewGuid().ToString();
             Image = new Image();
             ClearImage();
         }

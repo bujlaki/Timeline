@@ -67,6 +67,7 @@ namespace Timeline.Objects.Database
 
             var doc = new Document();
             doc.Add("timelineid", tlevent.TimelineId);
+            doc.Add("eventid", tlevent.EventId);
             doc.Add("title", tlevent.Title);
             if (!string.IsNullOrEmpty(tlevent.Description)) doc.Add("description", tlevent.Description);
             if (!string.IsNullOrEmpty(tlevent.ImageBase64)) doc.Add("image", tlevent.ImageBase64);
@@ -74,6 +75,7 @@ namespace Timeline.Objects.Database
             if (!string.IsNullOrEmpty(tlevent.Data)) doc.Add("data", tlevent.Data);
             doc.Add("startdate", tlevent.StartDate.Ticks);
             if (tlevent.EndDate!=null) doc.Add("enddate", tlevent.EndDate.Ticks);
+            doc.Add("enddateset", tlevent.EndDateSet ? "1" : "0");
             doc.Add("precision", (byte)tlevent.StartDate.Precision);
             return doc;
         }
@@ -84,6 +86,7 @@ namespace Timeline.Objects.Database
 
             var tlevent = new MTimelineEvent();
             tlevent.TimelineId = doc.ContainsKey("timelineid") ? doc["timelineid"].AsString() : "";
+            tlevent.EventId = doc.ContainsKey("eventid") ? doc["eventid"].AsString() : "";
             tlevent.Title = doc.ContainsKey("title") ? doc["title"].AsString() : "";
             tlevent.Description = doc.ContainsKey("description") ? doc["description"].AsString() : "";
             tlevent.ImageBase64 = doc.ContainsKey("image") ? doc["image"].AsString() : "";
@@ -92,6 +95,7 @@ namespace Timeline.Objects.Database
             tlevent.Data = doc.ContainsKey("data") ? doc["data"].AsString() : "";
             tlevent.StartDate = TimelineDateTime.FromTicks(Int64.Parse(doc["startdate"].AsString()));
             tlevent.EndDate = doc.ContainsKey("enddate") ? Timeline.TimelineDateTime.FromTicks(Int64.Parse(doc["enddate"].AsString())) : null;
+            tlevent.EndDateSet = doc.ContainsKey("enddateset") ? (doc["enddateset"].AsString() == "1") : false;
             tlevent.Precision = byte.Parse(doc["precision"].AsString());
             tlevent.StartDate.Precision = (TimelineUnits)tlevent.Precision;
             tlevent.EndDate.Precision = (TimelineUnits)tlevent.Precision;

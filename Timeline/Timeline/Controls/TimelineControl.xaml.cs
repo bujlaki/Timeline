@@ -39,6 +39,22 @@ namespace Timeline.Controls
             set { SetValue(DateProperty, value); }
         }
 
+        public static readonly BindableProperty ItemsTreeSourceProperty = BindableProperty.Create(
+            nameof(ItemsTreeSource),
+            typeof(EventTree),
+            typeof(TimelineControl),
+            new EventTree(TimelineUnits.All), BindingMode.TwoWay,
+            propertyChanged: OnItemsTreeSourceChanged);
+        private static void OnItemsTreeSourceChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
+        public EventTree ItemsTreeSource
+        {
+            get { return (EventTree)GetValue(ItemsTreeSourceProperty); }
+            set { SetValue(ItemsTreeSourceProperty, value); }
+        }
+
         public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
             nameof(ItemsSource),
             typeof(ObservableCollection<MTimelineEvent>),
@@ -59,12 +75,10 @@ namespace Timeline.Controls
                 tlc.Date = new TimelineDateTime(DateTime.UtcNow);
             tlc.canvasView.InvalidateSurface();
         }
-
         private void OnItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             canvasView.InvalidateSurface();
         }
-
         public ObservableCollection<MTimelineEvent> ItemsSource
         {
             get { return (ObservableCollection<MTimelineEvent>)GetValue(ItemsSourceProperty); }
@@ -227,6 +241,11 @@ namespace Timeline.Controls
 		int laneHeight;
         int lanesOffsetY;
 
+        double pixelsPerUnit;
+        double pixelsPerSubUnit;
+
+        EventTree root;
+
         bool forceInitialize;
 
 		public TimelineControl()
@@ -354,6 +373,9 @@ namespace Timeline.Controls
 
             Int64 minTicks = Date.Ticks - halfWidth * Pixeltime;
             Int64 maxTicks = Date.Ticks + halfWidth * Pixeltime;
+
+            pixelsPerUnit = (TimelineDateTime.AddTo(Date).Ticks - Date.Ticks) / Pixeltime;
+            pixelsPerSubUnit = (TimelineDateTime.AddTo(Date, Date.Precision - 1).Ticks - Date.Ticks) / Pixeltime;
 
             //TIMELINE
             canvas.DrawRect(0, 0, info.Width, timelineHeight, theme.TimelinePaint);
@@ -588,7 +610,7 @@ namespace Timeline.Controls
             canvas.Restore();
         }
 
-		private void AdjustZoomUnit()
+        private void AdjustZoomUnit()
         {
             switch (this.ZoomUnit)
             {

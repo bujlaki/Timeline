@@ -233,5 +233,13 @@ namespace Timeline.Objects.Timeline
             tempDate.Add(1);
             return tempDate;
         }
+
+        public static TimelineDateTime AddTo(TimelineDateTime tldate, TimelineUnits unit)
+        {
+            TimelineDateTime tempDate = new TimelineDateTime();
+            tldate.CopyTo(ref tempDate);
+            tempDate.Add(unit, 1);
+            return tempDate;
+        }
     }
 }

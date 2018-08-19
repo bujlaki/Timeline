@@ -48,7 +48,7 @@ namespace Timeline.Objects.Timeline
 
         private static int GetFreeLane(TimelineDateTime tld)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 1; i < 8; i++)
                 if ((laneBusyUntil[i] == null) || (laneBusyUntil[i] < tld)) return i;
 
             return -1;

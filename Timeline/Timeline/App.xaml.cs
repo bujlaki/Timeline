@@ -34,6 +34,7 @@ namespace Timeline
             services.Set(new Services.NavigationService(locator));
             services.Set(new Services.DBService());
             services.Set(new Services.AuthenticationService());
+            services.Set(new Services.Storage());
 
             if (!DesignMode.IsDesignModeEnabled)
             {

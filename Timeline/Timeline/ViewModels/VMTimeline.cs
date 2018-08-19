@@ -66,6 +66,7 @@ namespace Timeline.ViewModels
         public Command CmdAddEvent { get; set; }
         public Command CmdCloseEventInfo { get; set; }
         public Command CmdEditEventInfo { get; set; }
+        public Command CmdDeleteEvent { get; set; }
 
         public VMTimeline() : base()
         {
@@ -74,6 +75,7 @@ namespace Timeline.ViewModels
             CmdAddEvent = new Command(CmdAddEventExecute);
             CmdCloseEventInfo = new Command(CmdCloseEventInfoExecute);
             CmdEditEventInfo = new Command(CmdEditEventInfoExecute);
+            CmdDeleteEvent = new Command(CmdDeleteEventExecute);
 
             Events = new ObservableCollection<MTimelineEvent>();
             Date = new TimelineDateTime();
@@ -151,13 +153,25 @@ namespace Timeline.ViewModels
                 MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(EventSelected));
         }
 
+        private void CmdDeleteEventExecute(object obj)
+        {
+            if (EventSelected != null)
+            {
+                App.services.Database.DeleteEvent(EventSelected);
+                Events.Remove(EventSelected);
+                EventInfoVisible = false;
+                EventSelected = null;
+                RaisePropertyChanged("ItemsSource");
+            }
+        }
+
         public void LoadEvents()
         {
             if (TimelineId == "") return;
             Task.Run(async () => {
                 Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(TimelineId));
                 LaneCount = EventManager.SortEventsToLanes(Events, 10);
-                //EventTree = EventManager.BuildEventTree(Events);
+                EventTree = EventManager.BuildEventTree(Events);
                 RaisePropertyChanged("Events");
             });
         }

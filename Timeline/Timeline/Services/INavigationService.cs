@@ -20,6 +20,7 @@ namespace Timeline.Services
 		void GoToTimelineView(Models.MTimelineInfo timeline);
         void GoToTimelineInfoView();
         void GoToTimelineEventView(MTimelineEvent tlevent);
+        void GoToPictogramsView();
         void GoBack();
     }
 }
