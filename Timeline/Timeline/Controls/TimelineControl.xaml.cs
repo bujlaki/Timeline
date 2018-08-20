@@ -241,10 +241,23 @@ namespace Timeline.Controls
 		int laneHeight;
         int lanesOffsetY;
 
-        double pixelsPerUnit;
-        double pixelsPerSubUnit;
+        float pixelsPerUnit;
+        float pixelsPerSubUnit;
+        bool summarySubUnit;
+        TimelineUnits summaryUnit;
+        TimelineDateTime summaryDate;
 
-        EventTree root;
+        struct summaryKey
+        {
+            int unitValue;
+            int subUnitValue;
+            public summaryKey(int uval, int suval)
+            {
+                unitValue = uval;
+                subUnitValue = suval;
+            }
+        }
+        Dictionary<summaryKey, int> summary;
 
         bool forceInitialize;
 
@@ -272,6 +285,12 @@ namespace Timeline.Controls
 
             DeviceDisplay.ScreenMetricsChanaged += DeviceDisplay_ScreenMetricsChanged;
             forceInitialize = true;
+
+            //initialize summary objects
+            summary = new Dictionary<summaryKey, int>();
+            summaryUnit = ZoomUnit;
+            summaryDate = new TimelineDateTime();
+            summarySubUnit = false;
 		}
 
         private void DeviceDisplay_ScreenMetricsChanged(ScreenMetricsChanagedEventArgs e)
@@ -374,8 +393,16 @@ namespace Timeline.Controls
             Int64 minTicks = Date.Ticks - halfWidth * Pixeltime;
             Int64 maxTicks = Date.Ticks + halfWidth * Pixeltime;
 
+            //initialize summary feature
             pixelsPerUnit = (TimelineDateTime.AddTo(Date).Ticks - Date.Ticks) / Pixeltime;
             pixelsPerSubUnit = (TimelineDateTime.AddTo(Date, Date.Precision - 1).Ticks - Date.Ticks) / Pixeltime;
+            if (pixelsPerSubUnit > 25) summaryUnit = ZoomUnit - 1;
+            else summaryUnit = ZoomUnit;
+
+            summarySubUnit = false;
+            if (pixelsPerSubUnit > 25) summarySubUnit = true;
+            
+            summary.Clear();
 
             //TIMELINE
             canvas.DrawRect(0, 0, info.Width, timelineHeight, theme.TimelinePaint);
@@ -586,13 +613,28 @@ namespace Timeline.Controls
 		{
 			float startX;
 			float endX;
+            float widthX;
 			float eventTop;
 
 			startX = (e.StartDate.Ticks - minTicks) / Pixeltime;
 			endX = (e.EndDate.Ticks - minTicks) / Pixeltime - 1;
+            widthX = endX - startX;
 			eventTop = eventsTopY + e.LaneNumber * laneHeight + lanesOffsetY;
 
             if (eventTop > fullheight) return; //OUT OF SCREEN
+
+            if(widthX<50)
+            {
+                //add to summary
+                summaryKey key;
+                if (summarySubUnit) key = new summaryKey(TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit), TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit - 1));
+                else key = new summaryKey(TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit), 10000);
+
+                if (summary.ContainsKey(key)) summary[key] += 1;
+                else summary.Add(key, 1);
+                
+                return;
+            }
 
             //draw event box
 			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, theme.EventPaint);
@@ -608,6 +650,66 @@ namespace Timeline.Controls
             canvas.ClipRect(clipEvent);
             DrawTextInRect(canvas, e.Title, clipEvent, theme.EventTextPaint);
             canvas.Restore();
+        }
+
+        private void DrawSummaryEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        {
+            summaryKey key;
+            float startX;
+            Date.CopyTo(ref summaryDate, ZoomUnit);
+            while (summaryDate.Ticks > minTicks) summaryDate.Add(ZoomUnit, -1);
+
+            float unitPos;
+            do
+            {
+                unitPos = (summaryDate.Ticks - minTicks) / Pixeltime;
+                key = new summaryKey(TimelineDateTime.GetUnitValue(summaryDate, ZoomUnit), 10000);
+
+                if (summary.ContainsKey(key))
+                {
+                    int value = summary[key];
+                    startX = (summaryDate.Ticks - minTicks) / Pixeltime;
+                    canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
+                }
+
+                Int64 fromTicks = unitDate.Ticks;
+                try { unitDate.Add(ZoomUnit); }
+                catch (OverflowException)
+                {
+                    break;
+                }
+
+            } while (unitPos < fullwidth);
+        }
+
+        private void DrawSummarySubEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        {
+            summaryKey key;
+            float startX;
+            Date.CopyTo(ref summaryDate, ZoomUnit-1);
+            while (summaryDate.Ticks > minTicks) summaryDate.Add(ZoomUnit-1, -1);
+
+            float unitPos;
+            do
+            {
+                unitPos = (summaryDate.Ticks - minTicks) / Pixeltime;
+                key = new summaryKey(TimelineDateTime.GetUnitValue(summaryDate, ZoomUnit), 10000);
+
+                if (summary.ContainsKey(key))
+                {
+                    int value = summary[key];
+                    startX = (summaryDate.Ticks - minTicks) / Pixeltime;
+                    canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
+                }
+
+                Int64 fromTicks = unitDate.Ticks;
+                try { unitDate.Add(ZoomUnit-1); }
+                catch (OverflowException)
+                {
+                    break;
+                }
+
+            } while (unitPos < fullwidth);
         }
 
         private void AdjustZoomUnit()

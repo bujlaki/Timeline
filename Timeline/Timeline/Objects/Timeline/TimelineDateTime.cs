@@ -241,5 +241,21 @@ namespace Timeline.Objects.Timeline
             tempDate.Add(unit, 1);
             return tempDate;
         }
+
+        public static int GetUnitValue(TimelineDateTime tldate, TimelineUnits unit)
+        {
+            switch (unit)
+            {
+                case TimelineUnits.Century: return tldate.Century;
+                case TimelineUnits.Decade: return tldate.Decade;
+                case TimelineUnits.Year: return tldate.Year;
+                case TimelineUnits.Month: return tldate.Month;
+                case TimelineUnits.Day: return tldate.Day;
+                case TimelineUnits.Hour: return tldate.Hour;
+                case TimelineUnits.Minute: return tldate.Minute;
+                default: throw new ArgumentOutOfRangeException("Invalid argument: " + unit.ToString());
+            }
+        }
+           
     }
 }

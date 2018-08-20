@@ -18,5 +18,6 @@ namespace Timeline.Objects.Timeline
             children = new Dictionary<int, EventTree>();
             items = new List<MTimelineEvent>();
         }
+
     }
 }
