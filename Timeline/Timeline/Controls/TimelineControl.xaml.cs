@@ -249,8 +249,8 @@ namespace Timeline.Controls
 
         struct summaryKey
         {
-            int unitValue;
-            int subUnitValue;
+            public int unitValue;
+            public int subUnitValue;
             public summaryKey(int uval, int suval)
             {
                 unitValue = uval;
@@ -394,13 +394,13 @@ namespace Timeline.Controls
             Int64 maxTicks = Date.Ticks + halfWidth * Pixeltime;
 
             //initialize summary feature
-            pixelsPerUnit = (TimelineDateTime.AddTo(Date).Ticks - Date.Ticks) / Pixeltime;
-            pixelsPerSubUnit = (TimelineDateTime.AddTo(Date, Date.Precision - 1).Ticks - Date.Ticks) / Pixeltime;
-            if (pixelsPerSubUnit > 25) summaryUnit = ZoomUnit - 1;
-            else summaryUnit = ZoomUnit;
+            TimelineDateTime tempDate = new TimelineDateTime();
+            Date.CopyTo(ref tempDate, ZoomUnit);
+            pixelsPerUnit = (TimelineDateTime.AddTo(tempDate).Ticks - tempDate.Ticks) / Pixeltime;
+            pixelsPerSubUnit = (TimelineDateTime.AddTo(tempDate, ZoomUnit - 1).Ticks - tempDate.Ticks) / Pixeltime;
 
             summarySubUnit = false;
-            if (pixelsPerSubUnit > 25) summarySubUnit = true;
+            if (pixelsPerSubUnit > 50) summarySubUnit = true;
             
             summary.Clear();
 
@@ -424,8 +424,10 @@ namespace Timeline.Controls
             //EVENTS
             SKRect clipRect = new SKRect(0, timelineBottomY, info.Width, info.Height);
             canvas.ClipRect(clipRect);
-
 			if (ItemsSource.Count > 0) DrawTimelineEvents(canvas, minTicks, maxTicks);
+
+            //SUMMARY EVENTS
+            DrawSummaryEvents(canvas, minTicks, maxTicks);
         }
 
         #region "UNITS AND SUBUNITS DRAWING"
@@ -623,7 +625,7 @@ namespace Timeline.Controls
 
             if (eventTop > fullheight) return; //OUT OF SCREEN
 
-            if(widthX<50)
+            if(widthX<200)
             {
                 //add to summary
                 summaryKey key;
@@ -654,63 +656,115 @@ namespace Timeline.Controls
 
         private void DrawSummaryEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
         {
-            summaryKey key;
             float startX;
-            Date.CopyTo(ref summaryDate, ZoomUnit);
-            while (summaryDate.Ticks > minTicks) summaryDate.Add(ZoomUnit, -1);
-
-            float unitPos;
-            do
+            
+            foreach(summaryKey key in summary.Keys)
             {
-                unitPos = (summaryDate.Ticks - minTicks) / Pixeltime;
-                key = new summaryKey(TimelineDateTime.GetUnitValue(summaryDate, ZoomUnit), 10000);
+                summaryDate = GetDateForKey(key, ZoomUnit, summarySubUnit);
+                startX = (summaryDate.Ticks - minTicks) / Pixeltime;
 
-                if (summary.ContainsKey(key))
+                if (summarySubUnit)
                 {
-                    int value = summary[key];
-                    startX = (summaryDate.Ticks - minTicks) / Pixeltime;
+                    canvas.DrawRect(startX, eventsTopY, pixelsPerSubUnit, laneHeight - 1, theme.EventPaint);
+                }
+                else
+                {
                     canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
                 }
-
-                Int64 fromTicks = unitDate.Ticks;
-                try { unitDate.Add(ZoomUnit); }
-                catch (OverflowException)
-                {
-                    break;
-                }
-
-            } while (unitPos < fullwidth);
+            }
         }
 
-        private void DrawSummarySubEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        private TimelineDateTime GetDateForKey(summaryKey key, TimelineUnits unit, bool useSubUnit)
         {
-            summaryKey key;
-            float startX;
-            Date.CopyTo(ref summaryDate, ZoomUnit-1);
-            while (summaryDate.Ticks > minTicks) summaryDate.Add(ZoomUnit-1, -1);
-
-            float unitPos;
-            do
+            TimelineDateTime tldate = new TimelineDateTime();
+            if(useSubUnit)
             {
-                unitPos = (summaryDate.Ticks - minTicks) / Pixeltime;
-                key = new summaryKey(TimelineDateTime.GetUnitValue(summaryDate, ZoomUnit), 10000);
-
-                if (summary.ContainsKey(key))
+                switch (unit)
                 {
-                    int value = summary[key];
-                    startX = (summaryDate.Ticks - minTicks) / Pixeltime;
-                    canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
+                    case TimelineUnits.Century: tldate.SetDate(key.subUnitValue * 10, 1, 1, 0, 0); break;
+                    case TimelineUnits.Decade: tldate.SetDate(key.subUnitValue, 1, 1, 0, 0); break;
+                    case TimelineUnits.Year: tldate.SetDate(key.unitValue, key.subUnitValue, 1, 0, 0); break;
+                    case TimelineUnits.Month: tldate.SetDate(Date.Year, key.unitValue, key.subUnitValue, 0, 0); break;
+                    case TimelineUnits.Day: tldate.SetDate(Date.Year, Date.Month, key.unitValue, key.subUnitValue, 0); break;
+                    case TimelineUnits.Hour: tldate.SetDate(Date.Year, Date.Month, Date.Day, key.unitValue, key.subUnitValue); break;
+                    case TimelineUnits.Minute: throw new ArgumentOutOfRangeException("ZoomUnit can't be Minute... Ever...");
                 }
-
-                Int64 fromTicks = unitDate.Ticks;
-                try { unitDate.Add(ZoomUnit-1); }
-                catch (OverflowException)
+            }
+            else
+            {
+                switch(unit)
                 {
-                    break;
+                    case TimelineUnits.Century: tldate.SetDate(key.unitValue * 100, 1, 1, 0, 0); break;
+                    case TimelineUnits.Decade:  tldate.SetDate(key.unitValue * 10, 1, 1, 0, 0); break;
+                    case TimelineUnits.Year:    tldate.SetDate(key.unitValue, 1, 1, 0, 0); break;
+                    case TimelineUnits.Month:   tldate.SetDate(Date.Year, key.unitValue, 1, 0, 0); break;
+                    case TimelineUnits.Day:     tldate.SetDate(Date.Year, Date.Month, key.unitValue, 0, 0); break;
+                    case TimelineUnits.Hour:    tldate.SetDate(Date.Year, Date.Month, Date.Day, key.unitValue, 0); break;
+                    case TimelineUnits.Minute: throw new ArgumentOutOfRangeException("ZoomUnit can't be Minute... Ever...");
                 }
-
-            } while (unitPos < fullwidth);
+            }
+            return tldate;
         }
+
+        //private void DrawSummaryEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        //{
+        //    summaryKey key;
+        //    float startX;
+        //    Date.CopyTo(ref summaryDate, ZoomUnit);
+        //    while (summaryDate.Ticks > minTicks) summaryDate.Add(ZoomUnit, -1);
+
+        //    float unitPos;
+        //    do
+        //    {
+        //        unitPos = (summaryDate.Ticks - minTicks) / Pixeltime;
+        //        key = new summaryKey(TimelineDateTime.GetUnitValue(summaryDate, ZoomUnit), 10000);
+
+        //        if (summary.ContainsKey(key))
+        //        {
+        //            int value = summary[key];
+        //            startX = (summaryDate.Ticks - minTicks) / Pixeltime;
+        //            canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
+        //        }
+
+        //        Int64 fromTicks = unitDate.Ticks;
+        //        try { unitDate.Add(ZoomUnit); }
+        //        catch (OverflowException)
+        //        {
+        //            break;
+        //        }
+
+        //    } while (unitPos < fullwidth);
+        //}
+
+        //private void DrawSummarySubEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
+        //{
+        //    summaryKey key;
+        //    float startX;
+        //    Date.CopyTo(ref summaryDate, ZoomUnit-1);
+        //    while (summaryDate.Ticks > minTicks) summaryDate.Add(ZoomUnit-1, -1);
+
+        //    float unitPos;
+        //    do
+        //    {
+        //        unitPos = (summaryDate.Ticks - minTicks) / Pixeltime;
+        //        key = new summaryKey(TimelineDateTime.GetUnitValue(summaryDate, ZoomUnit), 10000);
+
+        //        if (summary.ContainsKey(key))
+        //        {
+        //            int value = summary[key];
+        //            startX = (summaryDate.Ticks - minTicks) / Pixeltime;
+        //            canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
+        //        }
+
+        //        Int64 fromTicks = unitDate.Ticks;
+        //        try { unitDate.Add(ZoomUnit-1); }
+        //        catch (OverflowException)
+        //        {
+        //            break;
+        //        }
+
+        //    } while (unitPos < fullwidth);
+        //}
 
         private void AdjustZoomUnit()
         {
