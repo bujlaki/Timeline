@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using Xamarin.Forms;
 
 using SkiaSharp;
+using skia = SkiaSharp.Views.Forms;
 
 using Xamarin.Essentials;
 
@@ -11,6 +13,12 @@ namespace Timeline.Objects.Timeline
 {
     public class TimelineTheme
     {
+        public Xamarin.Forms.Color bkgColor1;
+        public Xamarin.Forms.Color bkgColor2;
+        public Xamarin.Forms.Color bkgColor3;
+        public Xamarin.Forms.Color textColor1;
+        public Xamarin.Forms.Color textColor2;
+
         public SKPaint TimelinePaint { get; set; }
         public SKPaint UnitMarkPaint { get; set; }
         public SKPaint UnitTextPaint { get; set; }
@@ -20,9 +28,16 @@ namespace Timeline.Objects.Timeline
         public SKPaint EventPaint { get; set; }
         public SKPaint EventBorderPaint { get; set; }
         public SKPaint EventTextPaint { get; set; }
+        public SKPaint SummaryTextPaint { get; set; }
 
         public TimelineTheme(string userid)
         {
+            bkgColor1 = (Xamarin.Forms.Color)App.Current.Resources["bkgColor1"];
+            bkgColor2 = (Xamarin.Forms.Color)App.Current.Resources["bkgColor2"];
+            bkgColor3 = (Xamarin.Forms.Color)App.Current.Resources["bkgColor3"];
+            textColor1 = (Xamarin.Forms.Color)App.Current.Resources["textColor1"];
+            textColor2 = (Xamarin.Forms.Color)App.Current.Resources["textColor2"];
+
             Load("");
         }
 
@@ -45,20 +60,25 @@ namespace Timeline.Objects.Timeline
             SubUnitTextPaint.Color = SKColor.Parse(Preferences.Get("subunittext_color", SKColors.DimGray.ToString()));
 
             HighlightPaint = new SKPaint();
-            HighlightPaint.Color = SKColor.Parse(Preferences.Get("highlight_color", SKColors.Yellow.ToString()));
+            HighlightPaint.Color = SKColor.Parse(Preferences.Get("highlight_color", skia.Extensions.ToSKColor(bkgColor3).ToString()));
 
             EventPaint = new SKPaint();
-            EventPaint.Color = SKColor.Parse(Preferences.Get("event_color", SKColors.DarkGray.ToString()));
+            EventPaint.Color = SKColor.Parse(Preferences.Get("event_color", skia.Extensions.ToSKColor(bkgColor2).ToString()));
             EventPaint.Style = SKPaintStyle.Fill;
 
             EventBorderPaint = new SKPaint();
-            EventBorderPaint.Color = SKColor.Parse(Preferences.Get("eventborder_color", SKColors.Black.ToString()));
+            EventBorderPaint.Color = SKColor.Parse(Preferences.Get("eventborder_color", skia.Extensions.ToSKColor(bkgColor1).ToString()));
             EventBorderPaint.StrokeWidth = 4;
             EventBorderPaint.Style = SKPaintStyle.Stroke;
 
             EventTextPaint = new SKPaint();
-            EventTextPaint.Color = SKColor.Parse(Preferences.Get("eventtext_color", SKColors.White.ToString()));
-            EventTextPaint.TextSize = 32;
+            EventTextPaint.Color = SKColor.Parse(Preferences.Get("eventtext_color", skia.Extensions.ToSKColor(textColor1).ToString()));
+            EventTextPaint.TextSize = 48;
+
+            SummaryTextPaint = new SKPaint();
+            SummaryTextPaint.Color = SKColor.Parse(Preferences.Get("summarytext_color", skia.Extensions.ToSKColor(textColor1).ToString()));
+            SummaryTextPaint.TextSize = 78;
+            SummaryTextPaint.TextAlign = SKTextAlign.Center;
         }
            
         public void Save(string userid)
@@ -73,6 +93,7 @@ namespace Timeline.Objects.Timeline
             Preferences.Set("event_color", EventPaint.Color.ToString());
             Preferences.Set("eventborder_color", EventBorderPaint.Color.ToString());
             Preferences.Set("eventtext_color", EventTextPaint.Color.ToString());
+            Preferences.Set("summarytext_color", SummaryTextPaint.Color.ToString());
         }
     }
 }

@@ -657,20 +657,28 @@ namespace Timeline.Controls
         private void DrawSummaryEvents(SKCanvas canvas, Int64 minTicks, Int64 maxTicks)
         {
             float startX;
-            
-            foreach(summaryKey key in summary.Keys)
+            SKPath eventTextPath;
+
+            foreach (summaryKey key in summary.Keys)
             {
                 summaryDate = GetDateForKey(key, ZoomUnit, summarySubUnit);
-                startX = (summaryDate.Ticks - minTicks) / Pixeltime;
+                startX = (summaryDate.Ticks - minTicks) / Pixeltime + 2;
 
                 if (summarySubUnit)
                 {
-                    canvas.DrawRect(startX, eventsTopY, pixelsPerSubUnit, laneHeight - 1, theme.EventPaint);
+                    canvas.DrawRect(startX, eventsTopY, pixelsPerSubUnit - 4, laneHeight - 1, theme.EventPaint);
+                    eventTextPath = new SKPath();
+                    eventTextPath.MoveTo(startX, eventsTopY + (laneHeight - 1) / 2);
+                    eventTextPath.LineTo(startX + pixelsPerSubUnit - 4, eventsTopY + (laneHeight - 1) / 2);
                 }
                 else
                 {
-                    canvas.DrawRect(startX, eventsTopY, pixelsPerUnit, laneHeight - 1, theme.EventPaint);
+                    canvas.DrawRect(startX, eventsTopY, pixelsPerUnit - 4, laneHeight - 1, theme.EventPaint);
+                    eventTextPath = new SKPath();
+                    eventTextPath.MoveTo(startX, eventsTopY + (laneHeight - 1) / 2);
+                    eventTextPath.LineTo(startX + pixelsPerUnit - 4, eventsTopY + (laneHeight - 1) / 2);
                 }
+                canvas.DrawTextOnPath("-"+summary[key].ToString()+"-", eventTextPath, new SKPoint(0, theme.SummaryTextPaint.FontMetrics.CapHeight/2), theme.SummaryTextPaint);
             }
         }
 

@@ -90,6 +90,7 @@ namespace Timeline.ViewModels
         {
             arg2.TimelineId = this.TimelineId;
             Events.Add(arg2);
+            EventManager.SortEventsToLanes(Events, 10);
 
             App.services.Database.StoreEvent(arg2);
             RaisePropertyChanged("ItemsSource");
