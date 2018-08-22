@@ -16,7 +16,8 @@
             <viewmodel:VMLocator x:Key="vmLocator" />
             
             <converters:InverseBoolConverter x:Key="inverseBoolConverter" />
-
+            <converters:InverseDefaultStringToBoolConverter x:Key="inverseDefaultStringToBoolConverter" />
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

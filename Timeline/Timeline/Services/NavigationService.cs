@@ -11,6 +11,7 @@ using Timeline.ViewModels.Base;
 using Timeline.Views;
 using Timeline.Views.TestPages;
 using Timeline.Models;
+using System.Collections;
 
 namespace Timeline.Services
 {
@@ -32,6 +33,7 @@ namespace Timeline.Services
         private Lazy<VTimelineInfo> timelineInfoView;
         private Lazy<VTimelineEvent> timelineEventView;
         private Lazy<VPictograms> pictogramsView;
+        private Lazy<VEventType> eventTypeView;
 
         public NavigationService(VMLocator loc)
         {
@@ -50,6 +52,7 @@ namespace Timeline.Services
             timelineInfoView = new Lazy<VTimelineInfo>(() => new VTimelineInfo());
             timelineEventView = new Lazy<VTimelineEvent>(() => new VTimelineEvent());
             pictogramsView = new Lazy<VPictograms>(() => new VPictograms());
+            eventTypeView = new Lazy<VEventType>(() => new VEventType());
         }
 
 		public Page LoginPage()
@@ -138,8 +141,9 @@ namespace Timeline.Services
             }
         }
 
-        public void GoToTimelineInfoView()
+        public void GoToTimelineInfoView(MTimelineInfo tlinfo)
         {
+            _vmLocator.TimelineInfoViewModel.SetModel(tlinfo);
             _navigation.PushModalAsync(timelineInfoView.Value);
         }
 
@@ -164,6 +168,12 @@ namespace Timeline.Services
         {
             _vmLocator.PictogramsViewModel.LoadPictograms();
             _navigation.PushModalAsync(pictogramsView.Value);
+        }
+
+        public void GoToEventTypeView(DictionaryEntry etype)
+        {
+            _vmLocator.EventTypeViewModel.SetModel(etype);
+            _navigation.PushModalAsync(eventTypeView.Value);
         }
 
         public void GoBack() => _navigation.PopModalAsync();

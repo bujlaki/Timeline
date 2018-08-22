@@ -8,65 +8,99 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <AbsoluteLayout>
+            <controls:PageTitleControl Title="TIMELINE DATA"
+                                       AbsoluteLayout.LayoutFlags="All"
+                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
 
-            <Grid Grid.Column="1">
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.9, 0.7">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="2*"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="4*"/>
-                    <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
-                <Image Source="title"/>
+                <controls:XEntry Grid.Row="0"
+                                 Text="{Binding TimelineInfo.Name, Mode=TwoWay}" 
+                                 Placeholder="name"/>
 
-                <Frame Grid.Row="1"
-                       BackgroundColor="#307496"
-                       CornerRadius="20" 
-                       Margin="-10">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="4*"/>
-                        </Grid.RowDefinitions>
+                <Label Grid.Row="1"
+                       Text="Description" Style="{StaticResource fieldLabel}"/>
 
-                        <controls:XEntry Grid.Row="0" 
-                                         VerticalOptions="FillAndExpand"
-                                         Text="{Binding TimelineInfo.Name, Mode=OneWayToSource}" 
-                                         TextColor="#eeebd3" 
-                                         FontSize="18"
-                                         Placeholder="name"
-                                         PlaceholderColor="#bfd9f3"/>
+                <Editor Grid.Row="2"
+                        Text="{Binding TimelineInfo.Description, Mode=OneWayToSource}"
+                        TextColor="#234b64"
+                        BackgroundColor="#eeebd3"
+                        FontSize="14"/>
 
-                        <Label Grid.Row="1" Text="Description"/>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Column="0"
+                           Text="Event types and color codes" Style="{StaticResource fieldLabel}"/>
 
-                        <Editor Grid.Row="2"
-                                Text="{Binding TimelineInfo.Description, Mode=OneWayToSource}"
-                                TextColor="#234b64"
-                                BackgroundColor="#eeebd3"
-                                FontSize="14"/>
-                    </Grid>
-                </Frame>
+                    <Image Grid.Column="1" Source="add32" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdAddEventType}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
 
-                <Button Grid.Row="2" 
-                        Text="Create" 
-                        TextColor="#234B64"
-                        BackgroundColor="#bfd9f3"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center"
-                        Command="{Binding CmdCreate}"
-                        CommandParameter="1"
-                        BorderRadius="10"
-                        BorderWidth="2"
-                        BorderColor="#eeebd3"/>
+
+                <ListView Grid.Row="4" ItemsSource="{Binding TimelineInfo.ETypes}" BackgroundColor="{StaticResource bkgColor2}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Grid >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="45"/>
+                                        <ColumnDefinition Width="45"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Text="{Binding Key}" Style="{StaticResource linkLabel}" VerticalOptions="Center"/>
+
+                                    <BoxView Grid.Column="1" Color="White"/>
+                                    <BoxView Grid.Column="1" Color="{Binding Value}" Margin="2"/>
+
+                                    <Image Grid.Column="2" Source="edit32" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding CmdEditEventType}" CommandParameter="{Binding Entry}"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+
+                                    <Image Grid.Column="3" Source="delete32" HorizontalOptions="Center" VerticalOptions="Center"
+                                           IsVisible="{Binding TypeName, Converter={StaticResource inverseDefaultStringToBoolConverter}}">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding CmdDeleteEventType}" CommandParameter="{Binding Entry}"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
 
             </Grid>
-        </Grid>
+
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
+                    Text="Create" 
+                    Command="{Binding CmdCreate}"
+                    CommandParameter="1"
+                    IsVisible="{Binding NewTimeline}"/>
+
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
+                    Text="Update" 
+                    Command="{Binding CmdUpdate}"
+                    CommandParameter="1"
+                    IsVisible="{Binding NewTimeline, Converter={StaticResource inverseBoolConverter}}"/>
+        </AbsoluteLayout>
 
     </ContentPage.Content>
 </ContentPage>

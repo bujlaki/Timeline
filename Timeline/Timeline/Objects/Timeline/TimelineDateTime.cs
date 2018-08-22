@@ -207,6 +207,42 @@ namespace Timeline.Objects.Timeline
             dstDate.Precision = precision;
         }
 
+        public TimelineDateTime Copy()
+        {
+            TimelineDateTime target = new TimelineDateTime();
+            switch (precision)
+            {
+                case TimelineUnits.Minute:
+                    target.SetDate(Year, Month, Day, Hour, Minute);
+                    break;
+                case TimelineUnits.Hour:
+                    target.SetDate(Year, Month, Day, Hour, 0);
+                    break;
+                case TimelineUnits.Day:
+                    target.SetDate(Year, Month, Day, 0, 0);
+                    break;
+                case TimelineUnits.Month:
+                    target.SetDate(Year, Month, 1, 0, 0);
+                    break;
+                case TimelineUnits.Year:
+                    target.SetDate(Year, 1, 1, 0, 0);
+                    break;
+                case TimelineUnits.Decade:
+                    if (Decade == 0)
+                        target.SetDate(1, 1, 1, 0, 0);
+                    else
+                        target.SetDate(Decade * 10, 1, 1, 0, 0);
+                    break;
+                case TimelineUnits.Century:
+                    if (Century == 0) target.SetDate(1, 1, 1, 0, 0);
+                    else target.SetDate(Century * 100, 1, 1, 0, 0);
+                    break;
+            }
+
+            target.Precision = precision;
+            return target;
+        }
+
         public void Add(int value = 1)
         {
             Add(this.Precision, value);

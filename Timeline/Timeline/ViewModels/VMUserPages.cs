@@ -103,7 +103,7 @@ namespace Timeline.ViewModels
 
         public void CmdNewTimelineExecute(object obj)
         {
-            App.services.Navigation.GoToTimelineInfoView();
+            App.services.Navigation.GoToTimelineInfoView(null);
         }
 
         public void CmdTimelineSelectedExecute(object obj)

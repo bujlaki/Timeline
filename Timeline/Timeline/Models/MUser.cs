@@ -31,6 +31,16 @@ namespace Timeline.Models
             Email = "";
             PhotoUrl = "";
         }
-            
+        
+        public MUser Copy()
+        {
+            MUser target = new MUser();
+            target.UserId = UserId;
+            target.UserName = UserName;
+            target.Email = Email;
+            target.PhotoUrl = PhotoUrl;
+            foreach (MTimelineInfo tlinfo in Timelines) target.Timelines.Add(tlinfo);
+            return target;
+        }
     }
 }

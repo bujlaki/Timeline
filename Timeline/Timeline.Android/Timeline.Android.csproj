@@ -260,5 +260,11 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\gallery32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\options32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\add32.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

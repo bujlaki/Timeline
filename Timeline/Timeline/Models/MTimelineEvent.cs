@@ -47,5 +47,28 @@ namespace Timeline.Models
         public void ClearImage() {
             Image.Source = "noimage";
         }
+
+        public MTimelineEvent Copy()
+        {
+            MTimelineEvent target = new MTimelineEvent();
+            target.Title = Title;
+            target.TimelineId = TimelineId;
+            target.Description = Description;
+            target.Data = Data;
+            target.URL = URL;
+            target.StartDate = StartDate.Copy();
+            target.EndDate = EndDate.Copy();
+            target.EndDateSet = EndDateSet;
+            target.ImageBase64 = ImageBase64;
+            target.Image = ImageFromBase64(target.ImageBase64);
+            target.LaneNumber = LaneNumber;
+            return target;
+        }
+
+        private static Xamarin.Forms.Image ImageFromBase64(string base64picture)
+        {
+            byte[] imageBytes = Convert.FromBase64String(base64picture);
+            return new Xamarin.Forms.Image { Source = Xamarin.Forms.ImageSource.FromStream(() => new System.IO.MemoryStream(imageBytes)) };
+        }
     }
 }

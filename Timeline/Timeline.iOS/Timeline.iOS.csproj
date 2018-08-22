@@ -203,4 +203,10 @@
   <ItemGroup>
     <BundleResource Include="Resources\gallery32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\options32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\add32.png" />
+  </ItemGroup>
 </Project>

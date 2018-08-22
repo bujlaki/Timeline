@@ -64,6 +64,7 @@ namespace Timeline.ViewModels
         public Command CmdTap { get; set; }
         public Command CmdLongTap { get; set; }
         public Command CmdAddEvent { get; set; }
+        public Command CmdOptions { get; set; }
         public Command CmdCloseEventInfo { get; set; }
         public Command CmdEditEventInfo { get; set; }
         public Command CmdDeleteEvent { get; set; }
@@ -73,6 +74,7 @@ namespace Timeline.ViewModels
             CmdTap = new Command(TapExecute);
             CmdLongTap = new Command(LongTapExecute);
             CmdAddEvent = new Command(CmdAddEventExecute);
+            CmdOptions = new Command(CmdOptionsExecute);
             CmdCloseEventInfo = new Command(CmdCloseEventInfoExecute);
             CmdEditEventInfo = new Command(CmdEditEventInfoExecute);
             CmdDeleteEvent = new Command(CmdDeleteEventExecute);
@@ -134,6 +136,15 @@ namespace Timeline.ViewModels
         }
 
         private void CmdAddEventExecute(object obj)
+        {
+            //new event
+            TimelineDateTime tld = TimelineDateTime.FromTicks(Date.Ticks);
+            tld.Precision = ZoomUnit - 1;
+
+            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("", tld)));
+        }
+
+        private void CmdOptionsExecute(object obj)
         {
             //new event
             TimelineDateTime tld = TimelineDateTime.FromTicks(Date.Ticks);

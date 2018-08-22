@@ -20,7 +20,7 @@
         <Setter Property="TextColor" Value="{StaticResource textColor1}"/>
         <Setter Property="FontSize" Value="18"/>
         <Setter Property="PlaceholderColor" Value="{StaticResource bkgColor2}"/>
-        <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+        <Setter Property="VerticalOptions" Value="Start"/>
     </Style>
 
     <Style TargetType="Label" x:Key="mainLabel">

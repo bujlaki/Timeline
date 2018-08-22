@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Timeline.Controls"
+             xmlns:converters="clr-namespace:Timeline.Converters"
+             xmlns:colorpicker="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
+             x:Class="Timeline.Views.VEventType"
+             Title="EventType"
+             BindingContext="{Binding EventTypeViewModel, Source={StaticResource vmLocator}}"
+             NavigationPage.HasNavigationBar="False">
+    <ContentPage.Content>
+        <AbsoluteLayout>
+            <controls:PageTitleControl Title="EVENT TYPE"
+                                       AbsoluteLayout.LayoutFlags="All"
+                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
+
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.8, 0.7">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+
+                <controls:XEntry Grid.Row="0"
+                                 Text="{Binding TypeName, Mode=TwoWay}" 
+                                 Placeholder="typename"/>
+
+                <colorpicker:ColorPickerMixer Grid.Row="1" Color="{Binding TypeColor}"/>
+            </Grid>
+            
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
+                    Text="Create" 
+                    Command="{Binding CmdCreate}"
+                    CommandParameter="1"
+                    IsVisible="{Binding NewEventType}"/>
+
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5, 0.95, AutoSize, AutoSize" 
+                    Text="Update" 
+                    Command="{Binding CmdUpdate}"
+                    CommandParameter="1"
+                    IsVisible="{Binding NewEventType, Converter={StaticResource inverseBoolConverter}}"/>
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>
