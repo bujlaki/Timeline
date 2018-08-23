@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using Timeline.Objects.Auth;
+using Timeline.Objects.Collection;
 using Xamarin.Auth;
 
 namespace Timeline.Models
@@ -16,11 +17,11 @@ namespace Timeline.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
-        public ObservableCollection<MTimelineInfo> Timelines { get; set; }
+        public CustomObservableCollection<MTimelineInfo> Timelines { get; set; }
 
         public MUser()
         {
-            Timelines = new ObservableCollection<MTimelineInfo>();
+            Timelines = new CustomObservableCollection<MTimelineInfo>();
             Clear();
         }
 

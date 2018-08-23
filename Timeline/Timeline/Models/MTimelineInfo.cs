@@ -47,5 +47,16 @@ namespace Timeline.Models
 
             return target;
         }
+
+        public void UpdateFrom(MTimelineInfo tlinfo)
+        {
+            Name = tlinfo.Name;
+            Description = tlinfo.Description;
+
+            EventTypes.Clear();
+            IDictionaryEnumerator dictionaryEnumerator = tlinfo.EventTypes.GetEnumerator();
+            dictionaryEnumerator.Reset();
+            while (dictionaryEnumerator.MoveNext()) EventTypes.Add((string)dictionaryEnumerator.Key, (Xamarin.Forms.Color)dictionaryEnumerator.Value);
+        }
     }
 }

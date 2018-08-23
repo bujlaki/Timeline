@@ -34,33 +34,18 @@ namespace Timeline.ViewModels
     {
         private UserPagesMenuItem _selectedMenuItem;
         private MTimelineInfo _selectedTimeline;
-        private MUser _user;
+        
         private TimelineTheme theme;
 
-        public ObservableCollection<MTimelineInfo> Timelines;
-        public MTimelineInfo SelectedTimeline {
-            get { return _selectedTimeline; }
-            set
-            {
-                _selectedTimeline = value;
-                RaisePropertyChanged("SelectedTimeline");
-                if (_selectedTimeline == null) return;
-                CmdTimelineSelected.Execute(_selectedTimeline);
-                SelectedTimeline = null;
-            }
-        }
-
-        //commands
-        public Command CmdMenu { get; set; }
-        public Command CmdNewTimeline { get; set; }
-        public Command CmdTimelineSelected { get; set; }
-        public Command CmdShowTimeline { get; set; }
-        public Command CmdEditTimeline { get; set; }
-
-        public MUser User {
+        private MUser _user;
+        public MUser User
+        {
             get { return _user; }
             set { _user = value; RaisePropertyChanged("User"); }
-        }        
+        }
+
+        public ObservableCollection<MTimelineInfo> Timelines;
+
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
         public UserPagesMenuItem SelectedMenuItem
         {
@@ -75,6 +60,13 @@ namespace Timeline.ViewModels
             }
         }
 
+        //commands
+        public Command CmdMenu { get; set; }
+        public Command CmdNewTimeline { get; set; }
+        public Command CmdShowTimeline { get; set; }
+        public Command CmdEditTimeline { get; set; }
+
+
         public VMUserPages() : base()
         {
             MenuItems = new ObservableCollection<UserPagesMenuItem>(new[]
@@ -87,7 +79,6 @@ namespace Timeline.ViewModels
 
             CmdMenu = new Command(CmdMenuExecute);
             CmdNewTimeline = new Command(CmdNewTimelineExecute);
-            CmdTimelineSelected = new Command(CmdTimelineSelectedExecute);
             CmdShowTimeline = new Command(CmdShowTimelineExecute);
             CmdEditTimeline = new Command(CmdEditTimelineExecute);
 
@@ -104,8 +95,8 @@ namespace Timeline.ViewModels
 
         private void TimelineInfo_updated(VMTimelineInfo arg1, MTimelineInfo arg2)
         {
-            User.Timelines.Add(arg2);
             App.services.Database.UpdateUser(User);
+            User.Timelines.ReportItemChange(arg2);
         }
 
         public void CmdMenuExecute(object obj)
@@ -117,11 +108,6 @@ namespace Timeline.ViewModels
         public void CmdNewTimelineExecute(object obj)
         {
             App.services.Navigation.GoToTimelineInfoView(null);
-        }
-
-        public void CmdTimelineSelectedExecute(object obj)
-        {
-            //App.services.Navigation.GoToTimelineView((MTimelineInfo)obj);
         }
 
         public void CmdShowTimelineExecute(object obj)

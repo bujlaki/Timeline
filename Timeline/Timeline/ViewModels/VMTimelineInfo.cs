@@ -68,6 +68,7 @@ namespace Timeline.ViewModels
             }
             TimelineInfo = model.Copy();
 
+            EventTypes.Clear();
             foreach (KeyValuePair<string, Color> kvp in TimelineInfo.EventTypes) EventTypes.Add(kvp);
             UpdateAllProperties();
         }
@@ -179,6 +180,7 @@ namespace Timeline.ViewModels
             }
             if (String.IsNullOrEmpty(TimelineInfo.Description)) TimelineInfo.Description = "";
 
+            model.UpdateFrom(TimelineInfo);
             MessagingCenter.Send<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_updated", TimelineInfo);
             App.services.Navigation.GoBack();
         }

@@ -33,7 +33,7 @@
                        Text="Description" Style="{StaticResource fieldLabel}"/>
 
                 <Editor Grid.Row="2"
-                        Text="{Binding TimelineInfo.Description, Mode=OneWayToSource}"
+                        Text="{Binding TimelineInfo.Description, Mode=TwoWay}"
                         TextColor="#234b64"
                         BackgroundColor="#eeebd3"
                         FontSize="14"/>
