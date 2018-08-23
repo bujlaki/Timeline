@@ -2,13 +2,15 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:Timeline.Controls"
+             xmlns:colorpicker="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
+             xmlns:converters="clr-namespace:Timeline.Converters"
              x:Class="Timeline.Views.VTimelineInfo"
              Title="NEWTIMELINE"
              BindingContext="{Binding TimelineInfoViewModel, Source={StaticResource vmLocator}}"
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentPage.Content>
-        <AbsoluteLayout>
+        <AbsoluteLayout x:Name="absLayout">
             <controls:PageTitleControl Title="TIMELINE DATA"
                                        AbsoluteLayout.LayoutFlags="All"
                                        AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
@@ -18,6 +20,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="2*"/>
+                    <RowDefinition Height="10"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="4*"/>
                 </Grid.RowDefinitions>
@@ -35,7 +38,7 @@
                         BackgroundColor="#eeebd3"
                         FontSize="14"/>
 
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="50"/>
@@ -52,33 +55,33 @@
                 </Grid>
 
 
-                <ListView Grid.Row="4" ItemsSource="{Binding TimelineInfo.ETypes}" BackgroundColor="{StaticResource bkgColor2}">
+                <ListView Grid.Row="5" ItemsSource="{Binding EventTypes}" BackgroundColor="{StaticResource bkgColor2}"
+                          x:Name="eventTypesList">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <Grid >
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="50"/>
-                                        <ColumnDefinition Width="45"/>
+                                        <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="45"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Text="{Binding Key}" Style="{StaticResource linkLabel}" VerticalOptions="Center"/>
+                                    <Label Text="{Binding Key}" Style="{StaticResource linkLabel}" VerticalOptions="Center" Margin="10, 0, 0, 0"/>
 
-                                    <BoxView Grid.Column="1" Color="White"/>
-                                    <BoxView Grid.Column="1" Color="{Binding Value}" Margin="2"/>
+                                    <BoxView Grid.Column="1" Color="White" Margin="5"/>
+                                    <BoxView Grid.Column="1" Color="{Binding Value}" Margin="7">
+                                        <BoxView.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList}, Path=BindingContext.CmdEditEventType}" 
+                                                                  CommandParameter="{Binding .}"/>
+                                        </BoxView.GestureRecognizers>
+                                    </BoxView>
 
-                                    <Image Grid.Column="2" Source="edit32" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Image Grid.Column="2" Source="delete32" HorizontalOptions="Center" VerticalOptions="Center"
+                                           IsVisible="{Binding Key, Converter={StaticResource inverseDefaultStringToBoolConverter}}">
                                         <Image.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding CmdEditEventType}" CommandParameter="{Binding Entry}"/>
-                                        </Image.GestureRecognizers>
-                                    </Image>
-
-                                    <Image Grid.Column="3" Source="delete32" HorizontalOptions="Center" VerticalOptions="Center"
-                                           IsVisible="{Binding TypeName, Converter={StaticResource inverseDefaultStringToBoolConverter}}">
-                                        <Image.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding CmdDeleteEventType}" CommandParameter="{Binding Entry}"/>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList},Path=BindingContext.CmdDeleteEventType}" 
+                                                                  CommandParameter="{Binding .}"/>
                                         </Image.GestureRecognizers>
                                     </Image>
                                 </Grid>
@@ -100,6 +103,44 @@
                     Command="{Binding CmdUpdate}"
                     CommandParameter="1"
                     IsVisible="{Binding NewTimeline, Converter={StaticResource inverseBoolConverter}}"/>
+
+            <AbsoluteLayout AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                            BackgroundColor="#bb234b64"
+                            IsVisible="{Binding IsPicking}">
+                <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.8, 0.6"
+                      BackgroundColor="{StaticResource bkgColor1}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+
+                    <BoxView Grid.Row="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="#f4bd4f"/>
+                    <Label Grid.Row="0" Text="{Binding PickedTypeName}" HorizontalOptions="Center" VerticalOptions="Center" FontSize="20" TextColor="Black"/>
+                    
+                    <colorpicker:ColorPickerMixer Grid.Row="1" Color="{Binding PickedColor, Mode=TwoWay}"
+                                                  HorizontalOptions="Center"
+                                                  VerticalOptions="Center"
+                                                  EditAlpha="False"
+                                                  BackgroundColor="{StaticResource bkgColor1}"
+                                                  TextColor="{StaticResource textColor1}"
+                                                  EditorsColor="{StaticResource bkgColor1}"
+                                                  SliderWidth="150"
+                                                  ARGBEditorsWidth="65"
+                                                  ColorEditorWidth="100"/>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Text="OK" Margin="5" Command="{Binding CmdSetEventTypeColor}"/>
+                        <Button Grid.Column="1" Text="Cancel" Margin="5" Command="{Binding CmdCancelEventTypeColor}"/>
+                    </Grid>
+                </Grid>
+            </AbsoluteLayout>
+
         </AbsoluteLayout>
 
     </ContentPage.Content>

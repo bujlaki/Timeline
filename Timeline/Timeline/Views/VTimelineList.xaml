@@ -10,7 +10,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="5*"/>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
             
             <Label Grid.Row="0" 
@@ -20,24 +20,46 @@
             <ListView Grid.Row="1" 
                       ItemsSource="{Binding User.Timelines}"
                       Margin="30,0,30,0"
-                      RowHeight="80"
-                      SelectedItem="{Binding SelectedTimeline, Mode=TwoWay}">
+                      RowHeight="100"
+                      SelectedItem="{Binding SelectedTimeline, Mode=TwoWay}"
+                      x:Name="listView">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid Margin="0"
-                                  BackgroundColor="{StaticResource bkgColor2}">
+                            <Grid Grid.Column="0" Margin="4" BackgroundColor="{StaticResource bkgColor2}">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="2"/>
                                 </Grid.RowDefinitions>
 
-                                <Label Text="{Binding Name}" 
-                                       Grid.Row="0"
-                                       Margin="5, 0, 5, 0" 
-                                       Style="{StaticResource linkLabel}"/>
-                                
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="45"/>
+                                        <ColumnDefinition Width="45"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Text="{Binding Name}" 
+                                           Grid.Column="0"
+                                           Margin="5, 0, 5, 0" 
+                                           Style="{StaticResource linkLabel}"/>
+
+                                    <Image Grid.Column="1" Source="show32" HorizontalOptions="Center" VerticalOptions="Center" Margin="2">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference listView},Path=BindingContext.CmdShowTimeline}" 
+                                                                  CommandParameter="{Binding .}"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+
+                                    <Image Grid.Column="2" Source="edit32" HorizontalOptions="Center" VerticalOptions="Center" Margin="2">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference listView},Path=BindingContext.CmdEditTimeline}" 
+                                                                  CommandParameter="{Binding .}"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                </Grid>
+
                                 <Label Text="{Binding Description}" 
                                        Grid.Row="1" 
                                        Margin="5, 0, 5, 0" 
@@ -45,9 +67,10 @@
                                        VerticalOptions="FillAndExpand"
                                        HorizontalOptions="FillAndExpand"
                                        FontSize="12"/>
-                                
+
                                 <BoxView Grid.Row="2" Color="{StaticResource bkgColor1}"/>
                             </Grid>
+
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

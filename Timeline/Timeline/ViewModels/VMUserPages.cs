@@ -50,9 +50,13 @@ namespace Timeline.ViewModels
             }
         }
 
+        //commands
         public Command CmdMenu { get; set; }
         public Command CmdNewTimeline { get; set; }
         public Command CmdTimelineSelected { get; set; }
+        public Command CmdShowTimeline { get; set; }
+        public Command CmdEditTimeline { get; set; }
+
         public MUser User {
             get { return _user; }
             set { _user = value; RaisePropertyChanged("User"); }
@@ -84,12 +88,21 @@ namespace Timeline.ViewModels
             CmdMenu = new Command(CmdMenuExecute);
             CmdNewTimeline = new Command(CmdNewTimelineExecute);
             CmdTimelineSelected = new Command(CmdTimelineSelectedExecute);
+            CmdShowTimeline = new Command(CmdShowTimelineExecute);
+            CmdEditTimeline = new Command(CmdEditTimelineExecute);
 
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
+            MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_updated", TimelineInfo_updated);
         }
 
         private void TimelineInfo_created(VMTimelineInfo arg1, MTimelineInfo arg2)
+        {
+            User.Timelines.Add(arg2);
+            App.services.Database.UpdateUser(User);
+        }
+
+        private void TimelineInfo_updated(VMTimelineInfo arg1, MTimelineInfo arg2)
         {
             User.Timelines.Add(arg2);
             App.services.Database.UpdateUser(User);
@@ -108,7 +121,17 @@ namespace Timeline.ViewModels
 
         public void CmdTimelineSelectedExecute(object obj)
         {
+            //App.services.Navigation.GoToTimelineView((MTimelineInfo)obj);
+        }
+
+        public void CmdShowTimelineExecute(object obj)
+        {
             App.services.Navigation.GoToTimelineView((MTimelineInfo)obj);
+        }
+
+        public void CmdEditTimelineExecute(object obj)
+        {
+            App.services.Navigation.GoToTimelineInfoView((MTimelineInfo)obj);
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)
