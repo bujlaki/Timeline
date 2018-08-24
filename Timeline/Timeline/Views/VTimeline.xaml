@@ -41,13 +41,13 @@
                                TextColor="{StaticResource textColor2}"/>
                     </Grid>
 
-                    <Image Grid.Column="1" Source="options32"
+                    <!--<Image Grid.Column="1" Source="options32"
                            HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdOptions}"/>
                         </Image.GestureRecognizers>
-                    </Image>
+                    </Image>-->
                     
                     <Image Grid.Column="2" Source="search32" 
                            HorizontalOptions="Center"
@@ -86,6 +86,91 @@
                    Text="{Binding EventsStr}" />
 
             <Grid AbsoluteLayout.LayoutFlags="All" 
+                  AbsoluteLayout.LayoutBounds="0, 1, 1, 0.4" 
+                  IsVisible="{Binding EventInfoVisible}" 
+                  BackgroundColor="#234b64">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="40"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" 
+                           Text="EVENT DATA" 
+                           TextColor="#f4bd4f"
+                           FontSize="20"
+                           VerticalOptions="Center"/>
+
+                    <Image Grid.Column="1" 
+                           Source="edit32"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdEditEventInfo}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                    
+                    <Image Grid.Column="2" 
+                           Source="delete32"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdDeleteEvent}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+
+                    <Image Grid.Column="3" 
+                           Source="close32"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdCloseEventInfo}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                    
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Image Grid.Column="0" 
+                           BindingContext="{Binding SelectedEvent}"
+                           Source="{Binding Image.Source}" 
+                           VerticalOptions="Start"
+                           HorizontalOptions="Center"/>
+
+                    <ScrollView Grid.Column="1">
+                        <StackLayout Orientation="Vertical">
+                            <Label BindingContext="{Binding SelectedEvent}"
+                                   Text="{Binding Title}" 
+                                   TextColor="{StaticResource textColor2}"
+                                   FontSize="20"/>
+
+                            <Label Text="{Binding SelectedEventTimeFrame}" 
+                                   TextColor="{StaticResource textColor2}"
+                                   FontSize="12"/>
+
+                            <Label BindingContext="{Binding SelectedEvent}"
+                                   Text="{Binding Description}"
+                                   TextColor="{StaticResource textColor1}"
+                                   FontSize="14"/>
+                        </StackLayout>
+                    </ScrollView>
+                    
+                </Grid>
+
+            </Grid>
+            <!--<Grid AbsoluteLayout.LayoutFlags="All" 
                   AbsoluteLayout.LayoutBounds="0, 1, 1, 0.4" 
                   IsVisible="{Binding EventInfoVisible}" 
                   BackgroundColor="#234b64">
@@ -141,7 +226,7 @@
                     </Image>
                 </Grid>
 
-            </Grid>
+            </Grid>-->
             
 
         </AbsoluteLayout>

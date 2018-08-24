@@ -16,11 +16,9 @@ namespace Timeline.ViewModels
 {
 	public class VMTimeline : Base.VMBase
     {
-        private string title = "";
-        public string Title {
-            get { return title; }
-            set { title = value; RaisePropertyChanged("Title"); }
-        }
+        private MTimelineInfo timelineInfo;
+
+        public string Title { get { return timelineInfo.Name; } }
 
         private TimelineUnits zoomUnit;
         public TimelineUnits ZoomUnit
@@ -36,16 +34,7 @@ namespace Timeline.ViewModels
             set { date = value; RaisePropertyChanged("Date"); }
         }
 
-        private EventTree eventTree;
-        public EventTree EventTree
-        {
-            get { return eventTree; }
-            set { eventTree = value; RaisePropertyChanged("EventTree"); }
-        }
-
         public Int64 Pixeltime { get; }
-
-        public string TimelineId { get; set; }
         public ObservableCollection<MTimelineEvent> Events { get; set; }
         public int LaneCount { get; set; }
 
@@ -55,12 +44,24 @@ namespace Timeline.ViewModels
             set { eventInfoVisible = value; RaisePropertyChanged("EventInfoVisible"); }
         }
 
-        private MTimelineEvent eventSelected = null;
-        public MTimelineEvent EventSelected {
-            get { return eventSelected; }
-            set { eventSelected = value; RaisePropertyChanged("EventSelected"); }
+        private MTimelineEvent selectedEvent = null;
+        public MTimelineEvent SelectedEvent {
+            get { return selectedEvent; }
+            set { selectedEvent = value; RaisePropertyChanged("SelectedEvent"); RaisePropertyChanged("SelectedEventTimeFrame"); }
         }
 
+        public string SelectedEventTimeFrame {
+            get
+            {
+                if (SelectedEvent == null) return "";
+                if (SelectedEvent.EndDateSet)
+                    return "( " + SelectedEvent.StartDate.DateStr() + " - " + SelectedEvent.EndDate.DateStr() + " )";
+                else
+                    return "( " + SelectedEvent.StartDate.DateStr() + " )";
+            }
+        }
+
+        //commands
         public Command CmdTap { get; set; }
         public Command CmdLongTap { get; set; }
         public Command CmdAddEvent { get; set; }
@@ -88,9 +89,16 @@ namespace Timeline.ViewModels
             MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", TimelineEvent_updated);
         }
 
+        public void SetModel(MTimelineInfo model)
+        {
+            timelineInfo = model;
+            LoadEvents(timelineInfo.TimelineId);
+            UpdateAllProperties();
+        }
+
         private void TimelineEvent_created(VMTimelineEvent arg1, MTimelineEvent arg2)
         {
-            arg2.TimelineId = this.TimelineId;
+            arg2.TimelineId = timelineInfo.TimelineId;
             Events.Add(arg2);
             EventManager.SortEventsToLanes(Events, 10);
 
@@ -100,7 +108,7 @@ namespace Timeline.ViewModels
 
         private void TimelineEvent_updated(VMTimelineEvent arg1, MTimelineEvent arg2)
         {
-            arg2.TimelineId = this.TimelineId;
+            arg2.TimelineId = timelineInfo.TimelineId;
             Events.Add(arg2);
 
             App.services.Database.UpdateEvent(arg2);
@@ -120,7 +128,7 @@ namespace Timeline.ViewModels
                 tlevent.ClearImage();
             }
 
-            EventSelected = tlevent;
+            SelectedEvent = tlevent;
             EventInfoVisible = true;
         }
 
@@ -156,34 +164,44 @@ namespace Timeline.ViewModels
         private void CmdCloseEventInfoExecute(object obj)
         {
             EventInfoVisible = false;
-            EventSelected = null;
+            SelectedEvent = null;
         }
 
         private void CmdEditEventInfoExecute(object obj)
         {
-            if(EventSelected!=null)
-                MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(EventSelected));
+            if(SelectedEvent != null)
+                MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(SelectedEvent));
         }
 
         private void CmdDeleteEventExecute(object obj)
         {
-            if (EventSelected != null)
+            if (SelectedEvent != null)
             {
-                App.services.Database.DeleteEvent(EventSelected);
-                Events.Remove(EventSelected);
-                EventInfoVisible = false;
-                EventSelected = null;
-                RaisePropertyChanged("ItemsSource");
+                Task.Run(async () =>
+                {
+                    ConfirmConfig cc = new ConfirmConfig();
+                    cc.Message = "Are you sure?";
+                    cc.Title = "Delete event";
+                    if(await UserDialogs.Instance.ConfirmAsync(cc))
+                    {
+                        await App.services.Database.DeleteEvent(SelectedEvent);
+                        MainThread.BeginInvokeOnMainThread(() => {
+                            Events.Remove(SelectedEvent);
+                            EventInfoVisible = false;
+                            SelectedEvent = null;
+                            RaisePropertyChanged("ItemsSource");
+                        });
+                    }
+                });
             }
         }
 
-        public void LoadEvents()
+        public void LoadEvents(string id)
         {
-            if (TimelineId == "") return;
+            if (id == "") return;
             Task.Run(async () => {
-                Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(TimelineId));
+                Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(id));
                 LaneCount = EventManager.SortEventsToLanes(Events, 10);
-                EventTree = EventManager.BuildEventTree(Events);
                 RaisePropertyChanged("Events");
             });
         }

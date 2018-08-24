@@ -39,22 +39,6 @@ namespace Timeline.Controls
             set { SetValue(DateProperty, value); }
         }
 
-        public static readonly BindableProperty ItemsTreeSourceProperty = BindableProperty.Create(
-            nameof(ItemsTreeSource),
-            typeof(EventTree),
-            typeof(TimelineControl),
-            new EventTree(TimelineUnits.All), BindingMode.TwoWay,
-            propertyChanged: OnItemsTreeSourceChanged);
-        private static void OnItemsTreeSourceChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            ((TimelineControl)bindable).InvalidateLayout();
-        }
-        public EventTree ItemsTreeSource
-        {
-            get { return (EventTree)GetValue(ItemsTreeSourceProperty); }
-            set { SetValue(ItemsTreeSourceProperty, value); }
-        }
-
         public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
             nameof(ItemsSource),
             typeof(ObservableCollection<MTimelineEvent>),

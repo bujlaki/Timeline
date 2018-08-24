@@ -33,7 +33,7 @@ namespace Timeline.Objects.Database
             user.UserName = doc.ContainsKey("username") ? doc["username"].AsString() : "";
             user.Email = doc.ContainsKey("email") ? doc["email"].AsString() : "";
             var listTimelineInfo = doc.ContainsKey("timelines") ? doc["timelines"].AsDocument() : null;
-
+            
             if (listTimelineInfo != null)
                 foreach (Document infoItem in listTimelineInfo.Values) user.Timelines.Add( DynamoDoc2TimelineInfo(infoItem) );
 
@@ -48,6 +48,15 @@ namespace Timeline.Objects.Database
             doc.Add("timelineid", info.TimelineId);
             doc.Add("name", info.Name);
             doc.Add("description", info.Description);
+            Document eventtypesDoc = new Document();
+            foreach(KeyValuePair<string, Xamarin.Forms.Color> kvp in info.EventTypes)
+            {
+                Document etype = new Document();
+                etype.Add("name", kvp.Key);
+                etype.Add("color", ColorToHEX(kvp.Value));
+                eventtypesDoc.Add(kvp.Key, etype);
+            }
+            doc.Add("eventtypes", eventtypesDoc);
             return doc;
         }
 
@@ -57,7 +66,19 @@ namespace Timeline.Objects.Database
 
             var tli = new MTimelineInfo(doc["timelineid"]);
             tli.Name = doc.ContainsKey("name") ? doc["name"].AsString() : "";
-            tli.Description = doc.ContainsKey("description") ? doc["description"].AsString() : ""; 
+            tli.Description = doc.ContainsKey("description") ? doc["description"].AsString() : "";
+
+            var eventTypesDoc = doc.ContainsKey("eventtypes") ? doc["eventtypes"].AsDocument() : null;
+
+            if (eventTypesDoc != null)
+                foreach (Document item in eventTypesDoc.Values)
+                {
+                    if (item["name"] == "Default")
+                        tli.EventTypes["Default"] = Xamarin.Forms.Color.FromHex(item["color"]);
+                    else
+                        tli.EventTypes.Add(item["name"], Xamarin.Forms.Color.FromHex(item["color"]));
+                }
+
             return tli;
         }
 
@@ -113,5 +134,15 @@ namespace Timeline.Objects.Database
             if (value == null) return new DynamoDBNull();
             return (DynamoDBEntry)value;
         }
+
+        private static String ColorToHEX(Xamarin.Forms.Color c)
+        {
+            var red = (int)(c.R * 255);
+            var green = (int)(c.G * 255);
+            var blue = (int)(c.B * 255);
+            var hex = $"#{red:X2}{green:X2}{blue:X2}";
+            return hex;
+        }
+
     }
 }
