@@ -69,6 +69,7 @@
                 
                 <controls:TimelineControl Grid.Row="1" 
                                           x:Name="tlc"
+                                          EventTypes="{Binding EventTypes}"
                                           ItemsSource="{Binding Events, Mode=TwoWay}" 
                                           LaneCount="{Binding LaneCount}" 
                                           TapCommand="{Binding CmdTap}"
@@ -143,11 +144,32 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image Grid.Column="0" 
-                           BindingContext="{Binding SelectedEvent}"
-                           Source="{Binding Image.Source}" 
-                           VerticalOptions="Start"
-                           HorizontalOptions="Center"/>
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Image Grid.Row="0" 
+                               BindingContext="{Binding SelectedEvent}"
+                               Source="{Binding Image.Source}" 
+                               VerticalOptions="Start"
+                               HorizontalOptions="Center"/>
+
+                        <Label Grid.Row="2"
+                               Text="{Binding SelectedEventTypeName}"
+                               Style="{StaticResource fieldLabel}"/>
+
+                        <BoxView Grid.Row="3"
+                                 Margin="4"
+                                 Color="{StaticResource textColor1}"/>
+                        
+                        <BoxView Grid.Row="3"
+                                 Margin="6"
+                                 Color="{Binding SelectedEventTypeColor}"/>
+                    </Grid>
 
                     <ScrollView Grid.Column="1">
                         <StackLayout Orientation="Vertical">

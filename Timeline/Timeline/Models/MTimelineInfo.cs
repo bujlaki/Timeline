@@ -10,7 +10,10 @@ namespace Timeline.Models
         public string TimelineId { get; private set; }
         public string Name { get; set; }
         public string Description { get; set; }
-
+        public bool Shared { get; set; }
+        public string OwnerID { get; set; }
+        public string OwnerName { get; set; }
+        public string[] Tags { get; set; }
         public Dictionary<string, Xamarin.Forms.Color> EventTypes { get; set; }
 
         public MTimelineInfo()
@@ -18,6 +21,8 @@ namespace Timeline.Models
             TimelineId = Guid.NewGuid().ToString();
             Name = "";
             Description = "";
+            Shared = false;
+            Tags = new string[] { };
             EventTypes = new Dictionary<string, Xamarin.Forms.Color>();
             EventTypes.Add("Default", (Xamarin.Forms.Color)App.Current.Resources["bkgColor1"]);
         }

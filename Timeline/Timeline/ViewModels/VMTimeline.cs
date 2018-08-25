@@ -20,6 +20,8 @@ namespace Timeline.ViewModels
 
         public string Title { get { return timelineInfo.Name; } }
 
+        public Dictionary<string, Color> EventTypes { get { return timelineInfo.EventTypes; } }
+
         private TimelineUnits zoomUnit;
         public TimelineUnits ZoomUnit
         {
@@ -47,7 +49,12 @@ namespace Timeline.ViewModels
         private MTimelineEvent selectedEvent = null;
         public MTimelineEvent SelectedEvent {
             get { return selectedEvent; }
-            set { selectedEvent = value; RaisePropertyChanged("SelectedEvent"); RaisePropertyChanged("SelectedEventTimeFrame"); }
+            set { selectedEvent = value;
+                RaisePropertyChanged("SelectedEvent");
+                RaisePropertyChanged("SelectedEventTimeFrame");
+                RaisePropertyChanged("SelectedEventTypeColor");
+                RaisePropertyChanged("SelectedEventTypeName");
+            }
         }
 
         public string SelectedEventTimeFrame {
@@ -58,6 +65,22 @@ namespace Timeline.ViewModels
                     return "( " + SelectedEvent.StartDate.DateStr() + " - " + SelectedEvent.EndDate.DateStr() + " )";
                 else
                     return "( " + SelectedEvent.StartDate.DateStr() + " )";
+            }
+        }
+
+        public string SelectedEventTypeName
+        {
+            get {
+                if (SelectedEvent == null) return "";
+                return SelectedEvent.EventType;
+            }
+        }
+
+        public Color SelectedEventTypeColor
+        {
+            get {
+                if (SelectedEvent == null) return Color.Black;
+                return EventTypes[SelectedEvent.EventType];
             }
         }
 

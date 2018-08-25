@@ -39,6 +39,22 @@ namespace Timeline.Controls
             set { SetValue(DateProperty, value); }
         }
 
+        public static readonly BindableProperty EventTypesProperty = BindableProperty.Create(
+            nameof(EventTypes),
+            typeof(Dictionary<string, Color>),
+            typeof(TimelineControl),
+            new Dictionary<string, Color>(), BindingMode.Default,
+            propertyChanged: OnEventTypesChanged);
+        private static void OnEventTypesChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((TimelineControl)bindable).InvalidateLayout();
+        }
+        public Dictionary<string, Color> EventTypes
+        {
+            get { return (Dictionary<string, Color>)GetValue(EventTypesProperty); }
+            set { SetValue(EventTypesProperty, value); }
+        }
+
         public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
             nameof(ItemsSource),
             typeof(ObservableCollection<MTimelineEvent>),
@@ -623,6 +639,7 @@ namespace Timeline.Controls
             }
 
             //draw event box
+            theme.EventPaint.Color = EventTypes[e.EventType].ToSKColor();
 			canvas.DrawRect(startX, eventTop, endX - startX, laneHeight - 1, theme.EventPaint);
             if (highlighted)
                 theme.EventBorderPaint.Color = Color.Yellow.ToSKColor();

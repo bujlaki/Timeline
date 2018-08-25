@@ -20,7 +20,7 @@ namespace Timeline.Objects.Database
             client = new AmazonDynamoDBClient(credential, Amazon.RegionEndpoint.EUCentral1);
         }
 
-        #region "MDBUser"
+        #region "MUser"
         public async Task<MUser> CreateUser(LoginData login)
         {
             try
@@ -85,7 +85,36 @@ namespace Timeline.Objects.Database
         }
         #endregion
 
-        #region "MDBTimelineEvent"
+        #region "MTimelineInfo"
+        public async Task StoreSharedTimeline(MTimelineInfo tlinfo, MUser user)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "SharedTimelines");
+                tlinfo.OwnerID = user.UserId;
+                tlinfo.OwnerName = user.UserName;
+                await table.PutItemAsync(DynamoDBAdapter.TimelineInfo2DynamoDoc(tlinfo));
+
+                table = Table.LoadTable(client, "SharedTimelineTags");
+                DocumentBatchWrite batchWrite = table.CreateBatchWrite();
+                foreach (string tag in tlinfo.Tags)
+                {
+                    Document tagDoc = new Document();
+                    tagDoc.Add("tag", tag);
+                    tagDoc.Add("timelineid", tlinfo.TimelineId);
+                    batchWrite.AddDocumentToPut(tagDoc);
+                }
+                await batchWrite.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("StoreSharedTimeline ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region "MTimelineEvent"
         public async Task StoreEvent(MTimelineEvent tlevent)
         {
             try
@@ -106,7 +135,6 @@ namespace Timeline.Objects.Database
             {
                 Table table = Table.LoadTable(client, "TimelineEvents");
                 await table.DeleteItemAsync(tlevent.TimelineId, tlevent.EventId);
-                //await table.PutItemAsync(DynamoDBAdapter.TimelineEvent2DynamoDoc(tlevent));
             }
             catch (Exception ex)
             {
@@ -145,32 +173,6 @@ namespace Timeline.Objects.Database
                 throw ex;
             }
         }
-
-        //public async Task<List<MTimelineEvent>> GetEvents(string timelineId)
-        //{
-        //    try
-        //    {
-        //        List<MTimelineEvent> results = new List<MTimelineEvent>();
-
-        //        Table table = Table.LoadTable(client, "TimelineEvents");
-        //        QueryFilter filter = new QueryFilter("timelineid", QueryOperator.Equal, timelineId);
-        //        Search search = table.Query(filter);
-
-        //        do
-        //        {
-        //            var docSet = await search.GetNextSetAsync();
-        //            foreach (Document doc in docSet) results.Add( DynamoDBAdapter.DynamoDoc2TimelineEvent(doc) );
-
-        //        } while (!search.IsDone);
-
-        //        return results;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("GetEvents ERROR: " + ex.Message);
-        //        throw ex;
-        //    }
-        //}
 
         public async Task<List<MTimelineEvent>> GetEvents(string timelineId)
         {

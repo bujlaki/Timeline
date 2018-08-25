@@ -16,6 +16,7 @@ namespace Timeline.Services
         Task UpdateUser(MUser user);
         Task<MUser> GetUser(string userId);
         Task<MUser> GetUserOrCreate(LoginData login);
+        Task ShareTimeline(MTimelineInfo tlinfo, MUser user);
         Task StoreEvent(MTimelineEvent tlevent);
         Task DeleteEvent(MTimelineEvent tlevent);
         Task UpdateEvent(MTimelineEvent tlevent);

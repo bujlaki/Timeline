@@ -53,6 +53,11 @@ namespace Timeline.Services
             return u;
         }
 
+        public async Task ShareTimeline(MTimelineInfo tlinfo, MUser user)
+        {
+            await ddb.StoreSharedTimeline(tlinfo, user);
+        }
+
         public async Task StoreEvent(MTimelineEvent tlevent)
         {
             await ddb.StoreEvent(tlevent);

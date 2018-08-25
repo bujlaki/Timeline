@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 
 using Timeline.Objects.Timeline;
+using System.Collections.Generic;
 
 namespace Timeline.Models
 {
@@ -17,6 +18,7 @@ namespace Timeline.Models
         public Int64 StartDateTicks { get { return StartDate.Ticks; } }
         public Int64 EndDateTicks { get { return EndDate.Ticks; } }
         public byte Precision { get; set; }
+        public string EventType { get; set; }
 
         //internal
         public Image Image { get; set; }
@@ -28,6 +30,7 @@ namespace Timeline.Models
         public MTimelineEvent()
         {
             EventId = Guid.NewGuid().ToString();
+            EventType = "Default";
             Image = new Image();
             ClearImage();
         }

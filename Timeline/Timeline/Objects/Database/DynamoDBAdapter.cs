@@ -48,6 +48,15 @@ namespace Timeline.Objects.Database
             doc.Add("timelineid", info.TimelineId);
             doc.Add("name", info.Name);
             doc.Add("description", info.Description);
+
+            doc.Add("shared", info.Shared.ToString().ToLower());
+            doc.Add("ownerid", info.OwnerID);
+            doc.Add("ownername", info.OwnerName);
+
+            DynamoDBList tags = new DynamoDBList();
+            foreach (string tag in info.Tags) { tags.Add(tag); }
+            doc.Add("tags", tags);
+
             Document eventtypesDoc = new Document();
             foreach(KeyValuePair<string, Xamarin.Forms.Color> kvp in info.EventTypes)
             {
@@ -67,9 +76,14 @@ namespace Timeline.Objects.Database
             var tli = new MTimelineInfo(doc["timelineid"]);
             tli.Name = doc.ContainsKey("name") ? doc["name"].AsString() : "";
             tli.Description = doc.ContainsKey("description") ? doc["description"].AsString() : "";
+            tli.Shared = doc.ContainsKey("shared") ? (doc["shared"].AsString().Equals("true") ? true : false) : false;
+            tli.OwnerID = doc.ContainsKey("ownerid") ? doc["ownerid"].AsString() : "0";
+            tli.OwnerName = doc.ContainsKey("ownername") ? doc["ownername"].AsString() : "";
+
+            DynamoDBList tags = doc.ContainsKey("tags") ? doc["tags"].AsDynamoDBList() : null;
+            if (tags != null) tli.Tags = tags.AsArrayOfString();
 
             var eventTypesDoc = doc.ContainsKey("eventtypes") ? doc["eventtypes"].AsDocument() : null;
-
             if (eventTypesDoc != null)
                 foreach (Document item in eventTypesDoc.Values)
                 {
@@ -98,6 +112,7 @@ namespace Timeline.Objects.Database
             if (tlevent.EndDate!=null) doc.Add("enddate", tlevent.EndDate.Ticks);
             doc.Add("enddateset", tlevent.EndDateSet ? "1" : "0");
             doc.Add("precision", (byte)tlevent.StartDate.Precision);
+            doc.Add("eventtype", tlevent.EventType);
             return doc;
         }
 
@@ -120,6 +135,7 @@ namespace Timeline.Objects.Database
             tlevent.Precision = byte.Parse(doc["precision"].AsString());
             tlevent.StartDate.Precision = (TimelineUnits)tlevent.Precision;
             tlevent.EndDate.Precision = (TimelineUnits)tlevent.Precision;
+            tlevent.EventType = doc.ContainsKey("eventtype") ? doc["eventtype"].AsString() : "Default";
             return tlevent;
         }
 

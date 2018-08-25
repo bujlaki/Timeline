@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 
 using Xamarin.Forms;
+using Acr.UserDialogs;
+using Xamarin.Essentials;
 
 using Timeline.Models;
 using Timeline.Objects.Timeline;
+
 
 namespace Timeline.ViewModels
 {
@@ -32,8 +36,8 @@ namespace Timeline.ViewModels
 
     public class VMUserPages : Base.VMBase
     {
-        private UserPagesMenuItem _selectedMenuItem;
-        private MTimelineInfo _selectedTimeline;
+        private UserPagesMenuItem selectedMenuItem;
+        private MTimelineInfo selectedTimeline;
         
         private TimelineTheme theme;
 
@@ -49,13 +53,13 @@ namespace Timeline.ViewModels
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
         public UserPagesMenuItem SelectedMenuItem
         {
-            get { return _selectedMenuItem; }
+            get { return selectedMenuItem; }
             set
             {
-                _selectedMenuItem = value;
-                RaisePropertyChanged("SelectedItem");
-                if (_selectedMenuItem == null) return;
-                HandleMenuItem(_selectedMenuItem.Id);
+                selectedMenuItem = value;
+                RaisePropertyChanged("SelectedMenuItem");
+                if (selectedMenuItem == null) return;
+                HandleMenuItem(selectedMenuItem.Id);
                 SelectedMenuItem = null;
             }
         }
@@ -65,6 +69,8 @@ namespace Timeline.ViewModels
         public Command CmdNewTimeline { get; set; }
         public Command CmdShowTimeline { get; set; }
         public Command CmdEditTimeline { get; set; }
+        public Command CmdDeleteTimeline { get; set; }
+        public Command CmdShareTimeline { get; set; }
 
 
         public VMUserPages() : base()
@@ -81,6 +87,8 @@ namespace Timeline.ViewModels
             CmdNewTimeline = new Command(CmdNewTimelineExecute);
             CmdShowTimeline = new Command(CmdShowTimelineExecute);
             CmdEditTimeline = new Command(CmdEditTimelineExecute);
+            CmdDeleteTimeline = new Command(CmdDeleteTimelineExecute);
+            CmdShareTimeline = new Command(CmdShareTimelineExecute);
 
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
@@ -118,6 +126,32 @@ namespace Timeline.ViewModels
         public void CmdEditTimelineExecute(object obj)
         {
             App.services.Navigation.GoToTimelineInfoView((MTimelineInfo)obj);
+        }
+
+        public void CmdDeleteTimelineExecute(object obj)
+        {
+            Task.Run(async () =>
+            {
+                ConfirmConfig cc = new ConfirmConfig();
+                cc.Message = "Are you sure?";
+                cc.Title = "Delete timeline";
+                if (await UserDialogs.Instance.ConfirmAsync(cc))
+                {
+                    MTimelineInfo tlinfo = (MTimelineInfo)obj;
+                    User.Timelines.Remove(tlinfo);
+                    await App.services.Database.UpdateUser(User);
+                }
+            });
+        }
+
+        public void CmdShareTimelineExecute(object obj)
+        {
+            MTimelineInfo tlinfo = (MTimelineInfo)obj;
+            tlinfo.Shared = true;
+            tlinfo.OwnerID = User.UserId;
+            tlinfo.OwnerName = User.UserName;
+
+            App.services.Database.ShareTimeline(tlinfo, User);
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)

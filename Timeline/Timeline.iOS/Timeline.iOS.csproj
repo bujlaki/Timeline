@@ -212,4 +212,10 @@
   <ItemGroup>
     <BundleResource Include="Resources\show32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\share32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\eye32.png" />
+  </ItemGroup>
 </Project>
