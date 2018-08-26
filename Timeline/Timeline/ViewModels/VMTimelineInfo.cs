@@ -22,6 +22,12 @@ namespace Timeline.ViewModels
         public MTimelineInfo TimelineInfo { get; set; }
 
         public ObservableCollection<KeyValuePair<string, Color>> EventTypes { get; set; }
+        public ObservableCollection<string> Tags { get; set; }
+
+        //tab segments
+        public int SelectedSegment { get; set; }
+        public bool ShowEventTypes { get { return SelectedSegment == 0; } }
+        public bool ShowSearchTags { get { return SelectedSegment == 1; } }
 
         //color picking
         private bool isPicking;
@@ -39,6 +45,9 @@ namespace Timeline.ViewModels
         public Command CmdDeleteEventType { get; set; }
         public Command CmdSetEventTypeColor { get; set; }
         public Command CmdCancelEventTypeColor { get; set; }
+        public Command CmdTabSegmentTap { get; set; }
+        public Command CmdAddTag { get; set; }
+        public Command CmdDeleteTag { get; set; }
 
         public VMTimelineInfo() : base()
         {
@@ -52,8 +61,13 @@ namespace Timeline.ViewModels
             CmdSetEventTypeColor = new Command(CmdSetEventTypeColorExecute);
             CmdCancelEventTypeColor = new Command(CmdCancelEventTypeColorExecute);
 
+            CmdTabSegmentTap = new Command(CmdTabSegmentTapExecute);
+            CmdAddTag = new Command(CmdAddTagExecute);
+            CmdDeleteTag = new Command(CmdDeleteTagExecute);
+
             TimelineInfo = new MTimelineInfo();
             EventTypes = new ObservableCollection<KeyValuePair<string, Color>>();
+            Tags = new ObservableCollection<string>();
         }
 
         public void SetModel(MTimelineInfo tlinfo)
@@ -70,6 +84,10 @@ namespace Timeline.ViewModels
 
             EventTypes.Clear();
             foreach (KeyValuePair<string, Color> kvp in TimelineInfo.EventTypes) EventTypes.Add(kvp);
+
+            Tags.Clear();
+            foreach (string tag in TimelineInfo.Tags) Tags.Add(tag);
+
             UpdateAllProperties();
         }
 
@@ -158,6 +176,55 @@ namespace Timeline.ViewModels
             IsPicking = false;
         }
 
+        private void CmdTabSegmentTapExecute(object obj)
+        {
+            RaisePropertyChanged("ShowEventTypes");
+            RaisePropertyChanged("ShowSearchTags");
+        }
+
+        private void CmdAddTagExecute(object obj)
+        {
+            PromptConfig pc = new PromptConfig { Title = "Search tag" };
+            PromptResult pr;
+            Task.Run(async () =>
+            {
+                pr = await UserDialogs.Instance.PromptAsync(pc);
+
+                if (pr.Ok)
+                {
+                    if (pr.Text != "") AddSearchTag(pr.Text);
+                    else UserDialogs.Instance.Toast("Invalid tag");
+                }
+            });
+        }
+
+        private void CmdDeleteTagExecute(object obj)
+        {
+            DeleteSearchTag((string)obj);
+        }
+
+        private void AddSearchTag(string tag)
+        {
+            if (!TimelineInfo.Tags.Contains(tag))
+            {
+                Tags.Add(tag);
+                TimelineInfo.Tags = Tags.ToArray();
+            }
+            else
+            {
+                UserDialogs.Instance.Toast("This tag is already defined");
+            }
+        }
+
+        private void DeleteSearchTag(string tag)
+        {
+            var i = -1;
+            if (!TimelineInfo.Tags.Contains(tag)) return;
+
+            Tags.Remove(tag);
+            TimelineInfo.Tags = Tags.ToArray();
+        }
+
         private void CmdCreateExecute(object obj)
         {
             if (String.IsNullOrEmpty(TimelineInfo.Name))
@@ -181,7 +248,7 @@ namespace Timeline.ViewModels
             if (String.IsNullOrEmpty(TimelineInfo.Description)) TimelineInfo.Description = "";
 
             model.UpdateFrom(TimelineInfo);
-            MessagingCenter.Send<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_updated", TimelineInfo);
+            MessagingCenter.Send<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_updated", model);
             App.services.Navigation.GoBack();
         }
     }

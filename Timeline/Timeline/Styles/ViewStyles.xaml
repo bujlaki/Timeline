@@ -33,7 +33,7 @@
     <Style TargetType="Label" x:Key="titleLabel">
         <Setter Property="FontAttributes" Value="Bold"/>
         <Setter Property="TextColor" Value="{StaticResource textColor1}"/>
-        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontSize" Value="24"/>
         <Setter Property="HorizontalOptions" Value="Center"/>
     </Style>
     

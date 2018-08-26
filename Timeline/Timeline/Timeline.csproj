@@ -24,6 +24,7 @@
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.10.2" />
     <PackageReference Include="AWSSDK.Extensions.CognitoAuthentication" Version="0.9.4" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="SegmentedTabControl.FormsPlugin" Version="1.0.0" />
     <PackageReference Include="Xam.Plugin.Media" Version="4.0.1.5" />
     <PackageReference Include="Xamarin.Auth" Version="1.6.0.2" />
     <PackageReference Include="Xamarin.Essentials" Version="0.8.0-preview" />

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:Timeline.Controls"
              xmlns:colorpicker="clr-namespace:Amporis.Xamarin.Forms.ColorPicker;assembly=Amporis.Xamarin.Forms.ColorPicker"
+             xmlns:tabcontrol="clr-namespace:SegmentedTabControl.FormsPlugin;assembly=SegmentedTabControl"
              xmlns:converters="clr-namespace:Timeline.Converters"
              x:Class="Timeline.Views.VTimelineInfo"
              Title="NEWTIMELINE"
@@ -13,9 +14,9 @@
         <AbsoluteLayout x:Name="absLayout">
             <controls:PageTitleControl Title="TIMELINE DATA"
                                        AbsoluteLayout.LayoutFlags="All"
-                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.2"/>
-
-            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.9, 0.7">
+                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.1"/>
+           
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.9, 0.75">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -36,18 +37,63 @@
                         Text="{Binding TimelineInfo.Description, Mode=TwoWay}"
                         TextColor="#234b64"
                         BackgroundColor="#eeebd3"
-                        FontSize="14"/>
+                        FontSize="12"/>
 
-                <Grid Grid.Row="4">
+
+                <tabcontrol:SegmentedTabControl Grid.Row="4" 
+                                                UnselectedSegmentTextColor="{StaticResource bkgColor2}"
+                                                UnselectedSegmentBackgroundColor="{StaticResource bkgColor1}" 
+                                                TintColor="{StaticResource bkgColor2}" 
+                                                SelectedSegment="{Binding SelectedSegment, Mode=TwoWay}"
+                                                Command="{Binding CmdTabSegmentTap}">
+                    <tabcontrol:SegmentedTabControl.Children>
+                        <Label Text="Event types and color codes" />
+                        <Label Text="Search tags" />
+                    </tabcontrol:SegmentedTabControl.Children>
+                </tabcontrol:SegmentedTabControl>
+                
+                <Grid Grid.Row="5" IsVisible="{Binding ShowEventTypes}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="50"/>
                     </Grid.ColumnDefinitions>
-                    
-                    <Label Grid.Column="0"
-                           Text="Event types and color codes" Style="{StaticResource fieldLabel}"/>
 
-                    <Image Grid.Column="1" Source="add32" HorizontalOptions="Center" VerticalOptions="Center">
+                    <ListView Grid.Column="0" ItemsSource="{Binding EventTypes}" BackgroundColor="{StaticResource bkgColor2}"
+                          x:Name="eventTypesList">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="45"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Text="{Binding Key}" Style="{StaticResource linkLabel}" VerticalOptions="Center" Margin="10, 0, 0, 0"/>
+
+                                        <BoxView Grid.Column="1" Color="White" Margin="5"/>
+                                        <BoxView Grid.Column="1" Color="{Binding Value}" Margin="7">
+                                            <BoxView.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList}, Path=BindingContext.CmdEditEventType}" 
+                                                                  CommandParameter="{Binding .}"/>
+                                            </BoxView.GestureRecognizers>
+                                        </BoxView>
+
+                                        <Image Grid.Column="2" Source="delete32" HorizontalOptions="Center" VerticalOptions="Center"
+                                           IsVisible="{Binding Key, Converter={StaticResource inverseDefaultStringToBoolConverter}}">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList},Path=BindingContext.CmdDeleteEventType}" 
+                                                                  CommandParameter="{Binding .}"/>
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Image Grid.Column="1" Source="add32" HorizontalOptions="Center" VerticalOptions="Start">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CmdAddEventType}"/>
                         </Image.GestureRecognizers>
@@ -55,40 +101,43 @@
                 </Grid>
 
 
-                <ListView Grid.Row="5" ItemsSource="{Binding EventTypes}" BackgroundColor="{StaticResource bkgColor2}"
-                          x:Name="eventTypesList">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ViewCell>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="45"/>
-                                    </Grid.ColumnDefinitions>
+                <Grid Grid.Row="5" IsVisible="{Binding ShowSearchTags}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
 
-                                    <Label Text="{Binding Key}" Style="{StaticResource linkLabel}" VerticalOptions="Center" Margin="10, 0, 0, 0"/>
+                    <ListView Grid.Column="0" ItemsSource="{Binding Tags}" BackgroundColor="{StaticResource bkgColor2}"
+                          x:Name="searchTagList">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="45"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <BoxView Grid.Column="1" Color="White" Margin="5"/>
-                                    <BoxView Grid.Column="1" Color="{Binding Value}" Margin="7">
-                                        <BoxView.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList}, Path=BindingContext.CmdEditEventType}" 
+                                        <Label Text="{Binding .}" Style="{StaticResource linkLabel}" VerticalOptions="Center" Margin="10, 0, 0, 0"/>
+
+                                        <Image Grid.Column="2" Source="delete32" HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Image.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference searchTagList},Path=BindingContext.CmdDeleteTag}" 
                                                                   CommandParameter="{Binding .}"/>
-                                        </BoxView.GestureRecognizers>
-                                    </BoxView>
+                                            </Image.GestureRecognizers>
+                                        </Image>
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
 
-                                    <Image Grid.Column="2" Source="delete32" HorizontalOptions="Center" VerticalOptions="Center"
-                                           IsVisible="{Binding Key, Converter={StaticResource inverseDefaultStringToBoolConverter}}">
-                                        <Image.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList},Path=BindingContext.CmdDeleteEventType}" 
-                                                                  CommandParameter="{Binding .}"/>
-                                        </Image.GestureRecognizers>
-                                    </Image>
-                                </Grid>
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    <Image Grid.Column="1" Source="add32" HorizontalOptions="Center" VerticalOptions="Start">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdAddTag}"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
 
             </Grid>
 
@@ -104,6 +153,7 @@
                     CommandParameter="1"
                     IsVisible="{Binding NewTimeline, Converter={StaticResource inverseBoolConverter}}"/>
 
+            
             <AbsoluteLayout AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                             BackgroundColor="#bb234b64"
                             IsVisible="{Binding IsPicking}">

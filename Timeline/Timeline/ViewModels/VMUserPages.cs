@@ -36,21 +36,12 @@ namespace Timeline.ViewModels
 
     public class VMUserPages : Base.VMBase
     {
-        private UserPagesMenuItem selectedMenuItem;
-        private MTimelineInfo selectedTimeline;
-        
-        private TimelineTheme theme;
-
-        private MUser _user;
-        public MUser User
-        {
-            get { return _user; }
-            set { _user = value; RaisePropertyChanged("User"); }
-        }
-
-        public ObservableCollection<MTimelineInfo> Timelines;
+        //private MTimelineInfo selectedTimeline;
+        //private TimelineTheme theme;
 
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
+
+        private UserPagesMenuItem selectedMenuItem;
         public UserPagesMenuItem SelectedMenuItem
         {
             get { return selectedMenuItem; }
@@ -64,8 +55,24 @@ namespace Timeline.ViewModels
             }
         }
 
+        private MUser _user;
+        public MUser User
+        {
+            get { return _user; }
+            set { _user = value; RaisePropertyChanged("User"); }
+        }
+
+        public ObservableCollection<MTimelineInfo> Timelines;
+
+        //tab segments
+        public int SelectedSegment { get; set; }
+        public bool ShowSegment0 { get { return SelectedSegment == 0; } } 
+        public bool ShowSegment1 { get { return SelectedSegment == 1; } }
+        public bool ShowSegment2 { get { return SelectedSegment == 2; } }
+
         //commands
         public Command CmdMenu { get; set; }
+        public Command CmdTabSegmentTap { get; set; }
         public Command CmdNewTimeline { get; set; }
         public Command CmdShowTimeline { get; set; }
         public Command CmdEditTimeline { get; set; }
@@ -84,6 +91,7 @@ namespace Timeline.ViewModels
             });
 
             CmdMenu = new Command(CmdMenuExecute);
+            CmdTabSegmentTap = new Command(CmdTabSegmentTapExecute);
             CmdNewTimeline = new Command(CmdNewTimelineExecute);
             CmdShowTimeline = new Command(CmdShowTimelineExecute);
             CmdEditTimeline = new Command(CmdEditTimelineExecute);
@@ -104,6 +112,14 @@ namespace Timeline.ViewModels
         private void TimelineInfo_updated(VMTimelineInfo arg1, MTimelineInfo arg2)
         {
             App.services.Database.UpdateUser(User);
+
+            //if it is shared, need to update the shared record, and the tags
+            if (arg2.Shared)
+            {
+                App.services.Database.UpdateSharedTimeline(arg2, User);
+                App.services.Database.UpdateSharedTimelineTags(arg2);
+            }
+
             User.Timelines.ReportItemChange(arg2);
         }
 
@@ -111,6 +127,13 @@ namespace Timeline.ViewModels
         {
             Views.VUserPages mainPage = (App.services.Navigation.UserPagesView() as Views.VUserPages);
             mainPage.IsPresented = true;
+        }
+
+        public void CmdTabSegmentTapExecute(object obj)
+        {
+            RaisePropertyChanged("ShowSegment0");
+            RaisePropertyChanged("ShowSegment1");
+            RaisePropertyChanged("ShowSegment2");
         }
 
         public void CmdNewTimelineExecute(object obj)
@@ -152,6 +175,8 @@ namespace Timeline.ViewModels
             tlinfo.OwnerName = User.UserName;
 
             App.services.Database.ShareTimeline(tlinfo, User);
+            App.services.Database.UpdateUser(User);
+            User.Timelines.ReportItemChange(tlinfo);
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -109,6 +110,83 @@ namespace Timeline.Objects.Database
             catch (Exception ex)
             {
                 Console.WriteLine("StoreSharedTimeline ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task UpdateSharedTimeline(MTimelineInfo tlinfo, MUser user)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "SharedTimelines");
+                tlinfo.OwnerID = user.UserId;
+                tlinfo.OwnerName = user.UserName;
+                await table.UpdateItemAsync(DynamoDBAdapter.TimelineInfo2DynamoDoc(tlinfo));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("UpdateSharedTimeline ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task UpdateSharedTimelineTags(MTimelineInfo tlinfo)
+        {
+            try
+            {
+                //first let's get the TAGs already in the table for this timeline
+                List<string> existingTags = new List<string>();
+                Dictionary<string, AttributeValue> lastKeyEvaluated = null;
+                QueryRequest request = new QueryRequest("SharedTimelineTags");
+                request.IndexName = "timelineid-tag-index";
+                request.ExpressionAttributeValues.Add(":timelineIdValue", new AttributeValue(tlinfo.TimelineId));
+                request.KeyConditionExpression = "timelineid=:timelineIdValue";
+
+                do
+                {
+                    request.ExclusiveStartKey = lastKeyEvaluated;
+                    var response = await client.QueryAsync(request);
+
+                    foreach (Dictionary<string, AttributeValue> data in response.Items)
+                    {
+                        Document doc = Document.FromAttributeMap(data);
+                        if(doc.ContainsKey("tag")) existingTags.Add(doc["tag"]);
+                    }
+
+                    lastKeyEvaluated = response.LastEvaluatedKey;
+                } while (lastKeyEvaluated != null && lastKeyEvaluated.Count != 0);
+
+                //then build a list of the new TAGs
+                List<string> newTags = new List<string>();
+                foreach (string tag in tlinfo.Tags)
+                    if (!existingTags.Contains(tag)) newTags.Add(tag);
+
+                //then build a list of deleted TAGs
+                List<string> deletedTags = new List<string>();
+                foreach (string tag in existingTags)
+                    if (!tlinfo.Tags.Contains(tag)) deletedTags.Add(tag);
+
+                //then delete deleted TAGs
+                Table table;
+                table = Table.LoadTable(client, "SharedTimelineTags");
+                DocumentBatchWrite batchDelete = table.CreateBatchWrite();
+                foreach (string tag in deletedTags) batchDelete.AddKeyToDelete(tag, tlinfo.TimelineId);
+                await batchDelete.ExecuteAsync();
+
+                //then store new TAGs
+                DocumentBatchWrite batchWrite = table.CreateBatchWrite();
+                foreach (string tag in newTags)
+                {
+                    Document tagDoc = new Document();
+                    tagDoc.Add("tag", tag);
+                    tagDoc.Add("timelineid", tlinfo.TimelineId);
+                    batchWrite.AddDocumentToPut(tagDoc);
+                }
+                await batchWrite.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("UpdateSharedTimeline ERROR: " + ex.Message);
                 throw ex;
             }
         }

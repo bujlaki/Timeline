@@ -58,6 +58,16 @@ namespace Timeline.Services
             await ddb.StoreSharedTimeline(tlinfo, user);
         }
 
+        public async Task UpdateSharedTimeline(MTimelineInfo tlinfo, MUser user)
+        {
+            await ddb.UpdateSharedTimeline(tlinfo, user);
+        }
+
+        public async Task UpdateSharedTimelineTags(MTimelineInfo tlinfo)
+        {
+            await ddb.UpdateSharedTimelineTags(tlinfo);
+        }
+
         public async Task StoreEvent(MTimelineEvent tlevent)
         {
             await ddb.StoreEvent(tlevent);

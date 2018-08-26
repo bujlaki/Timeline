@@ -44,6 +44,10 @@ namespace Timeline.Models
             MTimelineInfo target = new MTimelineInfo();
             target.Name = Name;
             target.Description = Description;
+            target.Shared = Shared;
+            target.OwnerID = OwnerID;
+            target.OwnerName = OwnerName;
+            target.Tags = Tags;
 
             target.EventTypes.Clear();
             IDictionaryEnumerator dictionaryEnumerator = EventTypes.GetEnumerator();
@@ -57,6 +61,10 @@ namespace Timeline.Models
         {
             Name = tlinfo.Name;
             Description = tlinfo.Description;
+            Shared = tlinfo.Shared;
+            OwnerID = tlinfo.OwnerID;
+            OwnerName = tlinfo.OwnerName;
+            Tags = tlinfo.Tags;
 
             EventTypes.Clear();
             IDictionaryEnumerator dictionaryEnumerator = tlinfo.EventTypes.GetEnumerator();
