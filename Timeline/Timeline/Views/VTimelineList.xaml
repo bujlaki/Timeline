@@ -212,10 +212,9 @@
                         </Image>
                     </Grid>
                     <ListView Grid.Row="1"
-                              ItemsSource="{Binding User.Timelines}"
+                              ItemsSource="{Binding TimelineSearchResults}"
                               Margin="30,0,30,0"
                               RowHeight="120"
-                              SelectedItem="{Binding SelectedTimeline, Mode=TwoWay}"
                               x:Name="sharedListView">
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -239,7 +238,6 @@
                                                                           CommandParameter="{Binding .}"/>
                                                 </Image.GestureRecognizers>
                                             </Image>
-
                                         </Grid>
 
                                         <StackLayout Grid.Row="1" Orientation="Vertical">

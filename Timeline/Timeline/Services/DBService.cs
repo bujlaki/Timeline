@@ -68,6 +68,11 @@ namespace Timeline.Services
             await ddb.UpdateSharedTimelineTags(tlinfo);
         }
 
+        public async Task<List<MTimelineInfo>> SearchSharedTimeline(string tag)
+        {
+
+        }
+
         public async Task StoreEvent(MTimelineEvent tlevent)
         {
             await ddb.StoreEvent(tlevent);

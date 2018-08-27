@@ -190,6 +190,45 @@ namespace Timeline.Objects.Database
                 throw ex;
             }
         }
+
+        public async Task<List<MTimelineInfo>> SearchTimelinesForTag(string tag)
+        {
+            try
+            {
+                List<string> resultIds = new List<string>();
+
+                Dictionary<string, AttributeValue> lastKeyEvaluated = null;
+
+                QueryRequest request = new QueryRequest("TimelineEvents");
+                request.IndexName = "timelineid-startdate-index";
+                request.ExpressionAttributeValues.Add(":timelineIdValue", new AttributeValue(timelineId));
+                request.KeyConditionExpression = "timelineid=:timelineIdValue";
+
+                do
+                {
+                    request.ExclusiveStartKey = lastKeyEvaluated;
+
+                    var response = await client.QueryAsync(request);
+
+                    foreach (Dictionary<string, AttributeValue> data in response.Items)
+                    {
+                        Document doc = Document.FromAttributeMap(data);
+                        results.Add(DynamoDBAdapter.DynamoDoc2TimelineEvent(doc));
+                    }
+
+                    lastKeyEvaluated = response.LastEvaluatedKey;
+
+                } while (lastKeyEvaluated != null && lastKeyEvaluated.Count != 0);
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GetEvents ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+            
         #endregion
 
         #region "MTimelineEvent"

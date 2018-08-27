@@ -62,7 +62,8 @@ namespace Timeline.ViewModels
             set { _user = value; RaisePropertyChanged("User"); }
         }
 
-        public ObservableCollection<MTimelineInfo> Timelines;
+        //public ObservableCollection<MTimelineInfo> Timelines;
+        public ObservableCollection<MTimelineInfo> TimelineSearchResults;
 
         //tab segments
         public int SelectedSegment { get; set; }
@@ -78,6 +79,7 @@ namespace Timeline.ViewModels
         public Command CmdEditTimeline { get; set; }
         public Command CmdDeleteTimeline { get; set; }
         public Command CmdShareTimeline { get; set; }
+        public Command CmdSearch { get; set; }
 
 
         public VMUserPages() : base()
@@ -97,6 +99,7 @@ namespace Timeline.ViewModels
             CmdEditTimeline = new Command(CmdEditTimelineExecute);
             CmdDeleteTimeline = new Command(CmdDeleteTimelineExecute);
             CmdShareTimeline = new Command(CmdShareTimelineExecute);
+            CmdSearch = new Command(CmdSearchExecute);
 
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
@@ -177,6 +180,11 @@ namespace Timeline.ViewModels
             App.services.Database.ShareTimeline(tlinfo, User);
             App.services.Database.UpdateUser(User);
             User.Timelines.ReportItemChange(tlinfo);
+        }
+
+        public void CmdSearchExecute(object obj)
+        {
+            
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)
