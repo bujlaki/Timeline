@@ -10,6 +10,7 @@ using Android.OS;
 using Xamarin.Auth;
 using Plugin.CurrentActivity;
 using Acr.UserDialogs;
+using Android.Gms.Ads;
 
 namespace Timeline.Droid
 {
@@ -32,6 +33,9 @@ namespace Timeline.Droid
 
             //initialize UserDialogs
             UserDialogs.Init(this);
+
+            //initialize Ads
+            MobileAds.Initialize(ApplicationContext, "ca-app-pub-5812987721297534~6792480507");
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());

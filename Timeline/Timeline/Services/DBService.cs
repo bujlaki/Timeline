@@ -70,7 +70,9 @@ namespace Timeline.Services
 
         public async Task<List<MTimelineInfo>> SearchSharedTimeline(string tag)
         {
+            List<string> idList = await ddb.SearchSharedTimelinesForTag(tag);
 
+            return await ddb.GetSharedTimelinesForIDs(idList);
         }
 
         public async Task StoreEvent(MTimelineEvent tlevent)

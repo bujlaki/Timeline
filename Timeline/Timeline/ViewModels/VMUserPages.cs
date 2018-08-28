@@ -38,6 +38,7 @@ namespace Timeline.ViewModels
     {
         //private MTimelineInfo selectedTimeline;
         //private TimelineTheme theme;
+        public string SearchText { get; set; }
 
         public ObservableCollection<UserPagesMenuItem> MenuItems { get; set; }
 
@@ -63,7 +64,7 @@ namespace Timeline.ViewModels
         }
 
         //public ObservableCollection<MTimelineInfo> Timelines;
-        public ObservableCollection<MTimelineInfo> TimelineSearchResults;
+        public ObservableCollection<MTimelineInfo> TimelineSearchResults { get; set; }
 
         //tab segments
         public int SelectedSegment { get; set; }
@@ -182,9 +183,10 @@ namespace Timeline.ViewModels
             User.Timelines.ReportItemChange(tlinfo);
         }
 
-        public void CmdSearchExecute(object obj)
+        public async void CmdSearchExecute(object obj)
         {
-            
+            TimelineSearchResults = new ObservableCollection<MTimelineInfo>(await App.services.Database.SearchSharedTimeline(SearchText));
+            RaisePropertyChanged("TimelineSearchResults");
         }
 
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)

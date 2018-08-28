@@ -191,7 +191,7 @@ namespace Timeline.Objects.Database
             }
         }
 
-        public async Task<List<MTimelineInfo>> SearchTimelinesForTag(string tag)
+        public async Task<List<string>> SearchSharedTimelinesForTag(string tag)
         {
             try
             {
@@ -199,36 +199,48 @@ namespace Timeline.Objects.Database
 
                 Dictionary<string, AttributeValue> lastKeyEvaluated = null;
 
-                QueryRequest request = new QueryRequest("TimelineEvents");
-                request.IndexName = "timelineid-startdate-index";
-                request.ExpressionAttributeValues.Add(":timelineIdValue", new AttributeValue(timelineId));
-                request.KeyConditionExpression = "timelineid=:timelineIdValue";
+                QueryRequest request = new QueryRequest("SharedTimelineTags");
+                request.ExpressionAttributeValues.Add(":tagValue", new AttributeValue(tag));
+                request.KeyConditionExpression = "tag=:tagValue";
 
-                do
-                {
+                do {
                     request.ExclusiveStartKey = lastKeyEvaluated;
-
                     var response = await client.QueryAsync(request);
-
-                    foreach (Dictionary<string, AttributeValue> data in response.Items)
-                    {
-                        Document doc = Document.FromAttributeMap(data);
-                        results.Add(DynamoDBAdapter.DynamoDoc2TimelineEvent(doc));
-                    }
-
+                    foreach (Dictionary<string, AttributeValue> data in response.Items) resultIds.Add(data["timelineid"].S);
                     lastKeyEvaluated = response.LastEvaluatedKey;
 
                 } while (lastKeyEvaluated != null && lastKeyEvaluated.Count != 0);
 
-                return results;
+                return resultIds;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GetEvents ERROR: " + ex.Message);
+                Console.WriteLine("SearchTimelinesForTag ERROR: " + ex.Message);
                 throw ex;
             }
         }
             
+        public async Task<List<MTimelineInfo>> GetSharedTimelinesForIDs(List<string> idList)
+        {
+            try
+            {
+                List<MTimelineInfo> results = new List<MTimelineInfo>();
+
+                Table table = Table.LoadTable(client, "SharedTimelines");
+                DocumentBatchGet batchGet = table.CreateBatchGet();
+                foreach (string id in idList) batchGet.AddKey(id);
+
+                await batchGet.ExecuteAsync();
+
+                foreach (Document doc in batchGet.Results) results.Add(DynamoDBAdapter.DynamoDoc2TimelineInfo(doc));
+                return results;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GetTimelinesForIDs ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
         #endregion
 
         #region "MTimelineEvent"

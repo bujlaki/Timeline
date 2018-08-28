@@ -13,7 +13,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="7*"/>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                
                 <tabcontrol:SegmentedTabControl Grid.Row="0" Margin="20,0,20,0"
@@ -207,7 +207,7 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Center">
                             <Image.GestureRecognizers>
-                                <TapGestureRecognizer Command="CmdSearch"/>
+                                <TapGestureRecognizer Command="{Binding CmdSearch}"/>
                             </Image.GestureRecognizers>
                         </Image>
                     </Grid>
@@ -262,6 +262,9 @@
                     </ListView>
                 </Grid>
                 
+                
+                <!-- AD -->
+                <controls:AdControlView Grid.Row="2"/>
             </Grid>
         </AbsoluteLayout>
     </ContentView>
