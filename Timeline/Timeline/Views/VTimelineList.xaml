@@ -6,14 +6,15 @@
              x:Class="Timeline.Views.VTimelineList"
              Title="TimelineList"
              NavigationPage.HasNavigationBar="False"
-             BackgroundColor="#234b64">
+             BackgroundColor="#234b64"
+             Padding="0">
     <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
-        <AbsoluteLayout>
-            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1">
+        <AbsoluteLayout Padding="0">
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" Padding="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="7*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="60"/>
                 </Grid.RowDefinitions>
                
                 <tabcontrol:SegmentedTabControl Grid.Row="0" Margin="20,0,20,0"
@@ -264,7 +265,7 @@
                 
                 
                 <!-- AD -->
-                <controls:AdControlView Grid.Row="2"/>
+                <controls:AdControlView Grid.Row="2" Margin="0"/>
             </Grid>
         </AbsoluteLayout>
     </ContentView>
