@@ -35,7 +35,8 @@ namespace Timeline.Droid
             UserDialogs.Init(this);
 
             //initialize Ads
-            MobileAds.Initialize(ApplicationContext, "ca-app-pub-5812987721297534~6792480507");
+            //MobileAds.Initialize(ApplicationContext, "ca-app-pub-5812987721297534~6792480507");
+            MobileAds.Initialize(this, "ca-app-pub-5812987721297534~6792480507");
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
