@@ -29,9 +29,13 @@ namespace Timeline.ViewModels
         public Command CmdPictogram { get; set; }
         public Command CmdCreate { get; set; }
         public Command CmdUpdate { get; set; }
+        public Command CmdTabSegmentTap { get; set; }
 
         public string PageTitle { get; set; }
         public bool IsNewEvent { get; set; }
+        public int SelectedSegment { get; set; }
+        public bool ShowSegment1 { get; set; }
+        public bool ShowSegment2 { get; set; }
 
         private MTimelineEvent tlevent;
         public MTimelineEvent Event {
@@ -225,6 +229,8 @@ namespace Timeline.ViewModels
 
             CmdDigitUp = new Command(CmdDigitUpExecute);
             CmdDigitDown = new Command(CmdDigitDownExecute);
+
+            CmdTabSegmentTap = new Command(CmdTabSegmentTapExecute);
 
             DatePickerVisible = false;
 
@@ -515,6 +521,21 @@ namespace Timeline.ViewModels
 
             MessagingCenter.Send<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", this.Event);
             App.services.Navigation.GoBack();
+        }
+
+        private void CmdTabSegmentTapExecute(object obj)
+        {
+            if (SelectedSegment == 1)
+            {
+                ShowSegment1 = true;
+                ShowSegment2 = false;
+            }else
+            {
+                ShowSegment1 = false;
+                ShowSegment2 = true;
+            }
+            RaisePropertyChanged("ShowSegment1");
+            RaisePropertyChanged("ShowSegment2");
         }
     }
 }
