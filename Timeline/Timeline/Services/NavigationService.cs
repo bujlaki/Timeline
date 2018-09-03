@@ -106,6 +106,7 @@ namespace Timeline.Services
 
         public void GoToSignupPage()
         {
+            _vmLocator.SignupViewModel.PolicyAccepted = false;
             _navigation.PushModalAsync(signupView.Value);
         }
 

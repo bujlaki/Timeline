@@ -44,7 +44,7 @@ namespace Timeline.Objects.Timeline
         public void Load(string userid)
         {
             TimelinePaint = new SKPaint();
-            TimelinePaint.Color = SKColor.Parse(Preferences.Get("timeline_color", "#bfd9f3"));
+            TimelinePaint.Color = SKColor.Parse(Preferences.Get("timeline_color", skia.Extensions.ToSKColor(bkgColor3).ToString()));
 
             UnitMarkPaint = new SKPaint();
             UnitMarkPaint.Color = SKColor.Parse(Preferences.Get("unitmark_color", SKColors.Black.ToString()));
@@ -60,7 +60,7 @@ namespace Timeline.Objects.Timeline
             SubUnitTextPaint.Color = SKColor.Parse(Preferences.Get("subunittext_color", SKColors.DimGray.ToString()));
 
             HighlightPaint = new SKPaint();
-            HighlightPaint.Color = SKColor.Parse(Preferences.Get("highlight_color", skia.Extensions.ToSKColor(bkgColor3).ToString()));
+            HighlightPaint.Color = SKColor.Parse(Preferences.Get("highlight_color", skia.Extensions.ToSKColor(textColor2).ToString()));
 
             EventPaint = new SKPaint();
             EventPaint.Color = SKColor.Parse(Preferences.Get("event_color", skia.Extensions.ToSKColor(bkgColor2).ToString()));

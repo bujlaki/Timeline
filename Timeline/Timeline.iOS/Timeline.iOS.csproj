@@ -218,4 +218,16 @@
   <ItemGroup>
     <BundleResource Include="Resources\eye32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\checkedimage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\uncheckedimage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\checkedimage24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\uncheckedimage24.png" />
+  </ItemGroup>
 </Project>

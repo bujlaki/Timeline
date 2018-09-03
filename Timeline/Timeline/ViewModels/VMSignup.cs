@@ -13,6 +13,12 @@ namespace Timeline.ViewModels
         string username;
         string password;
         string email;
+        bool policyAccepted;
+
+        public bool PolicyAccepted {
+            get { return policyAccepted; }
+            set { policyAccepted = value; RaisePropertyChanged("PolicyAccepted"); }
+        }
 
         public Command CmdSignup { get; set; }
 
