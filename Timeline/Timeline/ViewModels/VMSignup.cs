@@ -20,6 +20,7 @@ namespace Timeline.ViewModels
             set { policyAccepted = value; RaisePropertyChanged("PolicyAccepted"); }
         }
 
+        public Command CmdPrivacyPolicy { get; set; }
         public Command CmdSignup { get; set; }
 
         public string Username
@@ -43,16 +44,39 @@ namespace Timeline.ViewModels
         public VMSignup() : base()
         {            
             CmdSignup = new Command(CmdSignupExecute);
+            CmdPrivacyPolicy = new Command(CmdPrivacyPolicyExecute);
         }
 
         void CmdSignupExecute(object obj)
         {
+            if(!PolicyAccepted)
+            {
+                AlertConfig ac = new AlertConfig();
+                ac.Title = "Your consent is required";
+                ac.Message = "You have to accept the Privacy Policy to create a new Timeline account.";
+                UserDialogs.Instance.Alert(ac);
+                return;
+            }
+
             Busy = true;
             BusyMessage = "Signing up...";
             Task.Run(async () =>
             {
                 await App.services.Authentication.SignupCognito(username, password, email, this);
             });
+        }
+
+        void CmdPrivacyPolicyExecute(object obj)
+        {
+            string s = "this is an example text";
+            string msg = "";
+            for (int i = 0; i < 100; i++) msg = msg + s + " ";
+
+            AlertConfig ac = new AlertConfig();
+            ac.Title = "Privacy Policy";
+            ac.Message = msg;
+
+            UserDialogs.Instance.Alert(ac);
         }
 
         public void OnAuthCompleted()

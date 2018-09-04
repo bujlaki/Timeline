@@ -6,9 +6,59 @@
              NavigationPage.HasNavigationBar="False"
              BackgroundColor="#234b64">
     <ContentView ControlTemplate="{StaticResource UserPagesTemplate}">
-        <StackLayout>
-            <Label Text="OPTIONS"
-                   Style="{StaticResource titleLabel}"/>
-        </StackLayout>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <ScrollView Grid.Row="0">
+                <StackLayout>
+                    <Label Text="OPTIONS"
+                       Style="{StaticResource titleLabel}"/>
+
+                    <Grid Margin="25, 10, 25, 10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0"
+                           Style="{StaticResource fieldLabel}"
+                           Text="Allow using my e-mail address to send me the latest Timeline news"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding OptAllowEmail}" OnColor="{StaticResource textColor2}"/>
+                    </Grid>
+
+                    <Grid Margin="25, 10, 25, 10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0"
+                           Style="{StaticResource fieldLabel}"
+                           Text="Allow tracking my location using GPS coordinates"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding OptAllowGPS}" OnColor="{StaticResource textColor2}"/>
+                    </Grid>
+
+                    <Label Margin="25, 10, 25, 10"
+                       Text="Read the Privacy Policy"
+                       Style="{StaticResource linkLabel}"
+                       HorizontalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CmdPrivacyPolicy}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </ScrollView>
+
+            <Label Grid.Row="1"
+                   Style="{StaticResource linkLabel}"
+                   Text="Delete user account"
+                   HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CmdDeleteAccount}"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+        
     </ContentView>
 </ContentPage>

@@ -81,6 +81,8 @@ namespace Timeline.ViewModels
         public Command CmdDeleteTimeline { get; set; }
         public Command CmdShareTimeline { get; set; }
         public Command CmdSearch { get; set; }
+        public Command CmdPrivacyPolicy { get; set; }
+        public Command CmdDeleteAccount { get; set; }
 
 
         public VMUserPages() : base()
@@ -90,7 +92,6 @@ namespace Timeline.ViewModels
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.Timelines, "My Timelines"),
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.Options, "Options" ),
                     new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.SignOut, "Sign out" ),
-                    new UserPagesMenuItem (UserPagesMenuItem.MenuItemID.Test, "Test"),
             });
 
             CmdMenu = new Command(CmdMenuExecute);
@@ -101,6 +102,8 @@ namespace Timeline.ViewModels
             CmdDeleteTimeline = new Command(CmdDeleteTimelineExecute);
             CmdShareTimeline = new Command(CmdShareTimelineExecute);
             CmdSearch = new Command(CmdSearchExecute);
+            CmdPrivacyPolicy = new Command(CmdPrivacyPolicyExecute);
+            CmdDeleteAccount = new Command(CmdDeleteAccountExecute);
 
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
@@ -189,6 +192,58 @@ namespace Timeline.ViewModels
             RaisePropertyChanged("TimelineSearchResults");
         }
 
+        void CmdPrivacyPolicyExecute(object obj)
+        {
+            string s = "this is an example text";
+            string msg = "";
+            for (int i = 0; i < 100; i++) msg = msg + s + " ";
+
+            AlertConfig ac = new AlertConfig();
+            ac.Title = "Privacy Policy";
+            ac.Message = msg;
+
+            UserDialogs.Instance.Alert(ac);
+        }
+
+        void CmdDeleteAccountExecute(object obj)
+        {
+            Task.Run(async () =>
+            {
+                ConfirmConfig cc = new ConfirmConfig();
+                cc.Title = "Delete user account";
+                cc.Message = "Are you sure to delete your account? This means your user data and all Timelines (including shared ones) will be deleted along with their event data.";
+                if (await UserDialogs.Instance.ConfirmAsync(cc))
+                {
+                    List<string> sharedTimelineIds = new List<string>();
+                    foreach (MTimelineInfo tlinfo in User.Timelines)
+                    {
+                        //remove shared timeline tags
+                        if (tlinfo.Shared)
+                        {
+                            await App.services.Database.DeleteSharedTimelineTags(tlinfo);
+                            sharedTimelineIds.Add(tlinfo.TimelineId);
+                        }
+
+                        //delete timeline events
+                        await App.services.Database.DeleteEventsByTimelineId(tlinfo.TimelineId);
+                    }
+
+                    //delete shared timelines
+                    if (sharedTimelineIds.Count > 0)
+                        await App.services.Database.DeleteSharedTimelinesByIDs(sharedTimelineIds);
+
+                    //delete user from DB
+                    await App.services.Database.DeleteUser(User);
+
+                    //delete Cognito user
+                    if(App.services.Authentication.Login.Type == Objects.Auth.LoginType.Cognito)
+                    {
+                        await App.services.Authentication.DeleteCognitoUser(User.UserName);
+                    }
+                }
+            });
+        }
+
         private void HandleMenuItem(UserPagesMenuItem.MenuItemID id)
         {
             Views.VUserPages mainPage = (App.services.Navigation.UserPagesView() as Views.VUserPages);
@@ -204,9 +259,9 @@ namespace Timeline.ViewModels
                     App.services.Authentication.SignOut();
                     App.services.Navigation.GoToLoginPage();
                     break;
-                case UserPagesMenuItem.MenuItemID.Test:
-                    App.services.Navigation.GoToTestPage();
-                    break;
+                //case UserPagesMenuItem.MenuItemID.Test:
+                //    App.services.Navigation.GoToTestPage();
+                //    break;
             }
             mainPage.IsPresented = false;
         }

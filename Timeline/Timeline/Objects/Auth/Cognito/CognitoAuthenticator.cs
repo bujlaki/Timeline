@@ -177,5 +177,13 @@ namespace Timeline.Objects.Auth.Cognito
             }
         }
 
+        public async Task DeleteUser(string username)
+        {
+            AmazonCognitoIdentityProviderClient provider = new AmazonCognitoIdentityProviderClient(new Amazon.Runtime.AnonymousAWSCredentials(), RegionEndpoint.EUCentral1);
+            CognitoUserPool userPool = new CognitoUserPool(this.USERPOOL_ID, this.CLIENTAPP_ID, provider);
+            CognitoUser user = new CognitoUser(username, this.CLIENTAPP_ID, userPool, provider);
+
+            await user.DeleteUserAsync();
+        }
     }
 }

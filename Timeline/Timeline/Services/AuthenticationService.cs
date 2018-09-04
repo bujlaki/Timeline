@@ -116,6 +116,11 @@ namespace Timeline.Services
             googleAuth.ReInit();
         }
 
+        public async Task DeleteCognitoUser(string username)
+        {
+            await cognitoAuth.DeleteUser(username);
+        }
+
         public void OnGoogleAuthCanceled()
         {
             Login.Clear();

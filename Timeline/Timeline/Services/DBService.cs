@@ -41,6 +41,11 @@ namespace Timeline.Services
             await ddb.UpdateUser(user);
         }
 
+        public async Task DeleteUser(MUser user)
+        {
+            await ddb.DeleteUser(user);
+        }
+
         public async Task<MUser> GetUser(string userId)
         {
             return await ddb.GetUserById(userId);
@@ -68,11 +73,21 @@ namespace Timeline.Services
             await ddb.UpdateSharedTimelineTags(tlinfo);
         }
 
+        public async Task DeleteSharedTimelineTags(MTimelineInfo tlinfo)
+        {
+            await ddb.DeleteSharedTimelineTags(tlinfo);
+        }
+
         public async Task<List<MTimelineInfo>> SearchSharedTimeline(string tag)
         {
             List<string> idList = await ddb.SearchSharedTimelinesForTag(tag);
 
             return await ddb.GetSharedTimelinesForIDs(idList);
+        }
+
+        public async Task DeleteSharedTimelinesByIDs(List<string> idList)
+        {
+            await ddb.DeleteSharedTimelinesByIDs(idList);
         }
 
         public async Task StoreEvent(MTimelineEvent tlevent)
@@ -100,5 +115,9 @@ namespace Timeline.Services
             return await ddb.GetEvents(timelineId);
         }
 
+        public async Task DeleteEventsByTimelineId(string timelineId)
+        {
+            await ddb.DeleteEventsByTimelineId(timelineId);
+        }
     }
 }

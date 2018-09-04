@@ -17,6 +17,7 @@ namespace Timeline.Services
         Task SignupCognito(string username, string password, string email, ISignupDelegate signupDelegate);
         Task VerifyUserCognito(string username, string verificationCode, IAccountVerificationDelegate verificationDelegate);
         void SignOut();
+        Task DeleteCognitoUser(string username);
     }
 
     public interface IAuthenticationDelegate

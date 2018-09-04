@@ -191,6 +191,23 @@ namespace Timeline.Objects.Database
             }
         }
 
+        public async Task DeleteSharedTimelineTags(MTimelineInfo tlinfo)
+        {
+            try
+            {
+                if (tlinfo.Tags.Length == 0) return;
+                Table table = Table.LoadTable(client, "SharedTimelineTags");
+                DocumentBatchWrite batchDelete = table.CreateBatchWrite();
+                foreach (string tag in tlinfo.Tags) batchDelete.AddKeyToDelete(tag, tlinfo.TimelineId);
+                await batchDelete.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DeleteSharedTimelineTags ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task<List<string>> SearchSharedTimelinesForTag(string tag)
         {
             try
@@ -238,6 +255,23 @@ namespace Timeline.Objects.Database
             catch (Exception ex)
             {
                 Console.WriteLine("GetTimelinesForIDs ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task DeleteSharedTimelinesByIDs(List<string> idList)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "SharedTimelines");
+                DocumentBatchWrite batchWrite = table.CreateBatchWrite();
+                
+                foreach (string id in idList) batchWrite.AddKeyToDelete(id);
+                await batchWrite.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DeleteSharedTimelinesByIDs ERROR: " + ex.Message);
                 throw ex;
             }
         }
@@ -337,6 +371,28 @@ namespace Timeline.Objects.Database
             catch (Exception ex)
             {
                 Console.WriteLine("GetEvents ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
+        public async Task DeleteEventsByTimelineId(string timelineId)
+        {
+            try
+            {
+                List<MTimelineEvent> events = await GetEvents(timelineId);
+
+                if (events.Count == 0) return;
+
+                Table table = Table.LoadTable(client, "TimelineEvents");
+                DocumentBatchWrite batchWrite = table.CreateBatchWrite();
+
+                foreach (MTimelineEvent tlevent in events) batchWrite.AddKeyToDelete(tlevent.TimelineId, tlevent.EventId);
+
+                await batchWrite.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DeleteEventsByTimelineId ERROR: " + ex.Message);
                 throw ex;
             }
         }
