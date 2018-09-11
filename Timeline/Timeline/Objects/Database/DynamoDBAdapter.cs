@@ -18,9 +18,15 @@ namespace Timeline.Objects.Database
             doc.Add("userid", user.UserId);
             doc.Add("username", user.UserName);
             doc.Add("email", user.Email);
+
             Document timelines = new Document();
             foreach (MTimelineInfo tli in user.Timelines) timelines.Add(tli.TimelineId, TimelineInfo2DynamoDoc(tli));
             doc.Add("timelines", timelines);
+
+            DynamoDBList favorites = new DynamoDBList();
+            foreach (string fav in user.Favorites) favorites.Add(fav);
+            doc.Add("favorites", favorites);
+
             return doc;
         }
 
@@ -32,10 +38,14 @@ namespace Timeline.Objects.Database
             user.UserId = doc["userid"].AsString();
             user.UserName = doc.ContainsKey("username") ? doc["username"].AsString() : "";
             user.Email = doc.ContainsKey("email") ? doc["email"].AsString() : "";
+
             var listTimelineInfo = doc.ContainsKey("timelines") ? doc["timelines"].AsDocument() : null;
-            
             if (listTimelineInfo != null)
                 foreach (Document infoItem in listTimelineInfo.Values) user.Timelines.Add( DynamoDoc2TimelineInfo(infoItem) );
+
+            var listFavorites = doc.ContainsKey("favorites") ? doc["favorites"].AsDynamoDBList() : null;
+            if (listFavorites != null)
+                foreach (DynamoDBEntry entry in listFavorites.Entries) user.Favorites.Add(entry.AsString());
 
             return user;
         }

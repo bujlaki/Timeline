@@ -296,7 +296,8 @@
                                                 TintColor="{StaticResource bkgColor2}" 
                                                 SelectedSegment="{Binding SelectedSegment, Mode=TwoWay}"
                                                 Command="{Binding CmdTabSegmentTap}"
-                                                VerticalOptions="Center">
+                                                VerticalOptions="Center"
+                                                HeightRequest="40">
                     <tabcontrol:SegmentedTabControl.Children>
                         <Label Text="Main data" />
                         <Label Text="Custom data" />

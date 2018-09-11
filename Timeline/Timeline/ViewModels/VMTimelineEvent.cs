@@ -252,6 +252,15 @@ namespace Timeline.ViewModels
             MessagingCenter.Subscribe<VMPictograms, string>(this, "Pictogram_selected", Pictogram_selected);
         }
 
+        public void InitView(MTimelineEvent tlevent)
+        {
+            Event = tlevent;
+            ShowSegment1 = true;
+            ShowSegment2 = false;
+            RaisePropertyChanged("ShowSegment1");
+            RaisePropertyChanged("ShowSegment2");
+        }
+
         private void CmdDigitUpExecute(object obj)
         {
             switch(int.Parse(obj.ToString()))
@@ -525,7 +534,7 @@ namespace Timeline.ViewModels
 
         private void CmdTabSegmentTapExecute(object obj)
         {
-            if (SelectedSegment == 1)
+            if (SelectedSegment == 0)
             {
                 ShowSegment1 = true;
                 ShowSegment2 = false;

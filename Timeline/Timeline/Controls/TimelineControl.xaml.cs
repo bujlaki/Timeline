@@ -667,17 +667,17 @@ namespace Timeline.Controls
 
                 if (summarySubUnit)
                 {
-                    canvas.DrawRect(startX, eventsTopY, pixelsPerSubUnit - 4, laneHeight - 1, theme.EventPaint);
+                    canvas.DrawRect(startX, eventsTopY + lanesOffsetY, pixelsPerSubUnit - 4, laneHeight - 1, theme.EventPaint);
                     eventTextPath = new SKPath();
-                    eventTextPath.MoveTo(startX, eventsTopY + (laneHeight - 1) / 2);
-                    eventTextPath.LineTo(startX + pixelsPerSubUnit - 4, eventsTopY + (laneHeight - 1) / 2);
+                    eventTextPath.MoveTo(startX, eventsTopY + (laneHeight - 1) / 2 + lanesOffsetY);
+                    eventTextPath.LineTo(startX + pixelsPerSubUnit - 4, eventsTopY + (laneHeight - 1) / 2 + lanesOffsetY);
                 }
                 else
                 {
-                    canvas.DrawRect(startX, eventsTopY, pixelsPerUnit - 4, laneHeight - 1, theme.EventPaint);
+                    canvas.DrawRect(startX, eventsTopY + lanesOffsetY, pixelsPerUnit - 4, laneHeight - 1, theme.EventPaint);
                     eventTextPath = new SKPath();
-                    eventTextPath.MoveTo(startX, eventsTopY + (laneHeight - 1) / 2);
-                    eventTextPath.LineTo(startX + pixelsPerUnit - 4, eventsTopY + (laneHeight - 1) / 2);
+                    eventTextPath.MoveTo(startX, eventsTopY + (laneHeight - 1) / 2 + lanesOffsetY);
+                    eventTextPath.LineTo(startX + pixelsPerUnit - 4, eventsTopY + (laneHeight - 1) / 2 + lanesOffsetY);
                 }
                 canvas.DrawTextOnPath("-"+summary[key].ToString()+"-", eventTextPath, new SKPoint(0, theme.SummaryTextPaint.FontMetrics.CapHeight/2), theme.SummaryTextPaint);
             }

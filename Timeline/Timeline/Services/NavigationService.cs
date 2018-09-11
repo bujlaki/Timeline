@@ -113,7 +113,9 @@ namespace Timeline.Services
         public void GoToUserPagesPage(string userid, bool clearStack = false)
         {
             //set the user
-            _vmLocator.UserPagesViewModel.User = Task.Run(async () => await App.services.Database.GetUser(userid)).Result;
+            MUser u = Task.Run(async () => await App.services.Database.GetUser(userid)).Result;
+            _vmLocator.UserPagesViewModel.InitView(u);
+            //_vmLocator.UserPagesViewModel.User = Task.Run(async () => await App.services.Database.GetUser(userid)).Result;
             
             if (clearStack)
             {
@@ -148,7 +150,7 @@ namespace Timeline.Services
 
         public void GoToTimelineEventView(MTimelineEvent tlevent)
         {
-            _vmLocator.TimelineEventViewModel.Event = tlevent;
+            _vmLocator.TimelineEventViewModel.InitView(tlevent);
             if (string.IsNullOrEmpty(tlevent.Title))
             {
                 _vmLocator.TimelineEventViewModel.PageTitle = "CREATE EVENT";

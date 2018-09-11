@@ -230,4 +230,7 @@
   <ItemGroup>
     <BundleResource Include="Resources\uncheckedimage24.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\favorite32.png" />
+  </ItemGroup>
 </Project>

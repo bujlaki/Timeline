@@ -236,7 +236,22 @@ namespace Timeline.Objects.Database
                 throw ex;
             }
         }
-            
+
+        public async Task<MTimelineInfo> GetSharedTimelineForID(string id)
+        {
+            try
+            {
+                Table table = Table.LoadTable(client, "SharedTimelines");
+                Document doc = await table.GetItemAsync(id);
+                return DynamoDBAdapter.DynamoDoc2TimelineInfo(doc);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GetSharedTimelineForID ERROR: " + ex.Message);
+                throw ex;
+            }
+        }
+
         public async Task<List<MTimelineInfo>> GetSharedTimelinesForIDs(List<string> idList)
         {
             try
@@ -254,7 +269,7 @@ namespace Timeline.Objects.Database
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GetTimelinesForIDs ERROR: " + ex.Message);
+                Console.WriteLine("GetSharedTimelinesForIDs ERROR: " + ex.Message);
                 throw ex;
             }
         }

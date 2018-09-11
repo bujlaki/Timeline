@@ -18,10 +18,12 @@ namespace Timeline.Models
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
         public CustomObservableCollection<MTimelineInfo> Timelines { get; set; }
+        public List<string> Favorites { get; set; }
 
         public MUser()
         {
             Timelines = new CustomObservableCollection<MTimelineInfo>();
+            Favorites = new List<string>();
             Clear();
         }
 

@@ -85,6 +85,16 @@ namespace Timeline.Services
             return await ddb.GetSharedTimelinesForIDs(idList);
         }
 
+        public async Task<MTimelineInfo> GetSharedTimelineByID(string id)
+        {
+            return await ddb.GetSharedTimelineForID(id);
+        }
+
+        public async Task<List<MTimelineInfo>> GetSharedTimelinesByIDs(List<string> idList)
+        {
+            return await ddb.GetSharedTimelinesForIDs(idList);
+        }
+
         public async Task DeleteSharedTimelinesByIDs(List<string> idList)
         {
             await ddb.DeleteSharedTimelinesByIDs(idList);

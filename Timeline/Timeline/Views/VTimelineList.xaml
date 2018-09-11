@@ -136,7 +136,7 @@
                     </Grid.RowDefinitions>
 
                     <ListView Grid.Row="0"
-                              ItemsSource="{Binding User.Timelines}"
+                              ItemsSource="{Binding TimelineFavorites}"
                               Margin="30,0,30,0"
                               RowHeight="120"
                               SelectedItem="{Binding SelectedTimeline, Mode=TwoWay}"
@@ -231,9 +231,17 @@
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="45"/>
+                                                <ColumnDefinition Width="45"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <Image Grid.Column="1" Source="eye32" HorizontalOptions="Center" VerticalOptions="Center" Margin="2">
+                                            <Image Grid.Column="1" Source="favorite32" HorizontalOptions="Center" VerticalOptions="Center" Margin="2">
+                                                <Image.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference listView},Path=BindingContext.CmdAddToFavorite}" 
+                                                                          CommandParameter="{Binding .}"/>
+                                                </Image.GestureRecognizers>
+                                            </Image>
+                                            
+                                            <Image Grid.Column="2" Source="eye32" HorizontalOptions="Center" VerticalOptions="Center" Margin="2">
                                                 <Image.GestureRecognizers>
                                                     <TapGestureRecognizer Command="{Binding Source={x:Reference listView},Path=BindingContext.CmdShowTimeline}" 
                                                                           CommandParameter="{Binding .}"/>

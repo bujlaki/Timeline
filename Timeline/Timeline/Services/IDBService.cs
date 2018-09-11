@@ -22,6 +22,8 @@ namespace Timeline.Services
         Task UpdateSharedTimelineTags(MTimelineInfo tlinfo);
         Task DeleteSharedTimelineTags(MTimelineInfo tlinfo);
         Task<List<MTimelineInfo>> SearchSharedTimeline(string tag);
+        Task<MTimelineInfo> GetSharedTimelineByID(string id);
+        Task<List<MTimelineInfo>> GetSharedTimelinesByIDs(List<string> idList);
         Task DeleteSharedTimelinesByIDs(List<string> idList);
         Task StoreEvent(MTimelineEvent tlevent);
         Task DeleteEvent(MTimelineEvent tlevent);

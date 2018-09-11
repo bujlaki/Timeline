@@ -65,6 +65,7 @@ namespace Timeline.ViewModels
 
         //public ObservableCollection<MTimelineInfo> Timelines;
         public ObservableCollection<MTimelineInfo> TimelineSearchResults { get; set; }
+        public ObservableCollection<MTimelineInfo> TimelineFavorites { get; set; }
 
         //tab segments
         public int SelectedSegment { get; set; }
@@ -80,6 +81,7 @@ namespace Timeline.ViewModels
         public Command CmdEditTimeline { get; set; }
         public Command CmdDeleteTimeline { get; set; }
         public Command CmdShareTimeline { get; set; }
+        public Command CmdAddToFavorite { get; set; }
         public Command CmdSearch { get; set; }
         public Command CmdPrivacyPolicy { get; set; }
         public Command CmdDeleteAccount { get; set; }
@@ -101,6 +103,7 @@ namespace Timeline.ViewModels
             CmdEditTimeline = new Command(CmdEditTimelineExecute);
             CmdDeleteTimeline = new Command(CmdDeleteTimelineExecute);
             CmdShareTimeline = new Command(CmdShareTimelineExecute);
+            CmdAddToFavorite = new Command(CmdAddToFavoriteExecute);
             CmdSearch = new Command(CmdSearchExecute);
             CmdPrivacyPolicy = new Command(CmdPrivacyPolicyExecute);
             CmdDeleteAccount = new Command(CmdDeleteAccountExecute);
@@ -108,6 +111,13 @@ namespace Timeline.ViewModels
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_created", TimelineInfo_created);
             MessagingCenter.Subscribe<VMTimelineInfo, MTimelineInfo>(this, "TimelineInfo_updated", TimelineInfo_updated);
+        }
+
+        public void InitView(MUser loggedInUser)
+        {
+            User = loggedInUser;
+            TimelineFavorites = new ObservableCollection<MTimelineInfo>(Task.Run(async () => await App.services.Database.GetSharedTimelinesByIDs(User.Favorites)).Result);
+
         }
 
         private void TimelineInfo_created(VMTimelineInfo arg1, MTimelineInfo arg2)
@@ -184,6 +194,22 @@ namespace Timeline.ViewModels
             App.services.Database.ShareTimeline(tlinfo, User);
             App.services.Database.UpdateUser(User);
             User.Timelines.ReportItemChange(tlinfo);
+        }
+
+        public void CmdAddToFavoriteExecute(object obj)
+        {
+            MTimelineInfo tlinfo = (MTimelineInfo)obj;
+
+            if(User.Favorites.Contains(tlinfo.TimelineId))
+            {
+                UserDialogs.Instance.Toast("This Timeline is already added to your favorites!");
+                return;
+            }
+
+            User.Favorites.Add(tlinfo.TimelineId);
+            TimelineFavorites.Add(tlinfo);
+            App.services.Database.UpdateUser(User);
+            RaisePropertyChanged("TimelineFavorites");
         }
 
         public async void CmdSearchExecute(object obj)
