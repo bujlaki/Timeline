@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -10,6 +11,7 @@ using Acr.UserDialogs;
 
 using Timeline.Models;
 using Timeline.Objects.Timeline;
+using Timeline.Objects.Collection;
 
 
 namespace Timeline.ViewModels
@@ -20,7 +22,15 @@ namespace Timeline.ViewModels
 
         public string Title { get { return timelineInfo.Name; } }
 
-        public Dictionary<string, Color> EventTypes { get { return timelineInfo.EventTypes; } }
+        public ObservableCollection<MEventType> EventTypes
+        {
+            get {
+                if(timelineInfo==null) return null;
+                return timelineInfo.EventTypes;
+            }
+        }
+
+        public Dictionary<string, Color> EventTypesDict { get; set; }
 
         private TimelineUnits zoomUnit;
         public TimelineUnits ZoomUnit
@@ -37,13 +47,20 @@ namespace Timeline.ViewModels
         }
 
         public Int64 Pixeltime { get; }
-        public ObservableCollection<MTimelineEvent> Events { get; set; }
+        public CustomObservableCollection<MTimelineEvent> Events { get; set; }
         public int LaneCount { get; set; }
 
         private bool eventInfoVisible = false;
         public bool EventInfoVisible {
             get { return eventInfoVisible; }
             set { eventInfoVisible = value; RaisePropertyChanged("EventInfoVisible"); }
+        }
+
+        private bool isEditingEventType = false;
+        public bool IsEditingEventType
+        {
+            get { return isEditingEventType; }
+            set { isEditingEventType = value; RaisePropertyChanged("IsEditingEventType"); }
         }
 
         private MTimelineEvent selectedEvent = null;
@@ -57,6 +74,15 @@ namespace Timeline.ViewModels
             }
         }
 
+        private MEventType selectedEventType;
+        public MEventType SelectedEventType {
+            get {
+                if (selectedEvent == null) return null;
+                return selectedEventType;
+            }
+            set { selectedEventType = value; RaisePropertyChanged("SelectedEventType"); }
+        }
+
         public string SelectedEventTimeFrame {
             get
             {
@@ -68,54 +94,74 @@ namespace Timeline.ViewModels
             }
         }
 
+        private string selectedEventTypeName;
         public string SelectedEventTypeName
         {
             get {
                 if (SelectedEvent == null) return "";
-                return SelectedEvent.EventType;
+                return selectedEventTypeName;
             }
+            set { selectedEventTypeName = value; RaisePropertyChanged("SelectedEventTypeName"); }
         }
 
+        public Color selectedEventTypeColor;
         public Color SelectedEventTypeColor
         {
             get {
                 if (SelectedEvent == null) return Color.Black;
-                return EventTypes[SelectedEvent.EventType];
+                return selectedEventTypeColor;
             }
+            set { selectedEventTypeColor = value; RaisePropertyChanged("SelectedEventTypeColor"); }
         }
 
         //commands
         public Command CmdTap { get; set; }
-        public Command CmdLongTap { get; set; }
         public Command CmdAddEvent { get; set; }
-        public Command CmdOptions { get; set; }
         public Command CmdCloseEventInfo { get; set; }
         public Command CmdEditEventInfo { get; set; }
         public Command CmdDeleteEvent { get; set; }
+        public Command CmdPickType { get; set; }
+        public Command CmdSetEventType { get; set; }
+        public Command CmdCancelEventType { get; set; }
+        public Command CmdGenerateEvents { get; set; }
 
         public VMTimeline() : base()
         {
             CmdTap = new Command(TapExecute);
-            CmdLongTap = new Command(LongTapExecute);
             CmdAddEvent = new Command(CmdAddEventExecute);
-            CmdOptions = new Command(CmdOptionsExecute);
             CmdCloseEventInfo = new Command(CmdCloseEventInfoExecute);
             CmdEditEventInfo = new Command(CmdEditEventInfoExecute);
             CmdDeleteEvent = new Command(CmdDeleteEventExecute);
+            CmdPickType = new Command(CmdPickEventTypeExecute);
+            CmdSetEventType = new Command(CmdSetEventTypeExecute);
+            CmdCancelEventType = new Command(CmdCancelEventTypeExecute);
+            CmdGenerateEvents = new Command(CmdGenerateEventsExecute);
 
-            Events = new ObservableCollection<MTimelineEvent>();
+            Events = new CustomObservableCollection<MTimelineEvent>();
+            EventTypesDict = new Dictionary<string, Color>();
+            EventTypesDict.Add("Default", (Xamarin.Forms.Color)App.Current.Resources["bkgColor1"]);
+
             Date = new TimelineDateTime();
             EventInfoVisible = false;
+            IsEditingEventType = false;
             
             //subscribe to events
             MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_created", TimelineEvent_created);
             MessagingCenter.Subscribe<VMTimelineEvent, MTimelineEvent>(this, "TimelineEvent_updated", TimelineEvent_updated);
+            MessagingCenter.Subscribe<VMGenerateEvents, MTimelineInfo>(this, "TimelineEvents_generated", TimelineEvents_generated);
         }
 
         public void SetModel(MTimelineInfo model)
         {
             timelineInfo = model;
             LoadEvents(timelineInfo.TimelineId);
+
+            //setup eventtypes
+            EventTypesDict.Clear();
+            foreach (MEventType etype in timelineInfo.EventTypes) EventTypesDict.Add(etype.TypeName, etype.Color);
+
+            ZoomUnit = TimelineUnits.Year;
+
             UpdateAllProperties();
         }
 
@@ -138,6 +184,12 @@ namespace Timeline.ViewModels
             RaisePropertyChanged("ItemsSource");
         }
 
+        private void TimelineEvents_generated(VMGenerateEvents arg1, MTimelineInfo arg2)
+        {
+            Events.Clear();
+            LoadEvents(arg2.TimelineId);
+        }
+
         private void TapExecute(object obj)
         {
             TapEventArg arg = (TapEventArg)obj;
@@ -152,30 +204,13 @@ namespace Timeline.ViewModels
             }
 
             SelectedEvent = tlevent;
+            SelectedEventType = EventTypes.FirstOrDefault(x => x.TypeName == SelectedEvent.EventType);
+            SelectedEventTypeName = SelectedEvent.EventType;
+            SelectedEventTypeColor = SelectedEventType.Color;
             EventInfoVisible = true;
         }
 
-        private void LongTapExecute(object obj)
-        {
-            TapEventArg arg = (TapEventArg)obj;
-
-            //new event
-            TimelineDateTime tld = TimelineDateTime.FromTicks(arg.Ticks);
-            tld.Precision = arg.ZoomUnit - 1;
-            
-            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("", tld)));
-        }
-
         private void CmdAddEventExecute(object obj)
-        {
-            //new event
-            TimelineDateTime tld = TimelineDateTime.FromTicks(Date.Ticks);
-            tld.Precision = ZoomUnit - 1;
-
-            MainThread.BeginInvokeOnMainThread(() => App.services.Navigation.GoToTimelineEventView(new MTimelineEvent("", tld)));
-        }
-
-        private void CmdOptionsExecute(object obj)
         {
             //new event
             TimelineDateTime tld = TimelineDateTime.FromTicks(Date.Ticks);
@@ -219,11 +254,36 @@ namespace Timeline.ViewModels
             }
         }
 
+        private void CmdPickEventTypeExecute(object obj)
+        {
+            IsEditingEventType = true;
+        }
+
+        private void CmdSetEventTypeExecute(object obj)
+        {
+            SelectedEvent.EventType = SelectedEventType.TypeName;
+            IsEditingEventType = false;
+            SelectedEventTypeName = SelectedEventType.TypeName;
+            SelectedEventTypeColor = SelectedEventType.Color;
+            SelectedEventType = null;
+            Events.ReportItemChange(SelectedEvent);
+        }
+
+        private void CmdCancelEventTypeExecute(object obj)
+        {
+            IsEditingEventType = false;
+        }
+
+        private void CmdGenerateEventsExecute(object obj)
+        {
+            App.services.Navigation.GoToGenerateEventsPage(timelineInfo);
+        }
+
         public void LoadEvents(string id)
         {
             if (id == "") return;
             Task.Run(async () => {
-                Events = new ObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(id));
+                Events = new CustomObservableCollection<MTimelineEvent>(await App.services.Database.GetEvents(id));
                 LaneCount = EventManager.SortEventsToLanes(Events, 10);
                 RaisePropertyChanged("Events");
             });

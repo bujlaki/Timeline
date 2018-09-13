@@ -34,6 +34,7 @@ namespace Timeline.Services
         private Lazy<VTimelineEvent> timelineEventView;
         private Lazy<VPictograms> pictogramsView;
         private Lazy<VEventType> eventTypeView;
+        private Lazy<VGenerateEvents> generateEventsView;
 
         public NavigationService(VMLocator loc)
         {
@@ -53,6 +54,7 @@ namespace Timeline.Services
             timelineEventView = new Lazy<VTimelineEvent>(() => new VTimelineEvent());
             pictogramsView = new Lazy<VPictograms>(() => new VPictograms());
             eventTypeView = new Lazy<VEventType>(() => new VEventType());
+            generateEventsView = new Lazy<VGenerateEvents>(() => new VGenerateEvents());
         }
 
 		public Page LoginPage()
@@ -130,7 +132,6 @@ namespace Timeline.Services
 
         public void GoToTimelineView(MTimelineInfo timeline)
         {
-            _vmLocator.TimelineViewModel.ZoomUnit = Objects.Timeline.TimelineUnits.Year;
             _vmLocator.TimelineViewModel.SetModel(timeline);
             try
             {
@@ -175,6 +176,12 @@ namespace Timeline.Services
         {
             _vmLocator.EventTypeViewModel.SetModel(etype);
             _navigation.PushModalAsync(eventTypeView.Value);
+        }
+
+        public void GoToGenerateEventsPage(MTimelineInfo tlinfo)
+        {
+            _vmLocator.GenerateEventsViewModel.InitView(tlinfo);
+            _navigation.PushModalAsync(generateEventsView.Value);
         }
 
         public void GoBack() => _navigation.PopModalAsync();

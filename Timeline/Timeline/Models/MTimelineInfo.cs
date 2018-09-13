@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+using Timeline.Objects.Collection;
+
 namespace Timeline.Models
 {
     public class MTimelineInfo
@@ -14,7 +16,8 @@ namespace Timeline.Models
         public string OwnerID { get; set; }
         public string OwnerName { get; set; }
         public string[] Tags { get; set; }
-        public Dictionary<string, Xamarin.Forms.Color> EventTypes { get; set; }
+        //public Dictionary<string, Xamarin.Forms.Color> EventTypes { get; set; }
+        public CustomObservableCollection<MEventType> EventTypes { get; set; }
 
         public MTimelineInfo()
         {
@@ -23,8 +26,10 @@ namespace Timeline.Models
             Description = "";
             Shared = false;
             Tags = new string[] { };
-            EventTypes = new Dictionary<string, Xamarin.Forms.Color>();
-            EventTypes.Add("Default", (Xamarin.Forms.Color)App.Current.Resources["bkgColor1"]);
+            //EventTypes = new Dictionary<string, Xamarin.Forms.Color>();
+            //EventTypes.Add("Default", (Xamarin.Forms.Color)App.Current.Resources["bkgColor1"]);
+            EventTypes = new CustomObservableCollection<MEventType>();
+            EventTypes.Add(new MEventType("Default", (Xamarin.Forms.Color)App.Current.Resources["bkgColor1"]));
         }
 
         public MTimelineInfo(string id) : this()
@@ -50,9 +55,10 @@ namespace Timeline.Models
             target.Tags = Tags;
 
             target.EventTypes.Clear();
-            IDictionaryEnumerator dictionaryEnumerator = EventTypes.GetEnumerator();
-            dictionaryEnumerator.Reset();
-            while (dictionaryEnumerator.MoveNext()) target.EventTypes.Add((string)dictionaryEnumerator.Key, (Xamarin.Forms.Color)dictionaryEnumerator.Value);
+            //IDictionaryEnumerator dictionaryEnumerator = EventTypes.GetEnumerator();
+            //dictionaryEnumerator.Reset();
+            //while (dictionaryEnumerator.MoveNext()) target.EventTypes.Add((string)dictionaryEnumerator.Key, (Xamarin.Forms.Color)dictionaryEnumerator.Value);
+            foreach (MEventType etype in EventTypes) target.EventTypes.Add(etype);
 
             return target;
         }
@@ -67,9 +73,10 @@ namespace Timeline.Models
             Tags = tlinfo.Tags;
 
             EventTypes.Clear();
-            IDictionaryEnumerator dictionaryEnumerator = tlinfo.EventTypes.GetEnumerator();
-            dictionaryEnumerator.Reset();
-            while (dictionaryEnumerator.MoveNext()) EventTypes.Add((string)dictionaryEnumerator.Key, (Xamarin.Forms.Color)dictionaryEnumerator.Value);
+            foreach (MEventType etype in tlinfo.EventTypes) EventTypes.Add(etype);
+            //IDictionaryEnumerator dictionaryEnumerator = tlinfo.EventTypes.GetEnumerator();
+            //dictionaryEnumerator.Reset();
+            //while (dictionaryEnumerator.MoveNext()) EventTypes.Add((string)dictionaryEnumerator.Key, (Xamarin.Forms.Color)dictionaryEnumerator.Value);
         }
     }
 }

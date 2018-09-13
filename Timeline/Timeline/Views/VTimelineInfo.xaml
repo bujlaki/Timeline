@@ -70,10 +70,10 @@
                                             <ColumnDefinition Width="45"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <Label Text="{Binding Key}" Style="{StaticResource linkLabel}" VerticalOptions="Center" Margin="10, 0, 0, 0"/>
+                                        <Label Text="{Binding TypeName}" Style="{StaticResource linkLabel}" VerticalOptions="Center" Margin="10, 0, 0, 0"/>
 
                                         <BoxView Grid.Column="1" Color="White" Margin="5"/>
-                                        <BoxView Grid.Column="1" Color="{Binding Value}" Margin="7">
+                                        <BoxView Grid.Column="1" Color="{Binding Color}" Margin="7">
                                             <BoxView.GestureRecognizers>
                                                 <TapGestureRecognizer Command="{Binding Source={x:Reference eventTypesList}, Path=BindingContext.CmdEditEventType}" 
                                                                   CommandParameter="{Binding .}"/>

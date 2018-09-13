@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Timeline.Controls"
+             xmlns:converters="clr-namespace:Timeline.Converters"
+             xmlns:tabcontrol="clr-namespace:SegmentedTabControl.FormsPlugin;assembly=SegmentedTabControl"
+             x:Class="Timeline.Views.VGenerateEvents"
+             Title="Generate Events"
+             BindingContext="{Binding GenerateEventsViewModel, Source={StaticResource vmLocator}}"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#234b64">
+    <ContentPage.Content>
+        <AbsoluteLayout>
+            <controls:PageTitleControl Title="GENERATE EVENTS"
+                                       AbsoluteLayout.LayoutFlags="All"
+                                       AbsoluteLayout.LayoutBounds="0, 0, 1, 0.1"/>
+
+
+            <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 1, 0.9, 0.9">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+
+                <tabcontrol:SegmentedTabControl Grid.Row="0" 
+                                                UnselectedSegmentTextColor="{StaticResource bkgColor2}"
+                                                UnselectedSegmentBackgroundColor="{StaticResource bkgColor1}" 
+                                                TintColor="{StaticResource bkgColor2}" 
+                                                SelectedSegment="{Binding SelectedSegment, Mode=TwoWay}"
+                                                Command="{Binding CmdTabSegmentTap}">
+                    <tabcontrol:SegmentedTabControl.Children>
+                        <Label Text="Event types and color codes" />
+                        <Label Text="Search tags" />
+                    </tabcontrol:SegmentedTabControl.Children>
+                </tabcontrol:SegmentedTabControl>
+                
+                <!-- SEGMENT1 -->
+                <ScrollView Grid.Row="1" IsVisible="{Binding ShowSegment1}">
+                    <StackLayout Orientation="Vertical">
+                        <Label Style="{StaticResource fieldLabel}" Text="Common title"/>
+                        <controls:XEntry Text="{Binding CommonTitle, Mode=TwoWay}"/>
+                        <Label Style="{StaticResource fieldLabel}" Text="Start date (YYYYMMDD)"/>
+                        <controls:XEntry Text="{Binding StartDateStr, Mode=TwoWay}"/>
+                        <Label Style="{StaticResource fieldLabel}" Text="End date (YYYYMMDD)"/>
+                        <controls:XEntry Text="{Binding EndDateStr, Mode=TwoWay}"/>
+                        <Label Style="{StaticResource fieldLabel}" Text="Query text"/>
+                        <controls:XEntry Text="{Binding QueryText, Mode=TwoWay}"/>
+                    </StackLayout>
+                </ScrollView>
+
+                <Button Grid.Row="2" Text="Generate" Command="{Binding CmdGenerate}"/>
+            </Grid>
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

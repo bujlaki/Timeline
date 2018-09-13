@@ -28,6 +28,7 @@ namespace Timeline.Objects.Timeline
         public SKPaint EventPaint { get; set; }
         public SKPaint EventBorderPaint { get; set; }
         public SKPaint EventTextPaint { get; set; }
+        public SKPaint SummaryEventPaint { get; set; }
         public SKPaint SummaryTextPaint { get; set; }
 
         public TimelineTheme(string userid)
@@ -75,6 +76,10 @@ namespace Timeline.Objects.Timeline
             EventTextPaint.Color = SKColor.Parse(Preferences.Get("eventtext_color", skia.Extensions.ToSKColor(textColor1).ToString()));
             EventTextPaint.TextSize = 48;
 
+            SummaryEventPaint = new SKPaint();
+            SummaryEventPaint.Color = SKColor.Parse(Preferences.Get("summaryevent_color", skia.Extensions.ToSKColor(bkgColor1).ToString()));
+            SummaryEventPaint.Style = SKPaintStyle.Fill;
+
             SummaryTextPaint = new SKPaint();
             SummaryTextPaint.Color = SKColor.Parse(Preferences.Get("summarytext_color", skia.Extensions.ToSKColor(textColor1).ToString()));
             SummaryTextPaint.TextSize = 78;
@@ -93,6 +98,7 @@ namespace Timeline.Objects.Timeline
             Preferences.Set("event_color", EventPaint.Color.ToString());
             Preferences.Set("eventborder_color", EventBorderPaint.Color.ToString());
             Preferences.Set("eventtext_color", EventTextPaint.Color.ToString());
+            Preferences.Set("summaryevent_color", SummaryEventPaint.Color.ToString());
             Preferences.Set("summarytext_color", SummaryTextPaint.Color.ToString());
         }
     }

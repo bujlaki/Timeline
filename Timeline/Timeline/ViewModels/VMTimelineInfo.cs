@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 
 using Timeline.Models;
+using Timeline.Objects.Collection;
 using Acr.UserDialogs;
 using Amporis.Xamarin.Forms.ColorPicker;
 using System.Collections.ObjectModel;
@@ -21,7 +22,7 @@ namespace Timeline.ViewModels
         public bool NewTimeline { get; set; }
         public MTimelineInfo TimelineInfo { get; set; }
 
-        public ObservableCollection<KeyValuePair<string, Color>> EventTypes { get; set; }
+        public CustomObservableCollection<MEventType> EventTypes { get; set; }
         public ObservableCollection<string> Tags { get; set; }
 
         //tab segments
@@ -66,7 +67,7 @@ namespace Timeline.ViewModels
             CmdDeleteTag = new Command(CmdDeleteTagExecute);
 
             TimelineInfo = new MTimelineInfo();
-            EventTypes = new ObservableCollection<KeyValuePair<string, Color>>();
+            EventTypes = new CustomObservableCollection<MEventType>();
             Tags = new ObservableCollection<string>();
         }
 
@@ -83,7 +84,7 @@ namespace Timeline.ViewModels
             TimelineInfo = model.Copy();
 
             EventTypes.Clear();
-            foreach (KeyValuePair<string, Color> kvp in TimelineInfo.EventTypes) EventTypes.Add(kvp);
+            foreach (MEventType etype in TimelineInfo.EventTypes) EventTypes.Add(etype);
 
             Tags.Clear();
             foreach (string tag in TimelineInfo.Tags) Tags.Add(tag);
@@ -108,9 +109,10 @@ namespace Timeline.ViewModels
 
         private void AddEventType(string key, Color color)
         {
-            if (!TimelineInfo.EventTypes.ContainsKey(key)) {
-                TimelineInfo.EventTypes.Add(key, color);
-                EventTypes.Add(new KeyValuePair<string, Color>(key, color));
+            MEventType etype = TimelineInfo.EventTypes.FirstOrDefault(x => x.TypeName == key);
+            if (etype==null) {
+                TimelineInfo.EventTypes.Add(new MEventType(key, color));
+                EventTypes.Add(new MEventType(key, color));
             }
             else {
                 UserDialogs.Instance.Toast("There is already a type with that name");
@@ -120,49 +122,41 @@ namespace Timeline.ViewModels
         private void DeleteEventType(string key)
         {
             var i = -1;
-            if (!TimelineInfo.EventTypes.ContainsKey(key)) return;
-            TimelineInfo.EventTypes.Remove(key);
-            foreach (KeyValuePair<string, Color> kvp in EventTypes)
-            {
-                if (kvp.Key == key) {
-                    i = EventTypes.IndexOf(kvp);
-                    break;
-                }
-            }
-            if (i >= 0) EventTypes.RemoveAt(i);
+            MEventType etype = TimelineInfo.EventTypes.FirstOrDefault(x => x.TypeName == key);
+            if (etype==null) return;
+
+            TimelineInfo.EventTypes.Remove(etype);
+
+            etype = EventTypes.FirstOrDefault(x => x.TypeName == key);
+            EventTypes.Remove(etype);
         }
 
         private void UpdateEventType(string key, Color color)
         {
             var i = -1;
-            if (!TimelineInfo.EventTypes.ContainsKey(key)) return;
-            TimelineInfo.EventTypes[key] = color;
-            foreach(KeyValuePair<string,Color> kvp in EventTypes)
-            {
-                if(kvp.Key == key) {
-                    i = EventTypes.IndexOf(kvp);
-                    break;
-                }
-            }
-            if (i >= 0)
-            {
-                EventTypes.RemoveAt(i);
-                EventTypes.Insert(i, new KeyValuePair<string, Color>(key, color));
-            }
+            MEventType etype = TimelineInfo.EventTypes.FirstOrDefault(x => x.TypeName == key);
+            if (etype == null) return;
+
+            etype.Color = color;
+
+            etype = EventTypes.FirstOrDefault(x => x.TypeName == key);
+            etype.Color = color;
+
+            EventTypes.ReportItemChange(etype);
         }
 
         private void CmdEditEventTypeExecute(object obj)
         {
-            KeyValuePair<string, Color> entry = (KeyValuePair<string, Color>)obj;
-            PickedTypeName = (string)entry.Key;
-            PickedColor = (Color)entry.Value;
+            MEventType etype = (MEventType)obj;
+            PickedTypeName = etype.TypeName;
+            PickedColor = etype.Color;
             IsPicking = true;
         }
 
         private void CmdDeleteEventTypeExecute(object obj)
         {
-            KeyValuePair<string, Color> entry = (KeyValuePair<string, Color>)obj;
-            DeleteEventType(entry.Key);
+            MEventType etype = (MEventType)obj;
+            DeleteEventType(etype.TypeName);
         }
 
         private void CmdSetEventTypeColorExecute(object obj)

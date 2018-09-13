@@ -60,20 +60,20 @@ namespace Timeline.Objects.Database
             doc.Add("description", info.Description);
 
             doc.Add("shared", info.Shared.ToString().ToLower());
-            doc.Add("ownerid", info.OwnerID);
-            doc.Add("ownername", info.OwnerName);
+            if(info.OwnerID!=null) doc.Add("ownerid", info.OwnerID);
+            if(info.OwnerName!=null) doc.Add("ownername", info.OwnerName);
 
             DynamoDBList tags = new DynamoDBList();
             foreach (string tag in info.Tags) { tags.Add(tag); }
             doc.Add("tags", tags);
 
             Document eventtypesDoc = new Document();
-            foreach(KeyValuePair<string, Xamarin.Forms.Color> kvp in info.EventTypes)
+            foreach(MEventType etype in info.EventTypes)
             {
-                Document etype = new Document();
-                etype.Add("name", kvp.Key);
-                etype.Add("color", ColorToHEX(kvp.Value));
-                eventtypesDoc.Add(kvp.Key, etype);
+                Document etypeDoc = new Document();
+                etypeDoc.Add("name", etype.TypeName);
+                etypeDoc.Add("color", ColorToHEX(etype.Color));
+                eventtypesDoc.Add(etype.TypeName, etypeDoc);
             }
             doc.Add("eventtypes", eventtypesDoc);
             return doc;
@@ -95,13 +95,10 @@ namespace Timeline.Objects.Database
 
             var eventTypesDoc = doc.ContainsKey("eventtypes") ? doc["eventtypes"].AsDocument() : null;
             if (eventTypesDoc != null)
-                foreach (Document item in eventTypesDoc.Values)
-                {
-                    if (item["name"] == "Default")
-                        tli.EventTypes["Default"] = Xamarin.Forms.Color.FromHex(item["color"]);
-                    else
-                        tli.EventTypes.Add(item["name"], Xamarin.Forms.Color.FromHex(item["color"]));
-                }
+            {
+                tli.EventTypes.Clear();
+                foreach (Document item in eventTypesDoc.Values) tli.EventTypes.Add(new MEventType(item["name"], Xamarin.Forms.Color.FromHex(item["color"])));
+            }
 
             return tli;
         }

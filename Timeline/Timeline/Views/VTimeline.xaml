@@ -41,13 +41,13 @@
                                TextColor="{StaticResource textColor2}"/>
                     </Grid>
 
-                    <!--<Image Grid.Column="1" Source="options32"
+                    <Image Grid.Column="1" Source="automate32" 
                            HorizontalOptions="Center"
                            VerticalOptions="Center">
                         <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdOptions}"/>
+                            <TapGestureRecognizer Command="{Binding CmdGenerateEvents}"/>
                         </Image.GestureRecognizers>
-                    </Image>-->
+                    </Image>
                     
                     <Image Grid.Column="2" Source="search32" 
                            HorizontalOptions="Center"
@@ -69,7 +69,7 @@
                 
                 <controls:TimelineControl Grid.Row="1" 
                                           x:Name="tlc"
-                                          EventTypes="{Binding EventTypes}"
+                                          EventTypes="{Binding EventTypesDict}"
                                           ItemsSource="{Binding Events, Mode=TwoWay}" 
                                           LaneCount="{Binding LaneCount}" 
                                           TapCommand="{Binding CmdTap}"
@@ -117,7 +117,7 @@
                             <TapGestureRecognizer Command="{Binding CmdEditEventInfo}"/>
                         </Image.GestureRecognizers>
                     </Image>
-                    
+
                     <Image Grid.Column="2" 
                            Source="delete32"
                            HorizontalOptions="Center"
@@ -135,7 +135,7 @@
                             <TapGestureRecognizer Command="{Binding CmdCloseEventInfo}"/>
                         </Image.GestureRecognizers>
                     </Image>
-                    
+
                 </Grid>
 
                 <Grid Grid.Row="1">
@@ -165,10 +165,14 @@
                         <BoxView Grid.Row="3"
                                  Margin="4"
                                  Color="{StaticResource textColor1}"/>
-                        
+
                         <BoxView Grid.Row="3"
                                  Margin="6"
-                                 Color="{Binding SelectedEventTypeColor}"/>
+                                 Color="{Binding SelectedEventTypeColor}">
+                            <BoxView.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CmdPickType}"/>
+                            </BoxView.GestureRecognizers>
+                        </BoxView>
                     </Grid>
 
                     <ScrollView Grid.Column="1">
@@ -188,69 +192,59 @@
                                    FontSize="14"/>
                         </StackLayout>
                     </ScrollView>
-                    
+
                 </Grid>
 
             </Grid>
-            <!--<Grid AbsoluteLayout.LayoutFlags="All" 
-                  AbsoluteLayout.LayoutBounds="0, 1, 1, 0.4" 
-                  IsVisible="{Binding EventInfoVisible}" 
-                  BackgroundColor="#234b64">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="50"/>
-                </Grid.ColumnDefinitions>
 
-                <ScrollView Grid.Column="0">
-                    <StackLayout BindingContext="{Binding EventSelected}" Orientation="Vertical">
-                        <Label Text="{Binding Title}" 
-                               TextColor="#f4bd4f"
-                               FontSize="20"/>
-                        <Label Text="{Binding Description}"
-                               TextColor="#eeebd3"
-                               FontSize="14"/>
-                    </StackLayout>
-                </ScrollView>
-
-                <Image Grid.Column="1" BindingContext="{Binding EventSelected}" Source="{Binding Image.Source}" />
-
-                <Grid Grid.Column="2" BackgroundColor="{StaticResource bkgColor2}">
+            <AbsoluteLayout AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                            BackgroundColor="#bb234b64"
+                            IsVisible="{Binding IsEditingEventType}">
+                <Grid AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.8, 0.6"
+                      BackgroundColor="{StaticResource bkgColor1}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"/>
-                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
 
-                    <Image Grid.Row="0" 
-                           Source="close32"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdCloseEventInfo}"/>
-                        </Image.GestureRecognizers>
-                    </Image>
-                    <Image Grid.Row="1" 
-                           Source="edit32"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdEditEventInfo}"/>
-                        </Image.GestureRecognizers>
-                    </Image>
-                    <Image Grid.Row="2" 
-                           Source="delete32"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding CmdDeleteEvent}"/>
-                        </Image.GestureRecognizers>
-                    </Image>
+                    <BoxView Grid.Row="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Color="#f4bd4f"/>
+                    <Label Grid.Row="0" Text="Event Type" HorizontalOptions="Center" VerticalOptions="Center" FontSize="20" TextColor="Black"/>
+
+                    <ListView Grid.Row="1"
+                              ItemsSource="{Binding EventTypes}"
+                              SelectedItem="{Binding SelectedEventType}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="45"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Grid.Column="0" Text="{Binding TypeName}" Style="{StaticResource linkLabel}"/>
+
+                                        <BoxView Grid.Column="1" Color="White" Margin="5"/>
+                                        <BoxView Grid.Column="1" Color="{Binding Color}" Margin="7"/>
+                                    </Grid>
+
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Text="OK" Margin="5" Command="{Binding CmdSetEventType}"/>
+                        <Button Grid.Column="1" Text="Cancel" Margin="5" Command="{Binding CmdCancelEventType}"/>
+                    </Grid>
                 </Grid>
-
-            </Grid>-->
-            
-
+            </AbsoluteLayout>
         </AbsoluteLayout>
     </ContentPage.Content>
 </ContentPage>

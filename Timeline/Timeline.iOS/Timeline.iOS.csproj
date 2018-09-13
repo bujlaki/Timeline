@@ -233,4 +233,7 @@
   <ItemGroup>
     <BundleResource Include="Resources\favorite32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\automate32.png" />
+  </ItemGroup>
 </Project>

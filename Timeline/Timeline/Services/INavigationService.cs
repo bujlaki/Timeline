@@ -23,6 +23,7 @@ namespace Timeline.Services
         void GoToTimelineEventView(MTimelineEvent tlevent);
         void GoToPictogramsView();
         void GoToEventTypeView(DictionaryEntry etype);
+        void GoToGenerateEventsPage(MTimelineInfo tlinfo);
         void GoBack();
     }
 }
