@@ -624,16 +624,29 @@ namespace Timeline.Controls
 
             if (eventTop > fullheight) return; //OUT OF SCREEN
 
-            if(widthX<200)
+            if(widthX<150)
             {
                 //add to summary
+                int startDateUnitValue = TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit);
+                int startDateSubUnitValue = TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit - 1);
+                int tlDateUnitValue = TimelineDateTime.GetUnitValue(this.Date, ZoomUnit);
+                int tlDateSubUnitValue = TimelineDateTime.GetUnitValue(this.Date, ZoomUnit - 1);
+
                 summaryKey key;
-                if (summarySubUnit) key = new summaryKey(TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit), TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit - 1));
-                else key = new summaryKey(TimelineDateTime.GetUnitValue(e.StartDate, ZoomUnit), 10000);
+                if (summarySubUnit)
+                {
+                    key = new summaryKey(startDateUnitValue, startDateSubUnitValue);
+                    if ((startDateUnitValue == tlDateUnitValue) && (startDateSubUnitValue == tlDateSubUnitValue)) AddToEventsStr(e);
+                }
+                else
+                {
+                    key = new summaryKey(startDateUnitValue, 10000);
+                    if (startDateUnitValue == tlDateUnitValue) AddToEventsStr(e);
+                }
 
                 if (summary.ContainsKey(key)) summary[key] += 1;
                 else summary.Add(key, 1);
-                
+
                 return;
             }
 

@@ -146,8 +146,13 @@ namespace Timeline.ViewModels
                     }
 
                     await App.services.Database.StoreEvents(events);
-                    MessagingCenter.Send<VMGenerateEvents, MTimelineInfo>(this, "TimelineEvents_generated", tlinfo);
-                    App.services.Navigation.GoBack();
+
+                    Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() => 
+                    {
+                        MessagingCenter.Send<VMGenerateEvents, MTimelineInfo>(this, "TimelineEvents_generated", tlinfo);
+                        App.services.Navigation.GoBack();
+                    });
+
                 }
             });
 

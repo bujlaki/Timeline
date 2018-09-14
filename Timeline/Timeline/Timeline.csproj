@@ -9,6 +9,7 @@
     <None Remove="Embedded\Piktograms\crown128.png" />
     <None Remove="Embedded\Piktograms\rip128.png" />
     <None Remove="Embedded\Piktograms\war128.png" />
+    <None Remove="Embedded\Text\PrivacyPolicy.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
     <EmbeddedResource Include="Embedded\Piktograms\crown128.png" />
     <EmbeddedResource Include="Embedded\Piktograms\rip128.png" />
     <EmbeddedResource Include="Embedded\Piktograms\war128.png" />
+    <EmbeddedResource Include="Embedded\Text\PrivacyPolicy.txt" />
   </ItemGroup>
 
   <ItemGroup>

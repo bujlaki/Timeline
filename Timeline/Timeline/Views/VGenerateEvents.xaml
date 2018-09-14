@@ -30,14 +30,18 @@
                                                 SelectedSegment="{Binding SelectedSegment, Mode=TwoWay}"
                                                 Command="{Binding CmdTabSegmentTap}">
                     <tabcontrol:SegmentedTabControl.Children>
-                        <Label Text="Event types and color codes" />
-                        <Label Text="Search tags" />
+                        <Label Text="Method 1" />
+                        <Label Text="Method 2" />
+                        <Label Text="Method 3" />
                     </tabcontrol:SegmentedTabControl.Children>
                 </tabcontrol:SegmentedTabControl>
                 
                 <!-- SEGMENT1 -->
                 <ScrollView Grid.Row="1" IsVisible="{Binding ShowSegment1}">
                     <StackLayout Orientation="Vertical">
+                        <Label Style="{StaticResource fieldLabel}" Text="INFO"/>
+                        <Label Style="{StaticResource fieldLabel}" Text="Generate events using vizgr.org. This Web API provides events extracted from WikiPedia. The events only have description, no title, so a common title is used for the created events." />
+                        <BoxView HeightRequest="10"/>
                         <Label Style="{StaticResource fieldLabel}" Text="Common title"/>
                         <controls:XEntry Text="{Binding CommonTitle, Mode=TwoWay}"/>
                         <Label Style="{StaticResource fieldLabel}" Text="Start date (YYYYMMDD)"/>

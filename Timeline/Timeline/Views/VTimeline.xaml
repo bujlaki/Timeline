@@ -153,10 +153,10 @@
                         </Grid.RowDefinitions>
 
                         <Image Grid.Row="0" 
-                               BindingContext="{Binding SelectedEvent}"
-                               Source="{Binding Image.Source}" 
-                               VerticalOptions="Start"
-                               HorizontalOptions="Center"/>
+                               Source="{Binding SelectedEventImageSource}" 
+                               VerticalOptions="FillAndExpand"
+                               HorizontalOptions="FillAndExpand"
+                               Aspect="AspectFit"/>
 
                         <Label Grid.Row="2"
                                Text="{Binding SelectedEventTypeName}"
@@ -177,8 +177,7 @@
 
                     <ScrollView Grid.Column="1">
                         <StackLayout Orientation="Vertical">
-                            <Label BindingContext="{Binding SelectedEvent}"
-                                   Text="{Binding Title}" 
+                            <Label Text="{Binding SelectedEventTitle}" 
                                    TextColor="{StaticResource textColor2}"
                                    FontSize="20"/>
 
@@ -186,8 +185,7 @@
                                    TextColor="{StaticResource textColor2}"
                                    FontSize="12"/>
 
-                            <Label BindingContext="{Binding SelectedEvent}"
-                                   Text="{Binding Description}"
+                            <Label Text="{Binding SelectedEventDescription}"
                                    TextColor="{StaticResource textColor1}"
                                    FontSize="14"/>
                         </StackLayout>

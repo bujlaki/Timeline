@@ -77,6 +77,7 @@ namespace Timeline.Objects.TouchTracking
                     break;
 
                 case TouchActionType.Moved:
+                    if (!touches.ContainsKey(id)) break;
                     info = touches[id];
                     if (info == null) break;
 
@@ -99,7 +100,8 @@ namespace Timeline.Objects.TouchTracking
                     info.PreviousPoint = info.NewPoint;
                     break;
 
-                case TouchActionType.Released:       
+                case TouchActionType.Released:
+                    if (!touches.ContainsKey(id)) break;
                     info = touches[id];
                     if (info == null) break;
 
@@ -128,6 +130,7 @@ namespace Timeline.Objects.TouchTracking
                     break;
 
                 case TouchActionType.Cancelled:
+                    if (!touches.ContainsKey(id)) break;
                     touches.Remove(id);
                     break;
             }

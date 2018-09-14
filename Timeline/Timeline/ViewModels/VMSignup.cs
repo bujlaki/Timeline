@@ -5,6 +5,8 @@ using Xamarin.Forms;
 
 using Timeline.Services;
 using Acr.UserDialogs;
+using System.IO;
+using System.Reflection;
 
 namespace Timeline.ViewModels
 {
@@ -68,13 +70,19 @@ namespace Timeline.ViewModels
 
         void CmdPrivacyPolicyExecute(object obj)
         {
-            string s = "this is an example text";
-            string msg = "";
-            for (int i = 0; i < 100; i++) msg = msg + s + " ";
+            byte[] buffer;
+            string strpp;
+            using (Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream("Timeline.Embedded.Text.PrivacyPolicy.txt"))
+            {
+                long length = s.Length;
+                buffer = new byte[length];
+                s.Read(buffer, 0, (int)length);
+                strpp = System.Text.Encoding.Default.GetString(buffer);
+            }
 
             AlertConfig ac = new AlertConfig();
             ac.Title = "Privacy Policy";
-            ac.Message = msg;
+            ac.Message = strpp;
 
             UserDialogs.Instance.Alert(ac);
         }

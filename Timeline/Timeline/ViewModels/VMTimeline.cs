@@ -71,6 +71,30 @@ namespace Timeline.ViewModels
                 RaisePropertyChanged("SelectedEventTimeFrame");
                 RaisePropertyChanged("SelectedEventTypeColor");
                 RaisePropertyChanged("SelectedEventTypeName");
+                RaisePropertyChanged("SelectedEventTitle");
+                RaisePropertyChanged("SelectedEventDescription");
+                RaisePropertyChanged("SelectedEventImageSource");
+            }
+        }
+
+        public string SelectedEventTitle {
+            get {
+                if (selectedEvent == null) return "";
+                return selectedEvent.Title;
+            }
+        }
+
+        public string SelectedEventDescription {
+            get {
+                if (selectedEvent == null) return "";
+                return selectedEvent.Description;
+            }
+        }
+
+        public ImageSource SelectedEventImageSource {
+            get {
+                if (selectedEvent == null) return null;
+                return selectedEvent.Image.Source;
             }
         }
 
@@ -154,7 +178,11 @@ namespace Timeline.ViewModels
         public void SetModel(MTimelineInfo model)
         {
             timelineInfo = model;
+            Events.Clear();
             LoadEvents(timelineInfo.TimelineId);
+
+            SelectedEvent = null;
+            IsEditingEventType = false;
 
             //setup eventtypes
             EventTypesDict.Clear();
@@ -178,10 +206,18 @@ namespace Timeline.ViewModels
         private void TimelineEvent_updated(VMTimelineEvent arg1, MTimelineEvent arg2)
         {
             arg2.TimelineId = timelineInfo.TimelineId;
-            Events.Add(arg2);
+            //Events.Add(arg2);
 
             App.services.Database.UpdateEvent(arg2);
             RaisePropertyChanged("ItemsSource");
+
+            RaisePropertyChanged("SelectedEvent");
+            RaisePropertyChanged("SelectedEventTimeFrame");
+            RaisePropertyChanged("SelectedEventTypeColor");
+            RaisePropertyChanged("SelectedEventTypeName");
+            RaisePropertyChanged("SelectedEventTitle");
+            RaisePropertyChanged("SelectedEventDescription");
+            RaisePropertyChanged("SelectedEventImageSource");
         }
 
         private void TimelineEvents_generated(VMGenerateEvents arg1, MTimelineInfo arg2)
@@ -266,6 +302,7 @@ namespace Timeline.ViewModels
             SelectedEventTypeName = SelectedEventType.TypeName;
             SelectedEventTypeColor = SelectedEventType.Color;
             SelectedEventType = null;
+            App.services.Database.UpdateEvent(SelectedEvent);
             Events.ReportItemChange(SelectedEvent);
         }
 
